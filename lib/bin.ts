@@ -1,12 +1,9 @@
 #!/usr/bin/env node
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import "dotenv/config";
 import express from "express";
-import packageJson from "../package.json" with { type: "json" };
 import { createServer } from "./server.js";
-
-const version = packageJson.version;
+import { packageJsonVersion } from "./utils/version.js";
 
 function startStreamableHTTP() {
 	const app = express();
@@ -71,7 +68,7 @@ function startStreamableHTTP() {
 		res.json({
 			status: "ok",
 			timestamp: new Date().toISOString(),
-			currentVersion: version,
+			currentVersion: packageJsonVersion,
 		});
 	});
 
@@ -82,7 +79,7 @@ function startStreamableHTTP() {
 	const port = process.env.PORT ?? 3002;
 	app.listen(port, () => {
 		console.log(
-			`Kontent.ai Learn MCP Server v${version} (Streamable HTTP) running on port ${port}.
+			`Kontent.ai Learn MCP Server v${packageJsonVersion} (Streamable HTTP) running on port ${port}.
 Available endpoint:
 /{environmentId}/mcp (requires Bearer authentication)`,
 		);
@@ -92,7 +89,7 @@ Available endpoint:
 async function startStdio() {
 	const { server } = createServer();
 	const transport = new StdioServerTransport();
-	console.error(`Kontent.ai MCP Server v${version} (stdio) starting`);
+	console.error(`Kontent.ai MCP Server v${packageJsonVersion} (stdio) starting`);
 	await server.connect(transport);
 }
 

@@ -32,5 +32,17 @@
 	},
 	"files": {
 		"includes": ["lib/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts", "sample/**/*.ts", "**/*.json", "!_legacy/**/*"]
-	}
+	},
+	"overrides": [
+		{
+			"includes": ["lib/utils/version.ts"],
+			"linter": {
+				"rules": {
+					"correctness": {
+						"useImportExtensions": "off"
+					}
+				}
+			}
+		}
+	]
 }
