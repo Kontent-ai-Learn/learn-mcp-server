@@ -7,9 +7,6 @@ permissions:
   id-token: write
   contents: read
 
-env:
-    INTEGRATION_ENVIRONMENT_ID: ${{ secrets.INTEGRATION_ENVIRONMENT_ID }}
-
 name: publish-to-npm
 jobs:
   publish:
