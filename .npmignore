@@ -1,0 +1,10 @@
+# Ignore everything
+*
+# And allow following
+!/dist/**
+!package.json
+!.npmignore
+!README.md
+!LICENSE.md
+
+

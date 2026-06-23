@@ -1,0 +1,75 @@
+{
+	"name": "@kontent-ai/learn-mcp-server",
+	"version": "0.0.1",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/kontent-ai/mcp-server"
+	},
+	"private": false,
+	"author": "richard sustek",
+	"license": "MIT",
+	"description": "MCP server for advanced search in kontent.ai learn materials, documentation & API reference",
+	"keywords": [
+		"Kontent",
+		"Kontent.ai",
+		"Kontent.ai Learn",
+		"Kontent.ai Documentation",
+		"Kontent.ai Search"
+	],
+	"engines": {
+		"node": ">= 22"
+	},
+	"packageManager": "pnpm@11.7.0",
+	"exports": {
+		".": {
+			"types": "./dist/public_api.d.ts",
+			"default": "./dist/public_api.js"
+		}
+	},
+	"bin": {
+		"@kontent-ai-learn/learn-mcp-server": "./build/bin.js"
+	},
+	"types": "./dist/public_api.d.ts",
+	"type": "module",
+	"sideEffects": false,
+	"scripts": {
+		"prepublishOnly": "pnpm run build",
+		"eslint": "eslint -c eslint.config.mjs .",
+		"lint": "pnpm run biome:check && pnpm run eslint",
+		"build": "pnpm run lint && pnpm run clean && pnpm run build:ts && pnpm run version",
+		"build:ts": "tsgo -p tsconfig.build.json",
+		"test": "vitest run --config=vitest.config.ts --coverage",
+		"test:unit": "vitest run --config=vitest-unit.config.ts",
+		"test:integration": "vitest run --config=vitest-integration.config.ts",
+		"test:types": "tsgo -p sample/tsconfig.json",
+		"sync-version": "tsx scripts/sync-version.ts",
+		"version": "npm run sync-version sync && npm run biome:fix -- server.json && git add server.json",
+		"biome:check": "biome check",
+		"biome:fix": "biome check --write",
+		"biome:fix:unsafe": "biome check --write --unsafe",
+		"clean": "tsx scripts/clean.ts",
+		"start:stdio": "node build/bin.js stdio",
+		"start:shttp": "node build/bin.js shttp",
+		"dev:stdio": "tsx watch src/bin.ts stdio",
+		"dev:shttp": "tsx watch src/bin.ts shttp"
+	},
+	"dependencies": {
+		"@kontent-ai/core-sdk": "^12.0.0-preview.40",
+		"ts-pattern": "^5",
+		"zod": "^4",
+		"@modelcontextprotocol/sdk": "1.29.0",
+		"express": "5.2.1"
+	},
+	"devDependencies": {
+		"@types/express": "5.0.6",
+		"@kontent-ai/biome-config": "0.7.3",
+		"@kontent-ai/eslint-config": "2.4.1",
+		"eslint": "10.5.0",
+		"@biomejs/biome": "2.5.1",
+		"@types/node": "26.0.0",
+		"vitest": "4.1.9",
+		"tsx": "4.22.4",
+		"@typescript/native-preview": "7.0.0-dev.20260615.1",
+		"esbuild": "0.28.1"
+	}
+}

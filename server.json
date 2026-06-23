@@ -1,0 +1,45 @@
+{
+	"$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+	"name": "io.github.kontent-ai-learn/learn-mcp-server",
+	"description": "MCP server for advanced search in kontent.ai learn materials, documentation & API reference",
+	"repository": {
+		"url": "https://github.com/Kontent-ai-Learn/learn-mcp-server",
+		"source": "github"
+	},
+	"version": "0.0.1",
+	"packages": [
+		{
+			"registryType": "npm",
+			"registryBaseUrl": "https://registry.npmjs.org",
+			"identifier": "@kontent-ai/learn-mcp-server",
+			"version": "0.0.1",
+			"transport": {
+				"type": "stdio"
+			},
+			"packageArguments": [
+				{
+					"type": "positional",
+					"value": "stdio"
+				}
+			],
+			"environmentVariables": []
+		},
+		{
+			"registryType": "npm",
+			"registryBaseUrl": "https://registry.npmjs.org",
+			"identifier": "@kontent-ai/learn-mcp-server",
+			"version": "0.0.1",
+			"transport": {
+				"type": "streamable-http",
+				"url": "http://localhost:3002/mcp"
+			},
+			"packageArguments": [
+				{
+					"type": "positional",
+					"value": "shttp"
+				}
+			],
+			"environmentVariables": []
+		}
+	]
+}
