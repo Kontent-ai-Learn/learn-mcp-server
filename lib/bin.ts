@@ -79,9 +79,8 @@ function startStreamableHTTP() {
 	const port = process.env.PORT ?? 3002;
 	app.listen(port, () => {
 		console.log(
-			`Kontent.ai Learn MCP Server v${packageJsonVersion} (Streamable HTTP) running on port ${port}.
-Available endpoint:
-/{environmentId}/mcp (requires Bearer authentication)`,
+			`Kontent.ai Learn MCP Server v${packageJsonVersion} (Streamable HTTP) running on port ${port}. 
+Available endpoint: /mcp`,
 		);
 	});
 }

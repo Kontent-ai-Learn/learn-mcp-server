@@ -50,8 +50,8 @@
 		"clean": "tsx scripts/clean.ts",
 		"start:stdio": "node build/bin.js stdio",
 		"start:shttp": "node build/bin.js shttp",
-		"dev:stdio": "tsx watch src/bin.ts stdio",
-		"dev:shttp": "tsx watch src/bin.ts shttp"
+		"dev:stdio": "tsx watch lib/bin.ts stdio",
+		"dev:shttp": "tsx watch lib/bin.ts shttp"
 	},
 	"dependencies": {
 		"@kontent-ai/core-sdk": "^12.0.0-preview.40",
