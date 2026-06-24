@@ -43,7 +43,7 @@
 		"test:integration": "vitest run --config=vitest-integration.config.ts",
 		"test:types": "tsgo -p sample/tsconfig.json",
 		"sync-version": "tsx scripts/sync-version.ts",
-		"version": "npm run sync-version sync && npm run biome:fix -- server.json && git add server.json",
+		"version": "pnpm run sync-version sync && pnpm run biome:fix -- server.json && git add server.json",
 		"biome:check": "biome check",
 		"biome:fix": "biome check --write",
 		"biome:fix:unsafe": "biome check --write --unsafe",
