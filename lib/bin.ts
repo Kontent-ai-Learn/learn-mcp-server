@@ -3,7 +3,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
 import { createServer } from "./server.js";
-import { packageJsonVersion } from "./utils/version.js";
+import { packageJsonName, packageJsonVersion } from "./utils/version.js";
 
 function startStreamableHTTP() {
 	const app = express();
@@ -24,7 +24,7 @@ function startStreamableHTTP() {
 			await server.connect(transport);
 			await transport.handleRequest(Object.assign(req, {}), res, req.body);
 		} catch (error) {
-			console.error("Error handling MCP request:", error);
+			console.error(`${packageJsonName}@${packageJsonVersion} - Error handling MCP request:`, error);
 			if (!res.headersSent) {
 				res.status(500).json({
 					jsonrpc: "2.0",
@@ -79,7 +79,7 @@ function startStreamableHTTP() {
 	const port = process.env.PORT ?? 3002;
 	app.listen(port, () => {
 		console.log(
-			`Kontent.ai Learn MCP Server v${packageJsonVersion} (Streamable HTTP) running on port ${port}. 
+			`${packageJsonName}@${packageJsonVersion} (Streamable HTTP) running on port ${port}. 
 Available endpoint: /mcp`,
 		);
 	});
@@ -88,7 +88,7 @@ Available endpoint: /mcp`,
 async function startStdio() {
 	const { server } = createServer();
 	const transport = new StdioServerTransport();
-	console.error(`Kontent.ai MCP Server v${packageJsonVersion} (stdio) starting`);
+	console.error(`${packageJsonName}@${packageJsonVersion} (stdio) starting`);
 	await server.connect(transport);
 }
 
