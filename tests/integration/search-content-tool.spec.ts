@@ -28,8 +28,6 @@ describe("search-content tool (in-memory e2e)", () => {
 				expect(results.length).toBeGreaterThan(0);
 				expect(results.some((r) => /webhook/i.test(r.title) || /webhook/i.test(r.body))).toBe(true);
 
-				console.log("RESUKLTS", results);
-
 				// Every result is annotated with how it matched and its scores.
 				for (const result of results) {
 					expect(["vector", "lexical", "hybrid"]).toContain(result.matchType);
