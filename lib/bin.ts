@@ -2,6 +2,7 @@
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
+import { ensureIndexReady } from "./indexing/service.js";
 import { createServer } from "./server.js";
 import { packageJsonName, packageJsonVersion } from "./utils/version.js";
 
@@ -100,6 +101,10 @@ async function main() {
 		console.error("Please specify a valid transport type: stdio or shttp");
 		process.exit(1);
 	}
+
+	// Build the documentation index once, before serving any requests. The index
+	// is a process-level singleton shared across all requests/tool calls.
+	await ensureIndexReady();
 
 	if (transportType === "stdio") {
 		await startStdio();

@@ -3,6 +3,13 @@
 .env
 .claude/settings.local.json
 
+# RAG index + embedding model cache
+.index/
+.cache/
+*.db
+*.db-wal
+*.db-shm
+
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # compiled output
