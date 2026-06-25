@@ -1,6 +1,7 @@
 import { mkdir } from "node:fs/promises";
 import { dirname } from "node:path";
 import { connect, type Database } from "@tursodatabase/database";
+import { match, P } from "ts-pattern";
 import { CANDIDATE_LIMIT, EMBEDDING_DIM, RRF_K } from "./constants.js";
 import type { DocChunk, MatchType, NormalizedDoc, SearchResult } from "./schema.js";
 
@@ -100,29 +101,32 @@ export async function searchHybrid({
 	readonly queryText: string;
 	readonly limit: number;
 }): Promise<readonly SearchResult[]> {
-	const [vector, lexical] = await Promise.all([vectorCandidates(db, queryVector), lexicalCandidates(db, tokenize(queryText))]);
-	const docScores = aggregate([
-		{ retriever: "vector", candidates: vector },
-		{ retriever: "lexical", candidates: lexical },
+	const [vectorMatches, lexicalMatches] = await Promise.all([
+		vectorCandidates(db, queryVector),
+		lexicalCandidates(db, tokenize(queryText)),
 	]);
-	const ranked = [...docScores.entries()].sort(([, a], [, b]) => b.score - a.score).slice(0, limit);
-	const documents = await getDocuments({ db, ids: ranked.map(([docId]) => docId) });
+	const aggregatedScores = aggregate([
+		{ retriever: "vector", candidates: vectorMatches },
+		{ retriever: "lexical", candidates: lexicalMatches },
+	]);
+	const rankedMatches = [...aggregatedScores.entries()].sort(([, a], [, b]) => b.score - a.score).slice(0, limit);
+	const documents = await getDocuments({ db, ids: rankedMatches.map(([docId]) => docId) });
 
-	return ranked.flatMap<SearchResult>(([docId, docScore]) => {
+	return rankedMatches.flatMap<SearchResult>(([docId, docScore]) => {
 		const doc = documents.get(docId);
-		return doc === undefined
-			? []
-			: [
-					{
-						...doc,
-						matchType: matchTypeOf(docScore),
-						score: round(docScore.score, 6),
-						scores: {
-							vector: docScore.vector === null ? null : round(docScore.vector, 4),
-							lexical: docScore.lexical,
-						},
-					},
-				];
+
+		if (!doc) {
+			return [];
+		}
+		return {
+			...doc,
+			matchType: matchTypeOf(docScore),
+			score: round(docScore.score, 6),
+			scores: {
+				vector: docScore.vector === null ? null : round(docScore.vector, 4),
+				lexical: docScore.lexical,
+			},
+		};
 	});
 }
 
@@ -138,8 +142,8 @@ export async function openStore(path: string): Promise<Database> {
 
 /** Map of document id -> content hash, for change detection. */
 export async function getDocHashes(db: Database): Promise<ReadonlyMap<string, string>> {
-	const stmt = await db.prepare("SELECT id, content_hash FROM documents");
-	const rows = (await stmt.all()) as readonly { readonly id: string; readonly content_hash: string }[];
+	const query = await db.prepare("SELECT id, content_hash FROM documents");
+	const rows = (await query.all()) as readonly { readonly id: string; readonly content_hash: string }[];
 	return new Map(rows.map((row) => [row.id, row.content_hash]));
 }
 
@@ -150,13 +154,13 @@ export async function deleteDocuments(db: Database, ids: readonly string[]): Pro
 	}
 	const delChunks = await db.prepare("DELETE FROM chunks WHERE doc_id = ?");
 	const delDoc = await db.prepare("DELETE FROM documents WHERE id = ?");
-	const tx = db.transaction(async (toDelete: readonly string[]) => {
+	const transaction = db.transaction(async (toDelete: readonly string[]) => {
 		for (const id of toDelete) {
 			await delChunks.run(id);
 			await delDoc.run(id);
 		}
 	});
-	await tx(ids);
+	await transaction(ids);
 }
 
 /**
@@ -169,7 +173,7 @@ export async function replaceDocument(db: Database, doc: NormalizedDoc, chunks: 
 	const insDoc = await db.prepare("INSERT INTO documents (id, title, url, body, content_hash, last_modified) VALUES (?, ?, ?, ?, ?, ?)");
 	const insChunk = await db.prepare("INSERT INTO chunks (chunk_key, doc_id, chunk_index, text) VALUES (?, ?, ?, ?)");
 
-	const tx = db.transaction(async () => {
+	const transaction = db.transaction(async () => {
 		await delChunks.run(doc.id);
 		await delDoc.run(doc.id);
 		await insDoc.run(doc.id, doc.title, doc.url, doc.body, doc.contentHash, doc.lastModified);
@@ -177,7 +181,7 @@ export async function replaceDocument(db: Database, doc: NormalizedDoc, chunks: 
 			await insChunk.run(chunk.chunkKey, chunk.docId, chunk.chunkIndex, chunk.text);
 		}
 	});
-	await tx(undefined);
+	await transaction(undefined);
 }
 
 /** Chunks whose embedding is missing or was produced by a different model. */
@@ -185,8 +189,8 @@ export async function selectChunksToEmbed(
 	db: Database,
 	model: string,
 ): Promise<readonly { readonly chunkKey: string; readonly text: string }[]> {
-	const stmt = await db.prepare("SELECT chunk_key, text FROM chunks WHERE embedding IS NULL OR embedding_model IS NOT ?");
-	const rows = (await stmt.all(model)) as readonly { readonly chunk_key: string; readonly text: string }[];
+	const query = await db.prepare("SELECT chunk_key, text FROM chunks WHERE embedding IS NULL OR embedding_model IS NOT ?");
+	const rows = (await query.all(model)) as readonly { readonly chunk_key: string; readonly text: string }[];
 	return rows.map((row) => ({ chunkKey: row.chunk_key, text: row.text }));
 }
 
@@ -198,13 +202,13 @@ export async function updateEmbeddings(
 	if (items.length === 0) {
 		return;
 	}
-	const upd = await db.prepare("UPDATE chunks SET embedding = vector32(?), embedding_model = ? WHERE chunk_key = ?");
-	const tx = db.transaction(async () => {
+	const query = await db.prepare("UPDATE chunks SET embedding = vector32(?), embedding_model = ? WHERE chunk_key = ?");
+	const transaction = db.transaction(async () => {
 		for (const item of items) {
-			await upd.run(toVectorParam(item.vector), model, item.chunkKey);
+			await query.run(toVectorParam(item.vector), model, item.chunkKey);
 		}
 	});
-	await tx(undefined);
+	await transaction(undefined);
 }
 
 function tokenize(query: string): readonly string[] {
@@ -212,11 +216,11 @@ function tokenize(query: string): readonly string[] {
 }
 
 async function vectorCandidates(db: Database, queryVector: Float32Array): Promise<readonly Candidate[]> {
-	const stmt = await db.prepare(
+	const query = await db.prepare(
 		`SELECT chunk_key, doc_id, vector_distance_cos(embedding, vector32(?)) AS distance
 		 FROM chunks WHERE embedding IS NOT NULL ORDER BY distance ASC LIMIT ?`,
 	);
-	const rows = (await stmt.all(toVectorParam(queryVector), CANDIDATE_LIMIT)) as readonly {
+	const rows = (await query.all(toVectorParam(queryVector), CANDIDATE_LIMIT)) as readonly {
 		readonly chunk_key: string;
 		readonly doc_id: string;
 		readonly distance: number;
@@ -234,8 +238,8 @@ async function lexicalCandidates(db: Database, tokens: readonly string[]): Promi
 	if (tokens.length === 0) {
 		return [];
 	}
-	const stmt = await db.prepare("SELECT chunk_key, doc_id, text FROM chunks WHERE text MATCH ? LIMIT ?");
-	const rows = (await stmt.all(tokens.join(" "), CANDIDATE_LIMIT * 3)) as readonly {
+	const query = await db.prepare("SELECT chunk_key, doc_id, text FROM chunks WHERE text MATCH ? LIMIT ?");
+	const rows = (await query.all(tokens.join(" "), CANDIDATE_LIMIT * 3)) as readonly {
 		readonly chunk_key: string;
 		readonly doc_id: string;
 		readonly text: string;
@@ -257,23 +261,30 @@ async function lexicalCandidates(db: Database, tokens: readonly string[]): Promi
  * score for the breakdown.
  */
 function aggregate(lists: readonly RankedList[]): ReadonlyMap<string, DocScore> {
-	const acc = new Map<string, DocScore>();
+	const result = new Map<string, DocScore>();
 	for (const { retriever, candidates } of lists) {
 		candidates.forEach((candidate, rank) => {
-			const prev = acc.get(candidate.docId) ?? { score: 0, vector: null, lexical: null };
+			const prev = result.get(candidate.docId) ?? { score: 0, vector: null, lexical: null };
 			const best = (current: number | null): number => (current === null ? candidate.raw : Math.max(current, candidate.raw));
-			acc.set(candidate.docId, {
+			result.set(candidate.docId, {
 				score: prev.score + 1 / (RRF_K + rank + 1),
 				vector: retriever === "vector" ? best(prev.vector) : prev.vector,
 				lexical: retriever === "lexical" ? best(prev.lexical) : prev.lexical,
 			});
 		});
 	}
-	return acc;
+	return result;
 }
 
 function matchTypeOf({ vector, lexical }: DocScore): MatchType {
-	return vector !== null && lexical !== null ? "hybrid" : vector !== null ? "vector" : "lexical";
+	return match({ vector, lexical })
+		.returnType<MatchType>()
+		.with({ vector: P.nonNullable, lexical: P.nonNullable }, () => "hybrid")
+		.with({ vector: P.nonNullable }, () => "vector")
+		.with({ lexical: P.nonNullable }, () => "lexical")
+		.otherwise(() => {
+			throw new Error("Invalid score type");
+		});
 }
 
 function round(value: number, places: number): number {
@@ -291,9 +302,9 @@ async function getDocuments({
 	if (ids.length === 0) {
 		return new Map();
 	}
-	const placeholders = ids.map(() => "?").join(", ");
-	const stmt = await db.prepare(`SELECT id, title, url, body FROM documents WHERE id IN (${placeholders})`);
-	const rows = (await stmt.all(...ids)) as readonly {
+	const documentIds = ids.map(() => "?").join(", ");
+	const query = await db.prepare(`SELECT id, title, url, body FROM documents WHERE id IN (${documentIds})`);
+	const rows = (await query.all(...ids)) as readonly {
 		readonly id: string;
 		readonly title: string;
 		readonly url: string;
