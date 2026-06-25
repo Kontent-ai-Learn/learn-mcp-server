@@ -2,7 +2,24 @@ import { mkdir } from "node:fs/promises";
 import { dirname } from "node:path";
 import { connect, type Database } from "@tursodatabase/database";
 import { CANDIDATE_LIMIT, EMBEDDING_DIM, RRF_K } from "./constants.js";
-import type { DocChunk, NormalizedDoc, SearchResult } from "./schema.js";
+import type { DocChunk, MatchType, NormalizedDoc, SearchResult } from "./schema.js";
+
+type DocRecord = { readonly title: string; readonly url: string; readonly body: string };
+
+type Retriever = "vector" | "lexical";
+
+/** A chunk that matched a retriever, carrying that retriever's raw score. */
+type Candidate = { readonly chunkKey: string; readonly docId: string; readonly raw: number };
+
+/** A ranked candidate list paired with the retriever that produced it. */
+type RankedList = { readonly retriever: Retriever; readonly candidates: readonly Candidate[] };
+
+/** Per-document fused score plus the best raw score from each retriever. */
+type DocScore = {
+	readonly score: number; // fused Reciprocal Rank Fusion score
+	readonly vector: number | null; // best cosine similarity across the doc's vector matches
+	readonly lexical: number | null; // best term-hit count across the doc's lexical matches
+};
 
 const DDL = `
 CREATE TABLE IF NOT EXISTS documents (
@@ -66,10 +83,50 @@ const STOPWORDS: ReadonlySet<string> = new Set([
 	"your",
 ]);
 
-const tokenize = (query: string): readonly string[] =>
-	(query.toLowerCase().match(/[a-z0-9]+/g) ?? []).filter((token) => token.length > 2 && !STOPWORDS.has(token));
+/**
+ * Hybrid search: fuse semantic (vector) and lexical (FTS) chunk matches with
+ * RRF, collapse to parent documents, and return each document's full body
+ * annotated with how it matched (`matchType`), the fused `score`, and the raw
+ * per-retriever `scores`.
+ */
+export async function searchHybrid({
+	db,
+	queryVector,
+	queryText,
+	limit,
+}: {
+	readonly db: Database;
+	readonly queryVector: Float32Array;
+	readonly queryText: string;
+	readonly limit: number;
+}): Promise<readonly SearchResult[]> {
+	const [vector, lexical] = await Promise.all([vectorCandidates(db, queryVector), lexicalCandidates(db, tokenize(queryText))]);
+	const docScores = aggregate([
+		{ retriever: "vector", candidates: vector },
+		{ retriever: "lexical", candidates: lexical },
+	]);
+	const ranked = [...docScores.entries()].sort(([, a], [, b]) => b.score - a.score).slice(0, limit);
+	const documents = await getDocuments({ db, ids: ranked.map(([docId]) => docId) });
 
-export const openStore = async (path: string): Promise<Database> => {
+	return ranked.flatMap<SearchResult>(([docId, docScore]) => {
+		const doc = documents.get(docId);
+		return doc === undefined
+			? []
+			: [
+					{
+						...doc,
+						matchType: matchTypeOf(docScore),
+						score: round(docScore.score, 6),
+						scores: {
+							vector: docScore.vector === null ? null : round(docScore.vector, 4),
+							lexical: docScore.lexical,
+						},
+					},
+				];
+	});
+}
+
+export async function openStore(path: string): Promise<Database> {
 	// Turso does not create the parent directory for a file-based database.
 	if (path !== ":memory:") {
 		await mkdir(dirname(path), { recursive: true });
@@ -77,17 +134,17 @@ export const openStore = async (path: string): Promise<Database> => {
 	const db = await connect(path, { experimental: ["index_method"] });
 	await db.exec(DDL);
 	return db;
-};
+}
 
 /** Map of document id -> content hash, for change detection. */
-export const getDocHashes = async (db: Database): Promise<ReadonlyMap<string, string>> => {
+export async function getDocHashes(db: Database): Promise<ReadonlyMap<string, string>> {
 	const stmt = await db.prepare("SELECT id, content_hash FROM documents");
 	const rows = (await stmt.all()) as readonly { readonly id: string; readonly content_hash: string }[];
 	return new Map(rows.map((row) => [row.id, row.content_hash]));
-};
+}
 
 /** Delete documents (and their chunks) that no longer exist in the source. */
-export const deleteDocuments = async (db: Database, ids: readonly string[]): Promise<void> => {
+export async function deleteDocuments(db: Database, ids: readonly string[]): Promise<void> {
 	if (ids.length === 0) {
 		return;
 	}
@@ -100,13 +157,13 @@ export const deleteDocuments = async (db: Database, ids: readonly string[]): Pro
 		}
 	});
 	await tx(ids);
-};
+}
 
 /**
  * Replace a single document and its chunks. New chunks are inserted with a NULL
  * embedding; the embed-missing pass fills them in afterwards.
  */
-export const replaceDocument = async (db: Database, doc: NormalizedDoc, chunks: readonly DocChunk[]): Promise<void> => {
+export async function replaceDocument(db: Database, doc: NormalizedDoc, chunks: readonly DocChunk[]): Promise<void> {
 	const delChunks = await db.prepare("DELETE FROM chunks WHERE doc_id = ?");
 	const delDoc = await db.prepare("DELETE FROM documents WHERE id = ?");
 	const insDoc = await db.prepare("INSERT INTO documents (id, title, url, body, content_hash, last_modified) VALUES (?, ?, ?, ?, ?, ?)");
@@ -121,23 +178,23 @@ export const replaceDocument = async (db: Database, doc: NormalizedDoc, chunks: 
 		}
 	});
 	await tx(undefined);
-};
+}
 
 /** Chunks whose embedding is missing or was produced by a different model. */
-export const selectChunksToEmbed = async (
+export async function selectChunksToEmbed(
 	db: Database,
 	model: string,
-): Promise<readonly { readonly chunkKey: string; readonly text: string }[]> => {
+): Promise<readonly { readonly chunkKey: string; readonly text: string }[]> {
 	const stmt = await db.prepare("SELECT chunk_key, text FROM chunks WHERE embedding IS NULL OR embedding_model IS NOT ?");
 	const rows = (await stmt.all(model)) as readonly { readonly chunk_key: string; readonly text: string }[];
 	return rows.map((row) => ({ chunkKey: row.chunk_key, text: row.text }));
-};
+}
 
-export const updateEmbeddings = async (
+export async function updateEmbeddings(
 	db: Database,
 	model: string,
 	items: readonly { readonly chunkKey: string; readonly vector: Float32Array }[],
-): Promise<void> => {
+): Promise<void> {
 	if (items.length === 0) {
 		return;
 	}
@@ -148,11 +205,13 @@ export const updateEmbeddings = async (
 		}
 	});
 	await tx(undefined);
-};
+}
 
-type ScoredKey = { readonly chunkKey: string; readonly docId: string };
+function tokenize(query: string): readonly string[] {
+	return (query.toLowerCase().match(/[a-z0-9]+/g) ?? []).filter((token) => token.length > 2 && !STOPWORDS.has(token));
+}
 
-const vectorCandidates = async (db: Database, queryVector: Float32Array): Promise<readonly ScoredKey[]> => {
+async function vectorCandidates(db: Database, queryVector: Float32Array): Promise<readonly Candidate[]> {
 	const stmt = await db.prepare(
 		`SELECT chunk_key, doc_id, vector_distance_cos(embedding, vector32(?)) AS distance
 		 FROM chunks WHERE embedding IS NOT NULL ORDER BY distance ASC LIMIT ?`,
@@ -160,16 +219,18 @@ const vectorCandidates = async (db: Database, queryVector: Float32Array): Promis
 	const rows = (await stmt.all(toVectorParam(queryVector), CANDIDATE_LIMIT)) as readonly {
 		readonly chunk_key: string;
 		readonly doc_id: string;
+		readonly distance: number;
 	}[];
-	return rows.map((row) => ({ chunkKey: row.chunk_key, docId: row.doc_id }));
-};
+	// vector_distance_cos returns 1 - cosineSimilarity, so similarity = 1 - distance.
+	return rows.map((row) => ({ chunkKey: row.chunk_key, docId: row.doc_id, raw: 1 - row.distance }));
+}
 
 /**
  * Lexical candidates. Turso's FTS has no usable relevance score (fts_score is a
  * constant), so MATCH is used only to select candidates, which are then ranked
- * app-side by query-term frequency.
+ * app-side by query-term hit count (also returned as the raw lexical score).
  */
-const lexicalCandidates = async (db: Database, tokens: readonly string[]): Promise<readonly ScoredKey[]> => {
+async function lexicalCandidates(db: Database, tokens: readonly string[]): Promise<readonly Candidate[]> {
 	if (tokens.length === 0) {
 		return [];
 	}
@@ -183,46 +244,50 @@ const lexicalCandidates = async (db: Database, tokens: readonly string[]): Promi
 	return rows
 		.map((row) => {
 			const haystack = row.text.toLowerCase();
-			const score = tokens.reduce((sum, token) => sum + haystack.split(token).length - 1, 0);
-			return { chunkKey: row.chunk_key, docId: row.doc_id, score };
+			const hits = tokens.reduce((sum, token) => sum + haystack.split(token).length - 1, 0);
+			return { chunkKey: row.chunk_key, docId: row.doc_id, raw: hits };
 		})
-		.sort((a, b) => b.score - a.score)
-		.slice(0, CANDIDATE_LIMIT)
-		.map(({ chunkKey, docId }) => ({ chunkKey, docId }));
-};
+		.sort((a, b) => b.raw - a.raw)
+		.slice(0, CANDIDATE_LIMIT);
+}
 
-/** Reciprocal Rank Fusion over the two ranked candidate lists. */
-const fuse = (
-	lists: readonly (readonly ScoredKey[])[],
-): { readonly scores: ReadonlyMap<string, number>; readonly docOf: ReadonlyMap<string, string> } => {
-	const scores = new Map<string, number>();
-	const docOf = new Map<string, string>();
-	for (const list of lists) {
-		list.forEach((entry, rank) => {
-			scores.set(entry.chunkKey, (scores.get(entry.chunkKey) ?? 0) + 1 / (RRF_K + rank + 1));
-			docOf.set(entry.chunkKey, entry.docId);
+/**
+ * Aggregate candidate chunks to the document level: sum each retriever's RRF
+ * contribution into the doc's fused score, and keep the best raw per-retriever
+ * score for the breakdown.
+ */
+function aggregate(lists: readonly RankedList[]): ReadonlyMap<string, DocScore> {
+	const acc = new Map<string, DocScore>();
+	for (const { retriever, candidates } of lists) {
+		candidates.forEach((candidate, rank) => {
+			const prev = acc.get(candidate.docId) ?? { score: 0, vector: null, lexical: null };
+			const best = (current: number | null): number => (current === null ? candidate.raw : Math.max(current, candidate.raw));
+			acc.set(candidate.docId, {
+				score: prev.score + 1 / (RRF_K + rank + 1),
+				vector: retriever === "vector" ? best(prev.vector) : prev.vector,
+				lexical: retriever === "lexical" ? best(prev.lexical) : prev.lexical,
+			});
 		});
 	}
-	return { scores, docOf };
-};
+	return acc;
+}
 
-const rankDocIds = (scores: ReadonlyMap<string, number>, docOf: ReadonlyMap<string, string>, limit: number): readonly string[] => {
-	const orderedDocIds = [...scores.entries()]
-		.sort(([, a], [, b]) => b - a)
-		.map(([chunkKey]) => docOf.get(chunkKey))
-		.filter((id): id is string => id !== undefined);
-	const seen = new Set<string>();
-	const result: string[] = []; // local accumulator (dedupe preserving rank order)
-	for (const id of orderedDocIds) {
-		if (!seen.has(id) && result.length < limit) {
-			seen.add(id);
-			result.push(id);
-		}
-	}
-	return result;
-};
+function matchTypeOf({ vector, lexical }: DocScore): MatchType {
+	return vector !== null && lexical !== null ? "hybrid" : vector !== null ? "vector" : "lexical";
+}
 
-const getDocuments = async (db: Database, ids: readonly string[]): Promise<ReadonlyMap<string, SearchResult>> => {
+function round(value: number, places: number): number {
+	const factor = 10 ** places;
+	return Math.round(value * factor) / factor;
+}
+
+async function getDocuments({
+	db,
+	ids,
+}: {
+	readonly db: Database;
+	readonly ids: readonly string[];
+}): Promise<ReadonlyMap<string, DocRecord>> {
 	if (ids.length === 0) {
 		return new Map();
 	}
@@ -235,21 +300,4 @@ const getDocuments = async (db: Database, ids: readonly string[]): Promise<Reado
 		readonly body: string;
 	}[];
 	return new Map(rows.map((row) => [row.id, { title: row.title, url: row.url, body: row.body }]));
-};
-
-/**
- * Hybrid search: fuse semantic (vector) and lexical (FTS) chunk matches with
- * RRF, collapse to parent documents, and return each document's full body.
- */
-export const searchHybrid = async (
-	db: Database,
-	queryVector: Float32Array,
-	queryText: string,
-	limit: number,
-): Promise<readonly SearchResult[]> => {
-	const [vector, lexical] = await Promise.all([vectorCandidates(db, queryVector), lexicalCandidates(db, tokenize(queryText))]);
-	const { scores, docOf } = fuse([vector, lexical]);
-	const docIds = rankDocIds(scores, docOf, limit);
-	const documents = await getDocuments(db, docIds);
-	return docIds.map((id) => documents.get(id)).filter((doc): doc is SearchResult => doc !== undefined);
-};
+}

@@ -39,9 +39,23 @@ export type DocChunk = {
 	readonly text: string;
 };
 
+/** Which retriever(s) surfaced a document. */
+export type MatchType = "vector" | "lexical" | "hybrid";
+
 /** What the search tool returns per matched parent document. */
 export type SearchResult = {
 	readonly title: string;
 	readonly url: string;
 	readonly body: string;
+	/** Which retriever(s) matched: semantic, lexical, or both. */
+	readonly matchType: MatchType;
+	/** Fused Reciprocal Rank Fusion score used for ranking (higher = better). */
+	readonly score: number;
+	/** Raw per-retriever scores; `null` when that retriever did not match. */
+	readonly scores: {
+		/** Cosine similarity (0–1); `null` if no vector match. */
+		readonly vector: number | null;
+		/** Term-hit count; `null` if no lexical match. */
+		readonly lexical: number | null;
+	};
 };

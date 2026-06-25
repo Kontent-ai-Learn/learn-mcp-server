@@ -35,5 +35,5 @@ export const search = async (query: string): Promise<readonly SearchResult[]> =>
 	}
 	const db = await ensureIndexReady();
 	const vector = await embedQuery(trimmed);
-	return searchHybrid(db, vector, trimmed, SEARCH_LIMIT);
+	return searchHybrid({ db, queryVector: vector, queryText: trimmed, limit: SEARCH_LIMIT });
 };

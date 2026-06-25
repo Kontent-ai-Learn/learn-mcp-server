@@ -2,6 +2,11 @@ import { match } from "ts-pattern";
 import { CHUNK_OVERLAP_CHARS, CHUNK_TARGET_CHARS } from "./constants.js";
 import type { DocChunk, NormalizedDoc } from "./schema.js";
 
+type PackState = {
+	readonly done: readonly string[];
+	readonly current: string;
+};
+
 export type ChunkOptions = {
 	readonly targetChars: number;
 	readonly overlapChars: number;
@@ -50,11 +55,6 @@ const overlapTail = (chunk: string, overlapChars: number): string => {
 const seedNext = (previous: string, unit: string, overlapChars: number): string => {
 	const tail = overlapTail(previous, overlapChars);
 	return tail.length > 0 ? `${tail}\n\n${unit}` : unit;
-};
-
-type PackState = {
-	readonly done: readonly string[];
-	readonly current: string;
 };
 
 /**
