@@ -1,26 +1,5 @@
 import { z } from "zod";
 
-/**
- * Shape of a single source document. The Zod schema is the source of truth;
- * all types are derived via `z.infer`.
- *
- * NOTE: these field names match the bundled sample data. When `loadSourceDocs`
- * is switched to a real export (remote JSON / Kontent.ai Delivery API), adjust
- * this schema (and wrap with `{ items: [...] }` if the export is not a
- * top-level array).
- */
-export const sourceDocSchema = z.object({
-	id: z.string().min(1),
-	title: z.string().min(1),
-	url: z.url(), // citation only — never fetched/scraped
-	body: z.string(), // plain text
-	last_modified: z.iso.datetime().optional(),
-});
-
-export const sourceDocsSchema = z.array(sourceDocSchema);
-
-export type SourceDoc = z.infer<typeof sourceDocSchema>;
-
 /** A source document after normalisation, with a content hash for change detection. */
 export type NormalizedDoc = {
 	readonly id: string;
@@ -59,3 +38,25 @@ export type SearchResult = {
 		readonly lexical: number | null;
 	};
 };
+
+/**
+ * Shape of a single source document. The Zod schema is the source of truth;
+ * `SourceDoc` is derived via `z.infer` (hence the schema const necessarily
+ * precedes the inferred type).
+ *
+ * NOTE: these field names match the bundled sample data. When `loadSourceDocs`
+ * is switched to a real export (remote JSON / Kontent.ai Delivery API), adjust
+ * this schema (and wrap with `{ items: [...] }` if the export is not a
+ * top-level array).
+ */
+export const sourceDocSchema = z.object({
+	id: z.string().min(1),
+	title: z.string().min(1),
+	url: z.url(), // citation only — never fetched/scraped
+	body: z.string(), // plain text
+	last_modified: z.iso.datetime().optional(),
+});
+
+export const sourceDocsSchema = z.array(sourceDocSchema);
+
+export type SourceDoc = z.infer<typeof sourceDocSchema>;
