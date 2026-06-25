@@ -10,6 +10,16 @@
 - Prefer `map`, `filter`, `reduce`, and other higher-order functions over imperative loops
 - Prefer early returns over nested conditionals
 
+## File Organization
+
+- Order members within a file top-to-bottom by kind:
+  1. `import`s
+  2. `type` / `interface` declarations
+  3. `const`s and other module-level configuration/values
+  4. exported functions and other exported members
+  5. non-exported (private) helpers and members last
+- Place an exported function above the private helpers it relies on (the helpers sit in the final group); module-level `const` arrow functions are only invoked at call time, so a later definition is fine at runtime.
+
 ## Libraries
 
 - Use **ts-pattern** for non-trivial `switch`/`if-else` chains — anything beyond a simple 2-branch condition should use `match()` from `ts-pattern`
