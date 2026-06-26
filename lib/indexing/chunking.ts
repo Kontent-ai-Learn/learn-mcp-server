@@ -7,7 +7,7 @@ type PackState = {
 	readonly current: string;
 };
 
-export type ChunkOptions = {
+type ChunkOptions = {
 	readonly targetChars: number;
 	readonly overlapChars: number;
 };
@@ -17,10 +17,6 @@ const defaultOptions: ChunkOptions = {
 	overlapChars: CHUNK_OVERLAP_CHARS,
 };
 
-/**
- * Split plain text into overlapping, paragraph-aligned chunks of roughly
- * `targetChars`. Pure: no I/O, deterministic.
- */
 export function chunkPlainText(text: string, options: ChunkOptions = defaultOptions): readonly string[] {
 	const { targetChars, overlapChars } = options;
 	const units = splitParagraphs(text).flatMap((paragraph) =>
@@ -42,7 +38,6 @@ export function chunkPlainText(text: string, options: ChunkOptions = defaultOpti
 	return packed.current.length > 0 ? [...packed.done, packed.current] : packed.done;
 }
 
-/** Chunk a normalised document into keyed `DocChunk`s. */
 export function chunkDoc(doc: NormalizedDoc, options: ChunkOptions = defaultOptions): readonly DocChunk[] {
 	return chunkPlainText(doc.body, options).map((text, chunkIndex) => ({
 		chunkKey: `${doc.id}:${chunkIndex}`,
