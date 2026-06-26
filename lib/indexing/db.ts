@@ -2,6 +2,14 @@ import { mkdir } from "node:fs/promises";
 import { dirname } from "node:path";
 import { connect, type Database } from "@tursodatabase/database";
 import { match, P } from "ts-pattern";
+import {
+	buildCreateTableQuery,
+	buildDeleteQuery,
+	buildInsertQuery,
+	buildSelectQuery,
+	buildUpdateQuery,
+	type TableDefinition,
+} from "../utils/db-utils.js";
 import { CANDIDATE_LIMIT, EMBEDDING_DIM, RRF_K } from "./config.js";
 import type { DocChunk, MatchType, NormalizedDoc, SearchResult } from "./schema.js";
 
@@ -22,27 +30,40 @@ type DocScore = {
 	readonly lexical: number | null; // best term-hit count across the doc's lexical matches
 };
 
-const DDL = `
-CREATE TABLE IF NOT EXISTS documents (
-	id            TEXT PRIMARY KEY,
-	title         TEXT NOT NULL,
-	url           TEXT NOT NULL,
-	body          TEXT NOT NULL,
-	content_hash  TEXT NOT NULL,
-	last_modified TEXT
-);
-CREATE TABLE IF NOT EXISTS chunks (
-	id              INTEGER PRIMARY KEY,
-	chunk_key       TEXT NOT NULL UNIQUE,
-	doc_id          TEXT NOT NULL,
-	chunk_index     INTEGER NOT NULL,
-	text            TEXT NOT NULL,
-	embedding       F32_BLOB(${EMBEDDING_DIM}),
-	embedding_model TEXT
-);
-CREATE INDEX IF NOT EXISTS idx_chunks_doc_id ON chunks(doc_id);
-CREATE INDEX IF NOT EXISTS idx_chunks_fts ON chunks USING fts (text);
-`;
+const DOCUMENTS_TABLE: TableDefinition<"documents", "id" | "title" | "url" | "body" | "contentHash" | "lastModified"> = {
+	tableName: "documents",
+	columns: {
+		id: { name: "id", type: "TEXT", primaryKey: true },
+		title: { name: "title", type: "TEXT", notNull: true },
+		url: { name: "url", type: "TEXT", notNull: true },
+		body: { name: "body", type: "TEXT", notNull: true },
+		contentHash: { name: "contentHash", type: "TEXT", notNull: true },
+		lastModified: { name: "lastModified", type: "TEXT" },
+	},
+};
+
+const CHUNKS_TABLE: TableDefinition<"chunks", "id" | "chunkKey" | "docId" | "chunkIndex" | "text" | "embedding" | "embeddingModel"> = {
+	tableName: "chunks",
+	columns: {
+		id: { name: "id", type: "INTEGER", primaryKey: true },
+		chunkKey: { name: "chunkKey", type: "TEXT", notNull: true, unique: true },
+		docId: { name: "docId", type: "TEXT", notNull: true },
+		chunkIndex: { name: "chunkIndex", type: "INTEGER", notNull: true },
+		text: { name: "text", type: "TEXT", notNull: true },
+		embedding: { name: "embedding", type: `F32_BLOB(${EMBEDDING_DIM})` },
+		embeddingModel: { name: "embeddingModel", type: "TEXT" },
+	},
+};
+
+function buildCreateIndexesQuery(): string {
+	return `
+CREATE INDEX IF NOT EXISTS idx_chunks_doc_id ON ${CHUNKS_TABLE.tableName}(${CHUNKS_TABLE.columns.docId.name});
+CREATE INDEX IF NOT EXISTS idx_chunks_fts ON ${CHUNKS_TABLE.tableName} USING fts (${CHUNKS_TABLE.columns.text.name});`;
+}
+
+function buildCreateTablesQuery(): string {
+	return [buildCreateTableQuery(DOCUMENTS_TABLE), buildCreateTableQuery(CHUNKS_TABLE), buildCreateIndexesQuery()].join("\n");
+}
 
 /** Turso represents a vector literal as a JSON array string passed to vector32(). */
 const toVectorParam = (vector: Float32Array): string => JSON.stringify(Array.from(vector));
@@ -84,12 +105,6 @@ const STOPWORDS: ReadonlySet<string> = new Set([
 	"your",
 ]);
 
-/**
- * Hybrid search: fuse semantic (vector) and lexical (FTS) chunk matches with
- * RRF, collapse to parent documents, and return each document's full body
- * annotated with how it matched (`matchType`), the fused `score`, and the raw
- * per-retriever `scores`.
- */
 export async function searchHybrid({
 	db,
 	queryVector,
@@ -130,21 +145,21 @@ export async function searchHybrid({
 	});
 }
 
-export async function openStore(path: string): Promise<Database> {
+export async function openDb(path: string): Promise<Database> {
 	// Turso does not create the parent directory for a file-based database.
 	if (path !== ":memory:") {
 		await mkdir(dirname(path), { recursive: true });
 	}
 	const db = await connect(path, { experimental: ["index_method"] });
-	await db.exec(DDL);
+	await db.exec(buildCreateTablesQuery());
 	return db;
 }
 
 /** Map of document id -> content hash, for change detection. */
 export async function getDocHashes(db: Database): Promise<ReadonlyMap<string, string>> {
-	const query = await db.prepare("SELECT id, content_hash FROM documents");
-	const rows = (await query.all()) as readonly { readonly id: string; readonly content_hash: string }[];
-	return new Map(rows.map((row) => [row.id, row.content_hash]));
+	const query = await db.prepare(buildSelectQuery({ definition: DOCUMENTS_TABLE, columnKeys: ["id", "contentHash"] }));
+	const rows = (await query.all()) as readonly { readonly id: string; readonly contentHash: string }[];
+	return new Map(rows.map((row) => [row.id, row.contentHash]));
 }
 
 /** Delete documents (and their chunks) that no longer exist in the source. */
@@ -152,8 +167,8 @@ export async function deleteDocuments(db: Database, ids: readonly string[]): Pro
 	if (ids.length === 0) {
 		return;
 	}
-	const delChunks = await db.prepare("DELETE FROM chunks WHERE doc_id = ?");
-	const delDoc = await db.prepare("DELETE FROM documents WHERE id = ?");
+	const delChunks = await db.prepare(buildDeleteQuery(CHUNKS_TABLE, "docId"));
+	const delDoc = await db.prepare(buildDeleteQuery(DOCUMENTS_TABLE, "id"));
 	const transaction = db.transaction(async (toDelete: readonly string[]) => {
 		for (const id of toDelete) {
 			await delChunks.run(id);
@@ -168,10 +183,10 @@ export async function deleteDocuments(db: Database, ids: readonly string[]): Pro
  * embedding; the embed-missing pass fills them in afterwards.
  */
 export async function replaceDocument(db: Database, doc: NormalizedDoc, chunks: readonly DocChunk[]): Promise<void> {
-	const delChunks = await db.prepare("DELETE FROM chunks WHERE doc_id = ?");
-	const delDoc = await db.prepare("DELETE FROM documents WHERE id = ?");
-	const insDoc = await db.prepare("INSERT INTO documents (id, title, url, body, content_hash, last_modified) VALUES (?, ?, ?, ?, ?, ?)");
-	const insChunk = await db.prepare("INSERT INTO chunks (chunk_key, doc_id, chunk_index, text) VALUES (?, ?, ?, ?)");
+	const delChunks = await db.prepare(buildDeleteQuery(CHUNKS_TABLE, "docId"));
+	const delDoc = await db.prepare(buildDeleteQuery(DOCUMENTS_TABLE, "id"));
+	const insDoc = await db.prepare(buildInsertQuery(DOCUMENTS_TABLE, ["id", "title", "url", "body", "contentHash", "lastModified"]));
+	const insChunk = await db.prepare(buildInsertQuery(CHUNKS_TABLE, ["chunkKey", "docId", "chunkIndex", "text"]));
 
 	const transaction = db.transaction(async () => {
 		await delChunks.run(doc.id);
@@ -189,9 +204,11 @@ export async function selectChunksToEmbed(
 	db: Database,
 	model: string,
 ): Promise<readonly { readonly chunkKey: string; readonly text: string }[]> {
-	const query = await db.prepare("SELECT chunk_key, text FROM chunks WHERE embedding IS NULL OR embedding_model IS NOT ?");
-	const rows = (await query.all(model)) as readonly { readonly chunk_key: string; readonly text: string }[];
-	return rows.map((row) => ({ chunkKey: row.chunk_key, text: row.text }));
+	const query = await db.prepare(
+		`SELECT ${CHUNKS_TABLE.columns.chunkKey.name}, ${CHUNKS_TABLE.columns.text.name} FROM ${CHUNKS_TABLE.tableName} WHERE ${CHUNKS_TABLE.columns.embedding.name} IS NULL OR ${CHUNKS_TABLE.columns.embeddingModel.name} IS NOT ?`,
+	);
+	const rows = (await query.all(model)) as readonly { readonly chunkKey: string; readonly text: string }[];
+	return rows.map((row) => ({ chunkKey: row.chunkKey, text: row.text }));
 }
 
 export async function updateEmbeddings(
@@ -202,7 +219,13 @@ export async function updateEmbeddings(
 	if (items.length === 0) {
 		return;
 	}
-	const query = await db.prepare("UPDATE chunks SET embedding = vector32(?), embedding_model = ? WHERE chunk_key = ?");
+	const query = await db.prepare(
+		buildUpdateQuery({
+			definition: CHUNKS_TABLE,
+			update: [{ column: "embedding", value: "vector32(?)" }, "embeddingModel"],
+			whereColumn: "chunkKey",
+		}),
+	);
 	const transaction = db.transaction(async () => {
 		for (const item of items) {
 			await query.run(toVectorParam(item.vector), model, item.chunkKey);
@@ -217,16 +240,16 @@ function tokenize(query: string): readonly string[] {
 
 async function vectorCandidates(db: Database, queryVector: Float32Array): Promise<readonly Candidate[]> {
 	const query = await db.prepare(
-		`SELECT chunk_key, doc_id, vector_distance_cos(embedding, vector32(?)) AS distance
-		 FROM chunks WHERE embedding IS NOT NULL ORDER BY distance ASC LIMIT ?`,
+		`SELECT ${CHUNKS_TABLE.columns.chunkKey.name}, ${CHUNKS_TABLE.columns.docId.name}, vector_distance_cos(${CHUNKS_TABLE.columns.embedding.name}, vector32(?)) AS distance
+		 FROM ${CHUNKS_TABLE.tableName} WHERE ${CHUNKS_TABLE.columns.embedding.name} IS NOT NULL ORDER BY distance ASC LIMIT ?`,
 	);
 	const rows = (await query.all(toVectorParam(queryVector), CANDIDATE_LIMIT)) as readonly {
-		readonly chunk_key: string;
-		readonly doc_id: string;
+		readonly chunkKey: string;
+		readonly docId: string;
 		readonly distance: number;
 	}[];
 	// vector_distance_cos returns 1 - cosineSimilarity, so similarity = 1 - distance.
-	return rows.map((row) => ({ chunkKey: row.chunk_key, docId: row.doc_id, raw: 1 - row.distance }));
+	return rows.map((row) => ({ chunkKey: row.chunkKey, docId: row.docId, raw: 1 - row.distance }));
 }
 
 /**
@@ -238,10 +261,12 @@ async function lexicalCandidates(db: Database, tokens: readonly string[]): Promi
 	if (tokens.length === 0) {
 		return [];
 	}
-	const query = await db.prepare("SELECT chunk_key, doc_id, text FROM chunks WHERE text MATCH ? LIMIT ?");
+	const query = await db.prepare(
+		`SELECT ${CHUNKS_TABLE.columns.chunkKey.name}, ${CHUNKS_TABLE.columns.docId.name}, ${CHUNKS_TABLE.columns.text.name} FROM ${CHUNKS_TABLE.tableName} WHERE text MATCH ? LIMIT ?`,
+	);
 	const rows = (await query.all(tokens.join(" "), CANDIDATE_LIMIT * 3)) as readonly {
-		readonly chunk_key: string;
-		readonly doc_id: string;
+		readonly chunkKey: string;
+		readonly docId: string;
 		readonly text: string;
 	}[];
 
@@ -249,7 +274,7 @@ async function lexicalCandidates(db: Database, tokens: readonly string[]): Promi
 		.map((row) => {
 			const haystack = row.text.toLowerCase();
 			const hits = tokens.reduce((sum, token) => sum + haystack.split(token).length - 1, 0);
-			return { chunkKey: row.chunk_key, docId: row.doc_id, raw: hits };
+			return { chunkKey: row.chunkKey, docId: row.docId, raw: hits };
 		})
 		.sort((a, b) => b.raw - a.raw)
 		.slice(0, CANDIDATE_LIMIT);
@@ -302,8 +327,13 @@ async function getDocuments({
 	if (ids.length === 0) {
 		return new Map();
 	}
-	const documentIds = ids.map(() => "?").join(", ");
-	const query = await db.prepare(`SELECT id, title, url, body FROM documents WHERE id IN (${documentIds})`);
+	const query = await db.prepare(
+		buildSelectQuery({
+			definition: DOCUMENTS_TABLE,
+			columnKeys: ["id", "title", "url", "body"],
+			where: { column: "id", operator: "IN", placeholderCount: ids.length },
+		}),
+	);
 	const rows = (await query.all(...ids)) as readonly {
 		readonly id: string;
 		readonly title: string;

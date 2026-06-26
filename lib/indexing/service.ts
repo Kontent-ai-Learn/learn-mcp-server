@@ -1,8 +1,8 @@
 import type { Database } from "@tursodatabase/database";
 import { getDbPath, SEARCH_LIMIT } from "./config.js";
+import { openDb, searchHybrid } from "./db.js";
 import { embedQuery } from "./embeddings.js";
 import type { SearchResult } from "./schema.js";
-import { openStore, searchHybrid } from "./store.js";
 import { syncIndex } from "./sync.js";
 
 /**
@@ -15,7 +15,6 @@ import { syncIndex } from "./sync.js";
  */
 const state: { ready: Promise<Database> | null } = { ready: null };
 
-/** Idempotent: opens the DB and runs the incremental sync on first call only. */
 export async function ensureIndexReady(): Promise<Database> {
 	state.ready ??= initOnce();
 	return await state.ready;
@@ -33,7 +32,7 @@ export async function search(query: string): Promise<readonly SearchResult[]> {
 }
 
 async function initOnce(): Promise<Database> {
-	const db = await openStore(getDbPath());
+	const db = await openDb(getDbPath());
 	await syncIndex(db);
 	return db;
 }

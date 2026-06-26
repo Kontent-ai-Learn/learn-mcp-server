@@ -2,10 +2,10 @@ import { createHash } from "node:crypto";
 import type { Database } from "@tursodatabase/database";
 import { chunkDoc } from "./chunking.js";
 import { EMBED_BATCH_SIZE, EMBEDDING_MODEL } from "./config.js";
+import { deleteDocuments, getDocHashes, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "./db.js";
 import { embedTexts } from "./embeddings.js";
 import type { NormalizedDoc, SourceDoc } from "./schema.js";
 import { loadSourceDocs } from "./source.js";
-import { deleteDocuments, getDocHashes, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "./store.js";
 
 /**
  * Bring the index up to date with the source: diff by content hash, re-chunk
