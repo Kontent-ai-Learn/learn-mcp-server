@@ -263,5 +263,4 @@ function buildCreateTablesQuery(): string {
 	return [buildCreateTableQuery(DOCUMENTS_TABLE), buildCreateTableQuery(CHUNKS_TABLE), buildCreateIndexesQuery()].join("\n");
 }
 
-/** Turso represents a vector literal as a JSON array string passed to vector32(). */
 const toVectorParam = (vector: Float32Array): string => JSON.stringify(Array.from(vector));

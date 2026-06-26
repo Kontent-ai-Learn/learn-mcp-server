@@ -13,9 +13,10 @@ export type ColumnDefinition = {
 	readonly unique?: boolean;
 };
 
-export type TableDefinition<TName extends string, TColumn extends string> = {
+/** A table keyed by its row type; `columns` holds one metadata entry per row field. */
+export type TableDefinition<TName extends string, TRow> = {
 	readonly tableName: TName;
-	readonly columns: Record<TColumn, ColumnDefinition>;
+	readonly columns: Record<keyof TRow & string, ColumnDefinition>;
 };
 
 export type SqlWhere<TColumn extends string> =
@@ -24,26 +25,7 @@ export type SqlWhere<TColumn extends string> =
 
 export type UpdateValue = SqlValue | { readonly expression: string; readonly params: readonly SqlValue[] };
 
-/** Maps a column's SQL type to its TypeScript value type. */
-type SqlColumnTsType<TSqlType extends string> = TSqlType extends "TEXT"
-	? string
-	: TSqlType extends "INTEGER" | "REAL"
-		? number
-		: TSqlType extends "BLOB" | `F32_BLOB(${string})` | `F8_BLOB(${string})`
-			? Uint8Array
-			: SqlValue;
-
-/** A column's value type, made nullable unless it is NOT NULL or a primary key. */
-type ColumnTsValue<TColumn extends ColumnDefinition> = TColumn extends { readonly notNull: true } | { readonly primaryKey: true }
-	? SqlColumnTsType<TColumn["type"]>
-	: SqlColumnTsType<TColumn["type"]> | null;
-
-/** The row shape produced by selecting `TColumn` columns from `TDef`, keyed by column key. */
-type SelectedRow<TDef extends TableDefinition<string, string>, TColumn extends keyof TDef["columns"]> = {
-	readonly [Key in TColumn]: ColumnTsValue<TDef["columns"][Key]>;
-};
-
-export function buildCreateTableQuery<TName extends string, TColumn extends string>(definition: TableDefinition<TName, TColumn>): string {
+export function buildCreateTableQuery<TName extends string, TRow>(definition: TableDefinition<TName, TRow>): string {
 	const columnDefs = Object.values<ColumnDefinition>(definition.columns)
 		.map((col) => {
 			const parts: string[] = [col.name, col.type];
@@ -63,64 +45,64 @@ export function buildCreateTableQuery<TName extends string, TColumn extends stri
 }
 
 /** Inserts a row, binding the provided column values by name. Runs directly (no prepare). */
-export async function insertInto<TName extends string, TColumn extends string>(
+export async function insertInto<TName extends string, TRow>(
 	db: Database,
 	{
 		definition,
 		values,
-	}: { readonly definition: TableDefinition<TName, TColumn>; readonly values: Partial<Record<NoInfer<TColumn>, SqlValue>> },
+	}: { readonly definition: TableDefinition<TName, TRow>; readonly values: Partial<Record<keyof TRow & string, SqlValue>> },
 ): Promise<SqlRunResult> {
 	const entries = Object.entries(values) as readonly [string, SqlValue][];
-	const names = entries.map(([key]) => definition.columns[key as TColumn].name).join(", ");
+	const names = entries.map(([key]) => columnName(definition, key as keyof TRow & string)).join(", ");
 	const placeholders = entries.map(() => "?").join(", ");
 	const params = entries.map(([, value]) => value);
 	return await db.run(`INSERT INTO ${definition.tableName} (${names}) VALUES (${placeholders})`, ...params);
 }
 
 /** Deletes rows matching `where`. `where` is required to avoid an accidental delete-all. */
-export async function deleteFrom<TName extends string, TColumn extends string>(
+export async function deleteFrom<TName extends string, TRow>(
 	db: Database,
-	{ definition, where }: { readonly definition: TableDefinition<TName, TColumn>; readonly where: SqlWhere<NoInfer<TColumn>> },
+	{ definition, where }: { readonly definition: TableDefinition<TName, TRow>; readonly where: SqlWhere<keyof TRow & string> },
 ): Promise<SqlRunResult> {
 	const { clause, params } = buildWhere(definition, where);
 	return await db.run(`DELETE FROM ${definition.tableName}${clause}`, ...params);
 }
 
-export async function updateTable<TName extends string, TColumn extends string>(
+export async function updateTable<TName extends string, TRow>(
 	db: Database,
 	{
 		definition,
 		set,
 		where,
 	}: {
-		readonly definition: TableDefinition<TName, TColumn>;
-		readonly set: Partial<Record<NoInfer<TColumn>, UpdateValue>>;
-		readonly where: { readonly column: NoInfer<TColumn>; readonly value: SqlValue };
+		readonly definition: TableDefinition<TName, TRow>;
+		readonly set: Partial<Record<keyof TRow & string, UpdateValue>>;
+		readonly where: { readonly column: keyof TRow & string; readonly value: SqlValue };
 	},
 ): Promise<SqlRunResult> {
 	const assignments = (Object.entries(set) as readonly [string, UpdateValue][]).map(([key, value]) => {
-		const name = definition.columns[key as TColumn].name;
+		const name = columnName(definition, key as keyof TRow & string);
 		return match(value)
 			.with({ expression: P.string }, (expr) => ({ sql: `${name} = ${expr.expression}`, params: expr.params }))
 			.otherwise((bound) => ({ sql: `${name} = ?`, params: [bound] as readonly SqlValue[] }));
 	});
 	const setClause = assignments.map((assignment) => assignment.sql).join(", ");
 	const params = [...assignments.flatMap((assignment) => assignment.params), where.value];
-	return await db.run(`UPDATE ${definition.tableName} SET ${setClause} WHERE ${definition.columns[where.column].name} = ?`, ...params);
+	return await db.run(`UPDATE ${definition.tableName} SET ${setClause} WHERE ${columnName(definition, where.column)} = ?`, ...params);
 }
 
-export async function selectFrom<TDef extends TableDefinition<string, string>, TColumn extends keyof TDef["columns"] & string>(
+export async function selectFrom<TName extends string, TRow, TColumn extends keyof TRow & string>(
 	db: Database,
 	{
 		definition,
 		columns,
 		where,
 	}: {
-		readonly definition: TDef;
+		readonly definition: TableDefinition<TName, TRow>;
 		readonly columns: readonly TColumn[];
-		readonly where?: SqlWhere<keyof TDef["columns"] & string>;
+		readonly where?: SqlWhere<keyof TRow & string>;
 	},
-): Promise<readonly SelectedRow<TDef, TColumn>[]> {
+): Promise<readonly Pick<TRow, TColumn>[]> {
 	const projection = columns
 		.map((key) => {
 			const name = columnName(definition, key);
@@ -129,10 +111,10 @@ export async function selectFrom<TDef extends TableDefinition<string, string>, T
 		.join(", ");
 	const { clause, params } = buildWhere(definition, where);
 	const rows = await db.all(`SELECT ${projection} FROM ${definition.tableName}${clause}`, ...params);
-	return rows as readonly SelectedRow<TDef, TColumn>[];
+	return rows as readonly Pick<TRow, TColumn>[];
 }
 
-function columnName<TDef extends TableDefinition<string, string>>(definition: TDef, key: keyof TDef["columns"] & string): string {
+function columnName<TName extends string, TRow>(definition: TableDefinition<TName, TRow>, key: keyof TRow & string): string {
 	const column = definition.columns[key];
 	if (column === undefined) {
 		throw new Error(`Unknown column "${key}" on table "${definition.tableName}"`);
@@ -140,9 +122,9 @@ function columnName<TDef extends TableDefinition<string, string>>(definition: TD
 	return column.name;
 }
 
-function buildWhere<TDef extends TableDefinition<string, string>>(
-	definition: TDef,
-	where: SqlWhere<keyof TDef["columns"] & string> | undefined,
+function buildWhere<TName extends string, TRow>(
+	definition: TableDefinition<TName, TRow>,
+	where: SqlWhere<keyof TRow & string> | undefined,
 ): { readonly clause: string; readonly params: readonly SqlValue[] } {
 	if (where === undefined) {
 		return { clause: "", params: [] };
