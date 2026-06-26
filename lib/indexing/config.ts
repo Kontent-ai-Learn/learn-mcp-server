@@ -35,3 +35,40 @@ export const getDbPath = (): string => getEnvConfig().dbPath;
 
 /** transformers.js model cache directory. */
 export const getCacheDir = (): string => getEnvConfig().cacheDir;
+
+// Common words carry little lexical signal and inflate generic documents in the
+// (IDF-less) term-frequency scorer, so they are dropped from the lexical side.
+export const STOPWORDS: ReadonlySet<string> = new Set([
+	"a",
+	"an",
+	"and",
+	"are",
+	"as",
+	"at",
+	"be",
+	"by",
+	"can",
+	"do",
+	"for",
+	"from",
+	"how",
+	"i",
+	"in",
+	"into",
+	"is",
+	"it",
+	"of",
+	"on",
+	"or",
+	"should",
+	"that",
+	"the",
+	"to",
+	"what",
+	"when",
+	"where",
+	"which",
+	"with",
+	"you",
+	"your",
+]);

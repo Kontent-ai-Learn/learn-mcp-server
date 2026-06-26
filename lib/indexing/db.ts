@@ -2,16 +2,10 @@ import { mkdir } from "node:fs/promises";
 import { dirname } from "node:path";
 import { connect, type Database } from "@tursodatabase/database";
 import { match, P } from "ts-pattern";
-import {
-	buildCreateTableQuery,
-	buildDeleteQuery,
-	buildInsertQuery,
-	buildSelectQuery,
-	buildUpdateQuery,
-	type TableDefinition,
-} from "../utils/db-utils.js";
-import { CANDIDATE_LIMIT, EMBEDDING_DIM, RRF_K } from "./config.js";
+import { buildCreateTableQuery, deleteFrom, insertInto, selectFrom, updateTable } from "../utils/db-utils.js";
+import { CANDIDATE_LIMIT, RRF_K, STOPWORDS } from "./config.js";
 import type { DocChunk, MatchType, NormalizedDoc, SearchResult } from "./schema.js";
+import { CHUNKS_TABLE, DOCUMENTS_TABLE } from "./tables.js";
 
 type DocRecord = { readonly title: string; readonly url: string; readonly body: string };
 
@@ -30,81 +24,6 @@ type DocScore = {
 	readonly lexical: number | null; // best term-hit count across the doc's lexical matches
 };
 
-const DOCUMENTS_TABLE: TableDefinition<"documents", "id" | "title" | "url" | "body" | "contentHash" | "lastModified"> = {
-	tableName: "documents",
-	columns: {
-		id: { name: "id", type: "TEXT", primaryKey: true },
-		title: { name: "title", type: "TEXT", notNull: true },
-		url: { name: "url", type: "TEXT", notNull: true },
-		body: { name: "body", type: "TEXT", notNull: true },
-		contentHash: { name: "contentHash", type: "TEXT", notNull: true },
-		lastModified: { name: "lastModified", type: "TEXT" },
-	},
-};
-
-const CHUNKS_TABLE: TableDefinition<"chunks", "id" | "chunkKey" | "docId" | "chunkIndex" | "text" | "embedding" | "embeddingModel"> = {
-	tableName: "chunks",
-	columns: {
-		id: { name: "id", type: "INTEGER", primaryKey: true },
-		chunkKey: { name: "chunkKey", type: "TEXT", notNull: true, unique: true },
-		docId: { name: "docId", type: "TEXT", notNull: true },
-		chunkIndex: { name: "chunkIndex", type: "INTEGER", notNull: true },
-		text: { name: "text", type: "TEXT", notNull: true },
-		embedding: { name: "embedding", type: `F32_BLOB(${EMBEDDING_DIM})` },
-		embeddingModel: { name: "embeddingModel", type: "TEXT" },
-	},
-};
-
-function buildCreateIndexesQuery(): string {
-	return `
-CREATE INDEX IF NOT EXISTS idx_chunks_doc_id ON ${CHUNKS_TABLE.tableName}(${CHUNKS_TABLE.columns.docId.name});
-CREATE INDEX IF NOT EXISTS idx_chunks_fts ON ${CHUNKS_TABLE.tableName} USING fts (${CHUNKS_TABLE.columns.text.name});`;
-}
-
-function buildCreateTablesQuery(): string {
-	return [buildCreateTableQuery(DOCUMENTS_TABLE), buildCreateTableQuery(CHUNKS_TABLE), buildCreateIndexesQuery()].join("\n");
-}
-
-/** Turso represents a vector literal as a JSON array string passed to vector32(). */
-const toVectorParam = (vector: Float32Array): string => JSON.stringify(Array.from(vector));
-
-// Common words carry little lexical signal and inflate generic documents in the
-// (IDF-less) term-frequency scorer, so they are dropped from the lexical side.
-const STOPWORDS: ReadonlySet<string> = new Set([
-	"a",
-	"an",
-	"and",
-	"are",
-	"as",
-	"at",
-	"be",
-	"by",
-	"can",
-	"do",
-	"for",
-	"from",
-	"how",
-	"i",
-	"in",
-	"into",
-	"is",
-	"it",
-	"of",
-	"on",
-	"or",
-	"should",
-	"that",
-	"the",
-	"to",
-	"what",
-	"when",
-	"where",
-	"which",
-	"with",
-	"you",
-	"your",
-]);
-
 export async function searchHybrid({
 	db,
 	queryVector,
@@ -117,10 +36,10 @@ export async function searchHybrid({
 	readonly limit: number;
 }): Promise<readonly SearchResult[]> {
 	const [vectorMatches, lexicalMatches] = await Promise.all([
-		vectorCandidates(db, queryVector),
-		lexicalCandidates(db, tokenize(queryText)),
+		getVectorCandidates(db, queryVector),
+		getLexicalCandidates(db, tokenize(queryText)),
 	]);
-	const aggregatedScores = aggregate([
+	const aggregatedScores = calculateScore([
 		{ retriever: "vector", candidates: vectorMatches },
 		{ retriever: "lexical", candidates: lexicalMatches },
 	]);
@@ -157,8 +76,7 @@ export async function openDb(path: string): Promise<Database> {
 
 /** Map of document id -> content hash, for change detection. */
 export async function getDocHashes(db: Database): Promise<ReadonlyMap<string, string>> {
-	const query = await db.prepare(buildSelectQuery({ definition: DOCUMENTS_TABLE, columnKeys: ["id", "contentHash"] }));
-	const rows = (await query.all()) as readonly { readonly id: string; readonly contentHash: string }[];
+	const rows = await selectFrom(db, { definition: DOCUMENTS_TABLE, columns: ["id", "contentHash"] });
 	return new Map(rows.map((row) => [row.id, row.contentHash]));
 }
 
@@ -167,12 +85,10 @@ export async function deleteDocuments(db: Database, ids: readonly string[]): Pro
 	if (ids.length === 0) {
 		return;
 	}
-	const delChunks = await db.prepare(buildDeleteQuery(CHUNKS_TABLE, "docId"));
-	const delDoc = await db.prepare(buildDeleteQuery(DOCUMENTS_TABLE, "id"));
 	const transaction = db.transaction(async (toDelete: readonly string[]) => {
 		for (const id of toDelete) {
-			await delChunks.run(id);
-			await delDoc.run(id);
+			await deleteFrom(db, { definition: CHUNKS_TABLE, where: { column: "docId", operator: "=", value: id } });
+			await deleteFrom(db, { definition: DOCUMENTS_TABLE, where: { column: "id", operator: "=", value: id } });
 		}
 	});
 	await transaction(ids);
@@ -183,20 +99,28 @@ export async function deleteDocuments(db: Database, ids: readonly string[]): Pro
  * embedding; the embed-missing pass fills them in afterwards.
  */
 export async function replaceDocument(db: Database, doc: NormalizedDoc, chunks: readonly DocChunk[]): Promise<void> {
-	const delChunks = await db.prepare(buildDeleteQuery(CHUNKS_TABLE, "docId"));
-	const delDoc = await db.prepare(buildDeleteQuery(DOCUMENTS_TABLE, "id"));
-	const insDoc = await db.prepare(buildInsertQuery(DOCUMENTS_TABLE, ["id", "title", "url", "body", "contentHash", "lastModified"]));
-	const insChunk = await db.prepare(buildInsertQuery(CHUNKS_TABLE, ["chunkKey", "docId", "chunkIndex", "text"]));
-
 	const transaction = db.transaction(async () => {
-		await delChunks.run(doc.id);
-		await delDoc.run(doc.id);
-		await insDoc.run(doc.id, doc.title, doc.url, doc.body, doc.contentHash, doc.lastModified);
+		await deleteFrom(db, { definition: CHUNKS_TABLE, where: { column: "docId", operator: "=", value: doc.id } });
+		await deleteFrom(db, { definition: DOCUMENTS_TABLE, where: { column: "id", operator: "=", value: doc.id } });
+		await insertInto(db, {
+			definition: DOCUMENTS_TABLE,
+			values: {
+				id: doc.id,
+				title: doc.title,
+				url: doc.url,
+				body: doc.body,
+				contentHash: doc.contentHash,
+				lastModified: doc.lastModified,
+			},
+		});
 		for (const chunk of chunks) {
-			await insChunk.run(chunk.chunkKey, chunk.docId, chunk.chunkIndex, chunk.text);
+			await insertInto(db, {
+				definition: CHUNKS_TABLE,
+				values: { chunkKey: chunk.chunkKey, docId: chunk.docId, chunkIndex: chunk.chunkIndex, text: chunk.text },
+			});
 		}
 	});
-	await transaction(undefined);
+	await transaction();
 }
 
 /** Chunks whose embedding is missing or was produced by a different model. */
@@ -204,10 +128,8 @@ export async function selectChunksToEmbed(
 	db: Database,
 	model: string,
 ): Promise<readonly { readonly chunkKey: string; readonly text: string }[]> {
-	const query = await db.prepare(
-		`SELECT ${CHUNKS_TABLE.columns.chunkKey.name}, ${CHUNKS_TABLE.columns.text.name} FROM ${CHUNKS_TABLE.tableName} WHERE ${CHUNKS_TABLE.columns.embedding.name} IS NULL OR ${CHUNKS_TABLE.columns.embeddingModel.name} IS NOT ?`,
-	);
-	const rows = (await query.all(model)) as readonly { readonly chunkKey: string; readonly text: string }[];
+	const sql = `SELECT ${CHUNKS_TABLE.columns.chunkKey.name}, ${CHUNKS_TABLE.columns.text.name} FROM ${CHUNKS_TABLE.tableName} WHERE ${CHUNKS_TABLE.columns.embedding.name} IS NULL OR ${CHUNKS_TABLE.columns.embeddingModel.name} IS NOT ?`;
+	const rows = (await db.all(sql, model)) as readonly { readonly chunkKey: string; readonly text: string }[];
 	return rows.map((row) => ({ chunkKey: row.chunkKey, text: row.text }));
 }
 
@@ -219,31 +141,29 @@ export async function updateEmbeddings(
 	if (items.length === 0) {
 		return;
 	}
-	const query = await db.prepare(
-		buildUpdateQuery({
-			definition: CHUNKS_TABLE,
-			update: [{ column: "embedding", value: "vector32(?)" }, "embeddingModel"],
-			whereColumn: "chunkKey",
-		}),
-	);
 	const transaction = db.transaction(async () => {
 		for (const item of items) {
-			await query.run(toVectorParam(item.vector), model, item.chunkKey);
+			await updateTable(db, {
+				definition: CHUNKS_TABLE,
+				set: {
+					embedding: { expression: "vector32(?)", params: [toVectorParam(item.vector)] },
+					embeddingModel: model,
+				},
+				where: { column: "chunkKey", value: item.chunkKey },
+			});
 		}
 	});
-	await transaction(undefined);
+	await transaction();
 }
 
 function tokenize(query: string): readonly string[] {
 	return (query.toLowerCase().match(/[a-z0-9]+/g) ?? []).filter((token) => token.length > 2 && !STOPWORDS.has(token));
 }
 
-async function vectorCandidates(db: Database, queryVector: Float32Array): Promise<readonly Candidate[]> {
-	const query = await db.prepare(
-		`SELECT ${CHUNKS_TABLE.columns.chunkKey.name}, ${CHUNKS_TABLE.columns.docId.name}, vector_distance_cos(${CHUNKS_TABLE.columns.embedding.name}, vector32(?)) AS distance
-		 FROM ${CHUNKS_TABLE.tableName} WHERE ${CHUNKS_TABLE.columns.embedding.name} IS NOT NULL ORDER BY distance ASC LIMIT ?`,
-	);
-	const rows = (await query.all(toVectorParam(queryVector), CANDIDATE_LIMIT)) as readonly {
+async function getVectorCandidates(db: Database, queryVector: Float32Array): Promise<readonly Candidate[]> {
+	const sql = `SELECT ${CHUNKS_TABLE.columns.chunkKey.name}, ${CHUNKS_TABLE.columns.docId.name}, vector_distance_cos(${CHUNKS_TABLE.columns.embedding.name}, vector32(?)) AS distance
+		 FROM ${CHUNKS_TABLE.tableName} WHERE ${CHUNKS_TABLE.columns.embedding.name} IS NOT NULL ORDER BY distance ASC LIMIT ?`;
+	const rows = (await db.all(sql, toVectorParam(queryVector), CANDIDATE_LIMIT)) as readonly {
 		readonly chunkKey: string;
 		readonly docId: string;
 		readonly distance: number;
@@ -257,14 +177,12 @@ async function vectorCandidates(db: Database, queryVector: Float32Array): Promis
  * constant), so MATCH is used only to select candidates, which are then ranked
  * app-side by query-term hit count (also returned as the raw lexical score).
  */
-async function lexicalCandidates(db: Database, tokens: readonly string[]): Promise<readonly Candidate[]> {
+async function getLexicalCandidates(db: Database, tokens: readonly string[]): Promise<readonly Candidate[]> {
 	if (tokens.length === 0) {
 		return [];
 	}
-	const query = await db.prepare(
-		`SELECT ${CHUNKS_TABLE.columns.chunkKey.name}, ${CHUNKS_TABLE.columns.docId.name}, ${CHUNKS_TABLE.columns.text.name} FROM ${CHUNKS_TABLE.tableName} WHERE text MATCH ? LIMIT ?`,
-	);
-	const rows = (await query.all(tokens.join(" "), CANDIDATE_LIMIT * 3)) as readonly {
+	const sql = `SELECT ${CHUNKS_TABLE.columns.chunkKey.name}, ${CHUNKS_TABLE.columns.docId.name}, ${CHUNKS_TABLE.columns.text.name} FROM ${CHUNKS_TABLE.tableName} WHERE ${CHUNKS_TABLE.columns.text.name} MATCH ? LIMIT ?`;
+	const rows = (await db.all(sql, tokens.join(" "), CANDIDATE_LIMIT * 3)) as readonly {
 		readonly chunkKey: string;
 		readonly docId: string;
 		readonly text: string;
@@ -285,7 +203,7 @@ async function lexicalCandidates(db: Database, tokens: readonly string[]): Promi
  * contribution into the doc's fused score, and keep the best raw per-retriever
  * score for the breakdown.
  */
-function aggregate(lists: readonly RankedList[]): ReadonlyMap<string, DocScore> {
+function calculateScore(lists: readonly RankedList[]): ReadonlyMap<string, DocScore> {
 	const result = new Map<string, DocScore>();
 	for (const { retriever, candidates } of lists) {
 		candidates.forEach((candidate, rank) => {
@@ -327,18 +245,23 @@ async function getDocuments({
 	if (ids.length === 0) {
 		return new Map();
 	}
-	const query = await db.prepare(
-		buildSelectQuery({
-			definition: DOCUMENTS_TABLE,
-			columnKeys: ["id", "title", "url", "body"],
-			where: { column: "id", operator: "IN", placeholderCount: ids.length },
-		}),
-	);
-	const rows = (await query.all(...ids)) as readonly {
-		readonly id: string;
-		readonly title: string;
-		readonly url: string;
-		readonly body: string;
-	}[];
+	const rows = await selectFrom(db, {
+		definition: DOCUMENTS_TABLE,
+		columns: ["id", "title", "url", "body"],
+		where: { column: "id", operator: "IN", values: ids },
+	});
 	return new Map(rows.map((row) => [row.id, { title: row.title, url: row.url, body: row.body }]));
 }
+
+function buildCreateIndexesQuery(): string {
+	return `
+CREATE INDEX IF NOT EXISTS idx_chunks_doc_id ON ${CHUNKS_TABLE.tableName}(${CHUNKS_TABLE.columns.docId.name});
+CREATE INDEX IF NOT EXISTS idx_chunks_fts ON ${CHUNKS_TABLE.tableName} USING fts (${CHUNKS_TABLE.columns.text.name});`;
+}
+
+function buildCreateTablesQuery(): string {
+	return [buildCreateTableQuery(DOCUMENTS_TABLE), buildCreateTableQuery(CHUNKS_TABLE), buildCreateIndexesQuery()].join("\n");
+}
+
+/** Turso represents a vector literal as a JSON array string passed to vector32(). */
+const toVectorParam = (vector: Float32Array): string => JSON.stringify(Array.from(vector));
