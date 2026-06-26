@@ -20,6 +20,16 @@
   5. non-exported (private) helpers and members last
 - Place an exported function above the private helpers it relies on (the helpers sit in the final group); module-level `const` arrow functions are only invoked at call time, so a later definition is fine at runtime.
 
+## Comments
+
+- Only add comments that carry meaningful, non-obvious information. If a function or
+  block is self-explanatory, leave it uncommented.
+- Strive to make the code itself self-explanatory (clear names, small functions) so that
+  comments are rarely needed in the first place.
+- Reserve comments for special situations the code cannot convey on its own: *why* a
+  non-obvious choice was made, workarounds, gotchas, invariants, or surprising edge cases —
+  not *what* the code is doing.
+
 ## Libraries
 
 - Use **ts-pattern** for non-trivial `switch`/`if-else` chains — anything beyond a simple 2-branch condition should use `match()` from `ts-pattern`
