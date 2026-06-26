@@ -2,7 +2,7 @@ import { mkdir } from "node:fs/promises";
 import { dirname } from "node:path";
 import { connect, type Database } from "@tursodatabase/database";
 import { match, P } from "ts-pattern";
-import { CANDIDATE_LIMIT, EMBEDDING_DIM, RRF_K } from "./constants.js";
+import { CANDIDATE_LIMIT, EMBEDDING_DIM, RRF_K } from "./config.js";
 import type { DocChunk, MatchType, NormalizedDoc, SearchResult } from "./schema.js";
 
 type DocRecord = { readonly title: string; readonly url: string; readonly body: string };

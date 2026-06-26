@@ -4,6 +4,8 @@
  * so the model identity lives here and nowhere else.
  */
 
+import { getEnvConfig } from "../utils/environment.utils.js";
+
 /**
  * The recommended transformer model for semantic search
  *
@@ -28,11 +30,8 @@ export const CANDIDATE_LIMIT = 30;
 /** Parent documents returned to the caller (bounds the response size). */
 export const SEARCH_LIMIT = 5;
 
-const DEFAULT_DB_PATH = ".index/learn-index.db";
-const DEFAULT_CACHE_DIR = ".cache/transformers";
-
 /** Persistent Turso DB path; overridable for deployment. */
-export const getDbPath = (): string => process.env.INDEX_DB_PATH ?? DEFAULT_DB_PATH;
+export const getDbPath = (): string => getEnvConfig().dbPath;
 
 /** transformers.js model cache directory. */
-export const getCacheDir = (): string => process.env.EMBEDDING_CACHE_DIR ?? DEFAULT_CACHE_DIR;
+export const getCacheDir = (): string => getEnvConfig().cacheDir;

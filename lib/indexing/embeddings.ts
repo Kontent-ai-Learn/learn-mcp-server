@@ -1,5 +1,5 @@
 import { env, type FeatureExtractionPipeline, pipeline } from "@huggingface/transformers";
-import { EMBEDDING_MODEL, getCacheDir } from "./constants.js";
+import { EMBEDDING_MODEL, getCacheDir } from "./config.js";
 
 env.cacheDir = getCacheDir();
 

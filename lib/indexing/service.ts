@@ -1,5 +1,5 @@
 import type { Database } from "@tursodatabase/database";
-import { getDbPath, SEARCH_LIMIT } from "./constants.js";
+import { getDbPath, SEARCH_LIMIT } from "./config.js";
 import { embedQuery } from "./embeddings.js";
 import type { SearchResult } from "./schema.js";
 import { openStore, searchHybrid } from "./store.js";

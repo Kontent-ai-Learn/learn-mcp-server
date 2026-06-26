@@ -7,7 +7,7 @@ import { type SourceDoc, sourceDocsSchema } from "./schema.js";
  * the bundled sample data, validated against the schema.
  *
  * TODO: to index real content, replace the body of this function with a fetch
- * of the remote JSON export (process.env.DOCS_EXPORT_URL) or a call to the
+ * of the remote JSON export or a call to the
  * Kontent.ai Delivery API, then `sourceDocsSchema.parse` the result. Nothing
  * else in the pipeline needs to change.
  */

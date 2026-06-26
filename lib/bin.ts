@@ -4,6 +4,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import express from "express";
 import { ensureIndexReady } from "./indexing/service.js";
 import { createServer } from "./server.js";
+import { getEnvConfig } from "./utils/environment.utils.js";
 import { packageJsonName, packageJsonVersion } from "./utils/version.js";
 
 function startStreamableHTTP() {
@@ -77,7 +78,7 @@ function startStreamableHTTP() {
 		next(err);
 	});
 
-	const port = process.env.PORT ?? 3002;
+	const port = getEnvConfig().port;
 	app.listen(port, () => {
 		console.log(
 			`${packageJsonName}@${packageJsonVersion} (Streamable HTTP) running on port ${port}. 
