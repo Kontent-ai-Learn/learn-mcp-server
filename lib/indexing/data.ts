@@ -5,14 +5,20 @@ import { packageJsonName, packageJsonVersion } from "../utils/version.js";
 import { getContentUrl } from "./config.js";
 import type { SourceDoc } from "./schema.js";
 
-const segmentSchema = z.object({
-	id: z.string(),
-	title: z.string(),
-	text: z.string(),
-	url: z.string(),
-});
+const segmentSchema = z.readonly(
+	z.object({
+		id: z.string(),
+		title: z.string(),
+		text: z.string(),
+		url: z.string(),
+	}),
+);
 
-const responseSchema = z.object({ data: z.object({ segments: z.array(segmentSchema) }) });
+const responseSchema = z.readonly(
+	z.object({
+		data: z.readonly(z.object({ segments: z.readonly(z.array(segmentSchema)) })),
+	}),
+);
 
 type Segment = z.infer<typeof segmentSchema>;
 
@@ -34,11 +40,10 @@ export const loadSourceDocs = async (): Promise<readonly SourceDoc[]> => {
 		mapExtraResponseProps: () => ({}),
 	});
 	const { payload } = await query.fetch();
-	return payload.data.segments.map(toSourceDoc);
+	return payload.data.segments.map(mapSegmentToSourceDoc);
 };
 
-/** Maps a content segment to a source document, converting its HTML body to Markdown. */
-export const toSourceDoc = (segment: Segment): SourceDoc => ({
+export const mapSegmentToSourceDoc = (segment: Segment): SourceDoc => ({
 	id: segment.id,
 	title: segment.title,
 	url: segment.url,

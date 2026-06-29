@@ -4,10 +4,10 @@ import type { Database } from "@tursodatabase/database";
 import { logger, type SpinnerLog } from "../utils/logger.js";
 import { chunkDoc } from "./chunking.js";
 import { EMBED_BATCH_SIZE, EMBEDDING_MODEL } from "./config.js";
+import { loadSourceDocs } from "./data.js";
 import { deleteDocuments, getDocHashes, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "./db.js";
 import { embedTexts } from "./embeddings.js";
 import type { NormalizedDoc, SourceDoc } from "./schema.js";
-import { loadSourceDocs } from "./source.js";
 
 /**
  * Bring the index up to date with the source: diff by content hash, re-chunk

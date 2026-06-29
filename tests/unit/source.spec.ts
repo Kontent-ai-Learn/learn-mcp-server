@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toSourceDoc } from "../../lib/indexing/source.js";
+import { mapSegmentToSourceDoc } from "../../lib/indexing/data.js";
 
 describe("toSourceDoc", () => {
 	const segment = {
@@ -10,14 +10,14 @@ describe("toSourceDoc", () => {
 	};
 
 	it("passes id, title and url through unchanged", () => {
-		const doc = toSourceDoc(segment);
+		const doc = mapSegmentToSourceDoc(segment);
 		expect(doc.id).toBe("webhooks");
 		expect(doc.title).toBe("Webhooks");
 		expect(doc.url).toBe("/learn/webhooks");
 	});
 
 	it("converts the HTML text to Markdown (no tags, structure preserved)", () => {
-		const { markdown } = toSourceDoc(segment);
+		const { markdown } = mapSegmentToSourceDoc(segment);
 		expect(markdown).not.toMatch(/<[a-z]/i); // no HTML tags remain
 		expect(markdown).toContain("## Webhooks"); // heading -> markdown
 		expect(markdown).toContain("**external**"); // <strong> -> bold
