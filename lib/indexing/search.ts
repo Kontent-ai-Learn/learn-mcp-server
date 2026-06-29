@@ -13,14 +13,15 @@ import { syncIndex } from "./sync.js";
  * IMPORTANT: never initialise inside `createServer` — that runs per HTTP
  * request. Initialise once in `main()` via `ensureIndexReady`.
  */
-const state: { ready: Promise<Database> | null } = { ready: null };
+let cachedDb: Database | null = null;
 
 export async function ensureIndexReady(): Promise<Database> {
-	state.ready ??= initOnce();
-	return await state.ready;
+	if (!cachedDb) {
+		cachedDb = await prepareDb();
+	}
+	return cachedDb;
 }
 
-/** Hybrid search over the indexed documentation, returning full parent documents. */
 export async function search(query: string): Promise<readonly SearchResult[]> {
 	const trimmed = query.trim();
 	if (trimmed.length === 0) {
@@ -28,10 +29,10 @@ export async function search(query: string): Promise<readonly SearchResult[]> {
 	}
 	const db = await ensureIndexReady();
 	const vector = await embedQuery(trimmed);
-	return searchHybrid({ db, queryVector: vector, queryText: trimmed, limit: SEARCH_LIMIT });
+	return await searchHybrid({ db, queryVector: vector, queryText: trimmed, limit: SEARCH_LIMIT });
 }
 
-async function initOnce(): Promise<Database> {
+async function prepareDb(): Promise<Database> {
 	const db = await openDb(getDbPath());
 	await syncIndex(db);
 	return db;

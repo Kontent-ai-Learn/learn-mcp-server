@@ -65,9 +65,7 @@ export async function searchHybrid({
 }
 
 export async function openDb(path: string): Promise<Database> {
-	if (path !== ":memory:") {
-		await mkdir(dirname(path), { recursive: true });
-	}
+	await mkdir(dirname(path), { recursive: true });
 	const db = await connect(path, { experimental: ["index_method"] });
 	await db.exec(buildCreateTablesQuery());
 	return db;

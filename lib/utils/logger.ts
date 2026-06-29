@@ -31,11 +31,11 @@ export const logger: Logger = {
 				render();
 			});
 			clearInterval(timer);
-			process.stderr.write(`\r✔ ${state.text}\n`);
+			process.stderr.write(`\r${state.text}\n`);
 			return result;
 		} catch (error) {
 			clearInterval(timer);
-			process.stderr.write(`\r✖ ${state.text}\n`);
+			process.stderr.write(`\r${state.text}\n`);
 			throw error;
 		}
 	},

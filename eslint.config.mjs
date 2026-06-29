@@ -11,6 +11,7 @@ export default defineConfig(
 		files: ["lib/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts", "sample/**/*.ts"],
 		rules: {
 			"no-unused-vars": "off",
+			"@typescript-eslint/prefer-nullish-coalescing": "off",
 		},
 	},
 );

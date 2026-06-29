@@ -79,9 +79,12 @@ async function applyDiff(
 
 /** Embed every chunk that is missing an embedding for the current model. */
 async function embedMissing(db: Database, spinner: SpinnerLog): Promise<number> {
-	const pending = await selectChunksToEmbed(db, EMBEDDING_MODEL);
-	spinner({ message: `Embedding chunks ${colorize("yellow", "0")}/${colorize("yellow", pending.length.toString())}` });
-	for (const [batchIndex, batch] of toBatches(pending, EMBED_BATCH_SIZE).entries()) {
+	const chunks = await selectChunksToEmbed(db, EMBEDDING_MODEL);
+	const batches = toBatches(chunks, EMBED_BATCH_SIZE);
+	spinner({
+		message: `Embedding ${colorize("yellow", chunks.length.toString())} chunks in ${colorize("yellow", batches.length.toString())} batches`,
+	});
+	for (const [batchIndex, batch] of batches.entries()) {
 		const vectors = await embedTexts(batch.map((chunk) => chunk.text));
 		await updateEmbeddings(
 			db,
@@ -91,10 +94,10 @@ async function embedMissing(db: Database, spinner: SpinnerLog): Promise<number> 
 				return vector ? [{ chunkKey: chunk.chunkKey, vector }] : [];
 			}),
 		);
-		const processed = Math.min((batchIndex + 1) * EMBED_BATCH_SIZE, pending.length);
+		const processed = Math.min((batchIndex + 1) * EMBED_BATCH_SIZE, chunks.length);
 		spinner({
-			message: `Embedding chunks ${colorize("yellow", processed.toString())}/${colorize("yellow", pending.length.toString())}`,
+			message: `Batch ${colorize("yellow", processed.toString())}/${colorize("yellow", chunks.length.toString())}`,
 		});
 	}
-	return pending.length;
+	return chunks.length;
 }

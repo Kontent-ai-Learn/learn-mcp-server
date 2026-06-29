@@ -28,7 +28,7 @@ export const RRF_K = 60;
 export const CANDIDATE_LIMIT = 30;
 
 /** Parent documents returned to the caller (bounds the response size). */
-export const SEARCH_LIMIT = 5;
+export const SEARCH_LIMIT = 10;
 
 /** Persistent Turso DB path; overridable for deployment. */
 export const getDbPath = (): string => getEnvConfig().dbPath;
