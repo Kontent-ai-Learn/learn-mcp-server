@@ -36,6 +36,9 @@ export const getDbPath = (): string => getEnvConfig().dbPath;
 /** transformers.js model cache directory. */
 export const getCacheDir = (): string => getEnvConfig().cacheDir;
 
+/** URL of the live content endpoint; when unset, indexing falls back to the bundled sample data. */
+export const getContentUrl = (): string | undefined => getEnvConfig().contentUrl;
+
 // Common words carry little lexical signal and inflate generic documents in the
 // (IDF-less) term-frequency scorer, so they are dropped from the lexical side.
 export const STOPWORDS: ReadonlySet<string> = new Set([

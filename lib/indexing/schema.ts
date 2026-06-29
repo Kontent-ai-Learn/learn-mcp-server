@@ -40,20 +40,15 @@ export type SearchResult = {
 };
 
 /**
- * Shape of a single source document. The Zod schema is the source of truth;
- * `SourceDoc` is derived via `z.infer` (hence the schema const necessarily
- * precedes the inferred type).
- *
- * NOTE: these field names match the bundled sample data. When `loadSourceDocs`
- * is switched to a real export (remote JSON / Kontent.ai Delivery API), adjust
- * this schema (and wrap with `{ items: [...] }` if the export is not a
- * top-level array).
+ * Normalised shape every content source maps to (the live endpoint's segments and the
+ * bundled sample data both produce this). Zod is the source of truth; `SourceDoc` is
+ * derived via `z.infer`, so the schema const precedes the inferred type.
  */
 export const sourceDocSchema = z.object({
 	id: z.string().min(1),
 	title: z.string().min(1),
-	url: z.url(), // citation only — never fetched/scraped
-	body: z.string(), // plain text
+	url: z.string().min(1), // citation only — never fetched/scraped, so any string (incl. relative) is fine
+	body: z.string(), // Markdown (converted from the source HTML)
 	last_modified: z.iso.datetime().optional(),
 });
 

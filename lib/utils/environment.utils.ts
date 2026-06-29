@@ -7,14 +7,33 @@ export function getEnvConfig(): {
 	readonly port: number;
 	readonly dbPath: string;
 	readonly cacheDir: string;
+	readonly contentUrl: string;
 } {
 	loadEnvironmentVariables();
 
+	const port = getOptionalValue("PORT");
+	const dbPath = getOptionalValue("DB_PATH");
+	const cacheDir = getOptionalValue("CACHE_DIR");
+	const contentUrl = getRequiredValue("CONTENT_URL");
+
 	return {
-		port: process.env.PORT ? +process.env.PORT : 3002,
-		dbPath: process.env.DB_PATH ?? "db/learn.db",
-		cacheDir: process.env.CACHE_DIR ?? ".cache/transformers",
+		port: port ? +port : 3002,
+		dbPath: dbPath ?? "db/learn.db",
+		cacheDir: cacheDir ?? ".cache/transformers",
+		contentUrl,
 	};
+}
+
+function getOptionalValue(name: string): string | undefined {
+	return process.env[name];
+}
+
+function getRequiredValue(name: string): string {
+	const value = process.env[name];
+	if (value === undefined) {
+		throw new Error(`Environment variable ${name} is required`);
+	}
+	return value;
 }
 
 function loadEnvironmentVariables(): void {
@@ -24,9 +43,11 @@ function loadEnvironmentVariables(): void {
 		return;
 	}
 	const envFilePath = path.join(path.dirname(packageJsonPath), ".env");
-	if (existsSync(envFilePath)) {
-		loadEnvFile(envFilePath);
+	if (!existsSync(envFilePath)) {
+		return;
 	}
+
+	loadEnvFile(envFilePath);
 }
 
 function findFile(fileName: string, dir: string): string | undefined {

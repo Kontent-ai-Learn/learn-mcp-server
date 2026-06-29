@@ -5,6 +5,7 @@ import express from "express";
 import { ensureIndexReady } from "./indexing/service.js";
 import { createServer } from "./server.js";
 import { getEnvConfig } from "./utils/environment.utils.js";
+import { logger } from "./utils/logger.js";
 import { packageJsonName, packageJsonVersion } from "./utils/version.js";
 
 function startStreamableHTTP() {
@@ -26,7 +27,10 @@ function startStreamableHTTP() {
 			await server.connect(transport);
 			await transport.handleRequest(Object.assign(req, {}), res, req.body);
 		} catch (error) {
-			console.error(`${packageJsonName}@${packageJsonVersion} - Error handling MCP request:`, error);
+			logger.log({
+				type: "error",
+				message: `${packageJsonName}@${packageJsonVersion} - Error handling MCP request: ${error instanceof Error ? error.message : String(error)}`,
+			});
 			if (!res.headersSent) {
 				res.status(500).json({
 					jsonrpc: "2.0",
@@ -90,7 +94,7 @@ Available endpoint: /mcp`,
 async function startStdio() {
 	const { server } = createServer();
 	const transport = new StdioServerTransport();
-	console.error(`${packageJsonName}@${packageJsonVersion} (stdio) starting`);
+	logger.log({ type: "info", message: `${packageJsonName}@${packageJsonVersion} (stdio) starting` });
 	await server.connect(transport);
 }
 
@@ -99,7 +103,7 @@ async function main() {
 	const transportType = args[0]?.toLowerCase();
 
 	if (!transportType || (transportType !== "stdio" && transportType !== "shttp")) {
-		console.error("Please specify a valid transport type: stdio or shttp");
+		logger.log({ type: "error", message: "Please specify a valid transport type: stdio or shttp" });
 		process.exit(1);
 	}
 
@@ -115,6 +119,6 @@ async function main() {
 }
 
 main().catch((error) => {
-	console.error("Fatal error:", error);
+	logger.log({ type: "error", message: `Fatal error: ${error instanceof Error ? error.message : String(error)}` });
 	process.exit(1);
 });

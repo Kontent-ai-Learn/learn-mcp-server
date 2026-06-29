@@ -1,13 +1,11 @@
 import type { SourceDoc } from "./schema.js";
 
 /**
- * Bundled sample documentation for local testing. ~20 plain-text docs modelled
- * on Kontent.ai Learn topics. Bodies are written so hybrid search is
- * demonstrable: exact terms (e.g. "webhook") exercise the lexical half while
- * paraphrases (e.g. "notify an external system when content changes") exercise
- * the semantic half.
- *
- * Swap this out by changing `loadSourceDocs` in `source.ts`.
+ * Test/dev fallback content, used by `loadSourceDocs` only when `CONTENT_URL` is unset
+ * (production indexes the live endpoint instead). ~20 plain-text docs modelled on
+ * Kontent.ai Learn topics, written so hybrid search is demonstrable: exact terms
+ * (e.g. "webhook") exercise the lexical half while paraphrases (e.g. "notify an external
+ * system when content changes") exercise the semantic half.
  */
 export const sampleDocs: readonly SourceDoc[] = [
 	{

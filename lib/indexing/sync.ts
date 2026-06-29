@@ -1,5 +1,7 @@
 import { createHash } from "node:crypto";
+import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
+import { logger, type SpinnerLog } from "../utils/logger.js";
 import { chunkDoc } from "./chunking.js";
 import { EMBED_BATCH_SIZE, EMBEDDING_MODEL } from "./config.js";
 import { deleteDocuments, getDocHashes, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "./db.js";
@@ -13,16 +15,18 @@ import { loadSourceDocs } from "./source.js";
  * incremental — unchanged docs keep their existing embeddings across restarts.
  */
 export async function syncIndex(db: Database): Promise<void> {
-	log("⏳ Indexing documentation…");
+	logger.log({ message: "Loading source documents…" });
 	const normalized = (await loadSourceDocs()).map(normalize);
-	const { changed, removed } = await applyDiff(db, normalized);
-	const embedded = await embedMissing(db);
-	log(`✅ Index ready: ${normalized.length} docs (${changed} new/changed, ${removed} removed), ${embedded} chunks embedded`);
-}
+	logger.log({ message: `Loaded ${colorize("yellow", normalized.length.toString())} source documents` });
 
-/** Indexing logs go to stderr so they never corrupt the stdio JSON-RPC stream. */
-function log(message: string): void {
-	console.error(message);
+	await logger.logWithSpinnerAsync(async (spinner) => {
+		const { changed, removed } = await applyDiff(db, normalized, spinner);
+		const embedded = await embedMissing(db, spinner);
+		spinner({
+			type: "completed",
+			message: `Index ready: ${colorize("yellow", normalized.length.toString())} docs (${colorize("green", changed.toString())} new/changed, ${colorize("red", removed.toString())} removed), ${colorize("yellow", embedded.toString())} chunks embedded`,
+		});
+	});
 }
 
 function normalizeBody(body: string): string {
@@ -55,6 +59,7 @@ function toBatches<T>(items: readonly T[], size: number): readonly (readonly T[]
 async function applyDiff(
 	db: Database,
 	normalized: readonly NormalizedDoc[],
+	spinner: SpinnerLog,
 ): Promise<{ readonly changed: number; readonly removed: number }> {
 	const existing = await getDocHashes(db);
 	const desiredIds = new Set(normalized.map((doc) => doc.id));
@@ -62,16 +67,21 @@ async function applyDiff(
 	const changed = normalized.filter((doc) => existing.get(doc.id) !== doc.contentHash);
 
 	await deleteDocuments(db, removed);
-	for (const doc of changed) {
+	spinner({ message: `Indexing documents ${colorize("yellow", "0")}/${colorize("yellow", changed.length.toString())}` });
+	for (const [index, doc] of changed.entries()) {
 		await replaceDocument(db, doc, chunkDoc(doc));
+		spinner({
+			message: `Indexing documents ${colorize("yellow", (index + 1).toString())}/${colorize("yellow", changed.length.toString())}`,
+		});
 	}
 	return { changed: changed.length, removed: removed.length };
 }
 
 /** Embed every chunk that is missing an embedding for the current model. */
-async function embedMissing(db: Database): Promise<number> {
+async function embedMissing(db: Database, spinner: SpinnerLog): Promise<number> {
 	const pending = await selectChunksToEmbed(db, EMBEDDING_MODEL);
-	for (const batch of toBatches(pending, EMBED_BATCH_SIZE)) {
+	spinner({ message: `Embedding chunks ${colorize("yellow", "0")}/${colorize("yellow", pending.length.toString())}` });
+	for (const [batchIndex, batch] of toBatches(pending, EMBED_BATCH_SIZE).entries()) {
 		const vectors = await embedTexts(batch.map((chunk) => chunk.text));
 		await updateEmbeddings(
 			db,
@@ -81,6 +91,10 @@ async function embedMissing(db: Database): Promise<number> {
 				return vector ? [{ chunkKey: chunk.chunkKey, vector }] : [];
 			}),
 		);
+		const processed = Math.min((batchIndex + 1) * EMBED_BATCH_SIZE, pending.length);
+		spinner({
+			message: `Embedding chunks ${colorize("yellow", processed.toString())}/${colorize("yellow", pending.length.toString())}`,
+		});
 	}
 	return pending.length;
 }

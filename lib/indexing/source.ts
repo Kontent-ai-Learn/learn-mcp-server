@@ -1,23 +1,50 @@
+import { NodeHtmlMarkdown } from "node-html-markdown";
 import { z } from "zod";
+import { getContentUrl } from "./config.js";
 import { sampleDocs } from "./sample-data.js";
 import { type SourceDoc, sourceDocsSchema } from "./schema.js";
 
+const segmentSchema = z
+	.object({
+		id: z.string(),
+		title: z.string(),
+		text: z.string(),
+		url: z.string(),
+	})
+	.readonly();
+
+const responseSchema = z.object({ data: z.object({ segments: z.array(segmentSchema).readonly() }).readonly() }).readonly();
+
+type Segment = z.infer<typeof segmentSchema>;
+
 /**
- * The single boundary for where documentation content comes from. v1 returns
- * the bundled sample data, validated against the schema.
- *
- * TODO: to index real content, replace the body of this function with a fetch
- * of the remote JSON export or a call to the
- * Kontent.ai Delivery API, then `sourceDocsSchema.parse` the result. Nothing
- * else in the pipeline needs to change.
+ * Loads the documents to index. Fetches the live content endpoint when `CONTENT_URL`
+ * is set; otherwise falls back to the bundled sample data (tests / local dev).
  */
 export const loadSourceDocs = async (): Promise<readonly SourceDoc[]> => {
-	// Async boundary preserved for the future remote/Delivery-API implementation,
-	// which will await a network fetch here.
-	const docs = await Promise.resolve(sampleDocs);
-	const result = sourceDocsSchema.safeParse(docs);
-	if (!result.success) {
-		throw new Error(`Invalid source documents:\n${z.prettifyError(result.error)}`);
+	const url = getContentUrl();
+	// Empty (tests set CONTENT_URL="") or unset → fall back to the bundled sample data.
+	if (!url) {
+		return sourceDocsSchema.parse(sampleDocs);
 	}
-	return result.data;
+	const {
+		data: { segments },
+	} = await fetchSegments(url);
+	return segments.map(toSourceDoc);
 };
+
+/** Maps a content segment to a source document, converting its HTML body to Markdown. */
+export const toSourceDoc = (segment: Segment): SourceDoc => ({
+	id: segment.id,
+	title: segment.title,
+	url: segment.url,
+	body: NodeHtmlMarkdown.translate(segment.text),
+});
+
+async function fetchSegments(url: string): Promise<z.infer<typeof responseSchema>> {
+	const response = await fetch(url);
+	if (!response.ok) {
+		throw new Error(`Failed to fetch content from ${url}: ${response.status} ${response.statusText}`);
+	}
+	return responseSchema.parse(await response.json());
+}
