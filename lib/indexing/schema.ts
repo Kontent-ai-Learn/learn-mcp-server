@@ -44,13 +44,15 @@ export type SearchResult = {
  * bundled sample data both produce this). Zod is the source of truth; `SourceDoc` is
  * derived via `z.infer`, so the schema const precedes the inferred type.
  */
-export const sourceDocSchema = z.object({
-	id: z.string().min(1),
-	title: z.string().min(1),
-	url: z.string().min(1), // citation only — never fetched/scraped, so any string (incl. relative) is fine
-	body: z.string(), // Markdown (converted from the source HTML)
-	last_modified: z.iso.datetime().optional(),
-});
+export const sourceDocSchema = z
+	.object({
+		id: z.string().min(1),
+		title: z.string().min(1),
+		url: z.string().min(1), // citation only — never fetched/scraped, so any string (incl. relative) is fine
+		body: z.string(), // Markdown (converted from the source HTML)
+		last_modified: z.iso.datetime().optional(),
+	})
+	.readonly();
 
 export const sourceDocsSchema = z.array(sourceDocSchema);
 
