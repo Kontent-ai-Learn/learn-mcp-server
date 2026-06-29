@@ -94,9 +94,8 @@ async function embedMissing(db: Database, spinner: SpinnerLog): Promise<number> 
 				return vector ? [{ chunkKey: chunk.chunkKey, vector }] : [];
 			}),
 		);
-		const processed = Math.min((batchIndex + 1) * EMBED_BATCH_SIZE, chunks.length);
 		spinner({
-			message: `Batch ${colorize("yellow", processed.toString())}/${colorize("yellow", chunks.length.toString())}`,
+			message: `Batch ${colorize("yellow", batchIndex.toString())}/${colorize("yellow", chunks.length.toString())}`,
 		});
 	}
 	return chunks.length;
