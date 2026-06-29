@@ -85,6 +85,10 @@ async function embedMissing(db: Database, spinner: SpinnerLog): Promise<number> 
 		message: `Embedding ${colorize("yellow", chunks.length.toString())} chunks in ${colorize("yellow", batches.length.toString())} batches`,
 	});
 	for (const [batchIndex, batch] of batches.entries()) {
+		spinner({
+			message: `Batch ${colorize("yellow", batchIndex.toString())}/${colorize("yellow", batches.length.toString())}`,
+		});
+
 		const vectors = await embedTexts(batch.map((chunk) => chunk.text));
 		await updateEmbeddings(
 			db,
@@ -94,9 +98,6 @@ async function embedMissing(db: Database, spinner: SpinnerLog): Promise<number> 
 				return vector ? [{ chunkKey: chunk.chunkKey, vector }] : [];
 			}),
 		);
-		spinner({
-			message: `Batch ${colorize("yellow", batchIndex.toString())}/${colorize("yellow", chunks.length.toString())}`,
-		});
 	}
 	return chunks.length;
 }
