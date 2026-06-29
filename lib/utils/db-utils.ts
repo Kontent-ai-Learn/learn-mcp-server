@@ -13,7 +13,6 @@ export type ColumnDefinition = {
 	readonly unique?: boolean;
 };
 
-/** A table keyed by its row type; `columns` holds one metadata entry per row field. */
 export type TableDefinition<TName extends string, TRow> = {
 	readonly tableName: TName;
 	readonly columns: Record<keyof TRow & string, ColumnDefinition>;
@@ -44,7 +43,6 @@ export function buildCreateTableQuery<TName extends string, TRow>(definition: Ta
 	return `CREATE TABLE IF NOT EXISTS ${definition.tableName} (${columnDefs});`;
 }
 
-/** Inserts a row, binding the provided column values by name. Runs directly (no prepare). */
 export async function insertInto<TName extends string, TRow>(
 	db: Database,
 	{
@@ -59,7 +57,6 @@ export async function insertInto<TName extends string, TRow>(
 	return await db.run(`INSERT INTO ${definition.tableName} (${names}) VALUES (${placeholders})`, ...params);
 }
 
-/** Deletes rows matching `where`. `where` is required to avoid an accidental delete-all. */
 export async function deleteFrom<TName extends string, TRow>(
 	db: Database,
 	{ definition, where }: { readonly definition: TableDefinition<TName, TRow>; readonly where: SqlWhere<keyof TRow & string> },
@@ -116,7 +113,7 @@ export async function selectFrom<TName extends string, TRow, TColumn extends key
 
 function columnName<TName extends string, TRow>(definition: TableDefinition<TName, TRow>, key: keyof TRow & string): string {
 	const column = definition.columns[key];
-	if (column === undefined) {
+	if (!column) {
 		throw new Error(`Unknown column "${key}" on table "${definition.tableName}"`);
 	}
 	return column.name;

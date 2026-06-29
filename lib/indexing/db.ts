@@ -65,7 +65,6 @@ export async function searchHybrid({
 }
 
 export async function openDb(path: string): Promise<Database> {
-	// Turso does not create the parent directory for a file-based database.
 	if (path !== ":memory:") {
 		await mkdir(dirname(path), { recursive: true });
 	}
@@ -123,7 +122,6 @@ export async function replaceDocument(db: Database, doc: NormalizedDoc, chunks: 
 	await transaction();
 }
 
-/** Chunks whose embedding is missing or was produced by a different model. */
 export async function selectChunksToEmbed(
 	db: Database,
 	model: string,
