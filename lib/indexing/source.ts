@@ -42,5 +42,5 @@ export const toSourceDoc = (segment: Segment): SourceDoc => ({
 	id: segment.id,
 	title: segment.title,
 	url: segment.url,
-	body: NodeHtmlMarkdown.translate(segment.text),
+	markdown: NodeHtmlMarkdown.translate(segment.text),
 });

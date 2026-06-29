@@ -40,7 +40,7 @@ function hashContent(parts: readonly string[]): string {
 function normalize(doc: SourceDoc): NormalizedDoc {
 	const title = doc.title.trim();
 	const url = doc.url.trim();
-	const body = normalizeBody(doc.body);
+	const body = normalizeBody(doc.markdown);
 	return {
 		id: doc.id,
 		title,

@@ -17,11 +17,11 @@ describe("toSourceDoc", () => {
 	});
 
 	it("converts the HTML text to Markdown (no tags, structure preserved)", () => {
-		const { body } = toSourceDoc(segment);
-		expect(body).not.toMatch(/<[a-z]/i); // no HTML tags remain
-		expect(body).toContain("## Webhooks"); // heading -> markdown
-		expect(body).toContain("**external**"); // <strong> -> bold
-		expect(body).toContain("Notify an **external** system.");
-		expect(body).toMatch(/[*-] One/); // list item -> markdown bullet
+		const { markdown } = toSourceDoc(segment);
+		expect(markdown).not.toMatch(/<[a-z]/i); // no HTML tags remain
+		expect(markdown).toContain("## Webhooks"); // heading -> markdown
+		expect(markdown).toContain("**external**"); // <strong> -> bold
+		expect(markdown).toContain("Notify an **external** system.");
+		expect(markdown).toMatch(/[*-] One/); // list item -> markdown bullet
 	});
 });
