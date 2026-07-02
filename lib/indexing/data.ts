@@ -7,7 +7,7 @@ import { packageJsonName, packageJsonVersion } from "../utils/version.js";
 import { getContentUrl } from "./config.js";
 import type { SourceDoc } from "./schema.js";
 
-const segmentSchema = z.readonly(
+export const segmentSchema = z.readonly(
 	z.object({
 		id: z.string(),
 		title: z.string(),
