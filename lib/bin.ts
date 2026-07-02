@@ -2,7 +2,7 @@
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
-import { ensureIndexReady } from "./indexing/search.js";
+import { syncDatabase } from "./indexing/search.js";
 import { createServer } from "./server.js";
 import { getEnvConfig } from "./utils/environment.utils.js";
 import { logger } from "./utils/logger.js";
@@ -109,7 +109,7 @@ async function main() {
 
 	// Build the documentation index once, before serving any requests. The index
 	// is a process-level singleton shared across all requests/tool calls.
-	await ensureIndexReady();
+	await syncDatabase();
 
 	if (transportType === "stdio") {
 		await startStdio();

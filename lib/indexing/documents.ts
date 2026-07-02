@@ -4,7 +4,6 @@ import type { Database } from "@tursodatabase/database";
 import { logger, type SpinnerLog } from "../utils/logger.js";
 import { chunkDoc } from "./chunking.js";
 import { EMBED_BATCH_SIZE, EMBEDDING_MODEL } from "./config.js";
-import { loadSourceDocs } from "./data.js";
 import { deleteDocuments, getDocHashes, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "./db.js";
 import { embedTexts } from "./embeddings.js";
 import type { NormalizedDoc, SourceDoc } from "./schema.js";
@@ -14,12 +13,11 @@ import type { NormalizedDoc, SourceDoc } from "./schema.js";
  * changed docs, then embed any chunk lacking an embedding. Persistent +
  * incremental — unchanged docs keep their existing embeddings across restarts.
  */
-export async function syncIndex(db: Database): Promise<void> {
-	logger.log({ message: "Loading source documents…" });
-	const normalized = (await loadSourceDocs()).map(normalize);
-	logger.log({ message: `Loaded ${colorize("yellow", normalized.length.toString())} source documents` });
+export async function indexSourceDocuments(db: Database, sourceDocuments: readonly SourceDoc[]): Promise<Database> {
+	const normalized = sourceDocuments.map(normalize);
 
 	await logger.logWithSpinnerAsync(async (spinner) => {
+		logger.log({ message: `Indexing ${colorize("yellow", normalized.length.toString())} source documents` });
 		const { changed, removed } = await applyDiff(db, normalized, spinner);
 		const embedded = await embedMissing(db, spinner);
 		spinner({
@@ -27,6 +25,7 @@ export async function syncIndex(db: Database): Promise<void> {
 			message: `Index ready: ${colorize("yellow", normalized.length.toString())} docs (${colorize("green", changed.toString())} new/changed, ${colorize("red", removed.toString())} removed), ${colorize("yellow", embedded.toString())} chunks embedded`,
 		});
 	});
+	return db;
 }
 
 function normalizeBody(body: string): string {
@@ -61,10 +60,10 @@ async function applyDiff(
 	normalized: readonly NormalizedDoc[],
 	spinner: SpinnerLog,
 ): Promise<{ readonly changed: number; readonly removed: number }> {
-	const existing = await getDocHashes(db);
+	const currentDocHashes = await getDocHashes(db);
 	const desiredIds = new Set(normalized.map((doc) => doc.id));
-	const removed = [...existing.keys()].filter((id) => !desiredIds.has(id));
-	const changed = normalized.filter((doc) => existing.get(doc.id) !== doc.contentHash);
+	const removed = [...currentDocHashes.keys()].filter((id) => !desiredIds.has(id));
+	const changed = normalized.filter((doc) => currentDocHashes.get(doc.id) !== doc.contentHash);
 
 	await deleteDocuments(db, removed);
 	spinner({ message: `Indexing documents ${colorize("yellow", "0")}/${colorize("yellow", changed.length.toString())}` });

@@ -1,6 +1,8 @@
-import { createFetchQuery, getDefaultHttpService } from "@kontent-ai/core-sdk";
+import { createFetchQuery, getDefaultHttpService, type TryCatchResult, tryCatchAsync } from "@kontent-ai/core-sdk";
+import { colorize } from "@kontent-ai/core-sdk/devkit";
 import { NodeHtmlMarkdown } from "node-html-markdown";
 import * as z from "zod/mini";
+import { logger } from "../utils/logger.js";
 import { packageJsonName, packageJsonVersion } from "../utils/version.js";
 import { getContentUrl } from "./config.js";
 import type { SourceDoc } from "./schema.js";
@@ -10,7 +12,7 @@ const segmentSchema = z.readonly(
 		id: z.string(),
 		title: z.string(),
 		text: z.string(),
-		url: z.string(),
+		url: z.url(),
 	}),
 );
 
@@ -22,25 +24,32 @@ const responseSchema = z.readonly(
 
 type Segment = z.infer<typeof segmentSchema>;
 
-export const loadSourceDocs = async (): Promise<readonly SourceDoc[]> => {
-	const url = getContentUrl();
-	if (!url) {
-		throw new Error("Invalid source docs url");
-	}
-	const query = createFetchQuery({
-		url,
-		config: {
-			httpService: getDefaultHttpService(),
-			runtimeValidation: { validateResponses: true },
-		},
-		schema: responseSchema,
-		sdkInfo: { name: packageJsonName, version: packageJsonVersion, host: "npmjs.com" },
-		mapMetadata: () => ({}),
-		mapError: (error) => error,
-		mapExtraResponseProps: () => ({}),
+export const loadSourceDocs = async (): Promise<TryCatchResult<readonly SourceDoc[]>> => {
+	return await tryCatchAsync(async () => {
+		logger.log({ message: "Fetching source documents" });
+
+		const url = getContentUrl();
+		if (!url) {
+			throw new Error("Invalid source docs url");
+		}
+		const query = createFetchQuery({
+			url,
+			config: {
+				httpService: getDefaultHttpService(),
+				runtimeValidation: { validateResponses: true },
+			},
+			schema: responseSchema,
+			sdkInfo: { name: packageJsonName, version: packageJsonVersion, host: "npmjs.com" },
+			mapMetadata: () => ({}),
+			mapError: (error) => error,
+			mapExtraResponseProps: () => ({}),
+		});
+		const { payload } = await query.fetch();
+
+		logger.log({ message: `Loaded ${colorize("yellow", payload.data.segments.length.toString())} source documents` });
+
+		return payload.data.segments.map(mapSegmentToSourceDoc);
 	});
-	const { payload } = await query.fetch();
-	return payload.data.segments.map(mapSegmentToSourceDoc);
 };
 
 export const mapSegmentToSourceDoc = (segment: Segment): SourceDoc => ({

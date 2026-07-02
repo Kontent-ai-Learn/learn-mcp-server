@@ -7,14 +7,14 @@ export function getEnvConfig(): {
 	readonly port: number;
 	readonly dbPath: string;
 	readonly cacheDir: string;
-	readonly contentUrl: string;
+	readonly contentUrl: string | undefined;
 } {
 	loadEnvironmentVariables();
 
 	const port = getOptionalValue("PORT");
 	const dbPath = getOptionalValue("DB_PATH");
 	const cacheDir = getOptionalValue("CACHE_DIR");
-	const contentUrl = getRequiredValue("CONTENT_URL");
+	const contentUrl = getOptionalValue("CONTENT_URL");
 
 	return {
 		port: port ? +port : 3002,
@@ -26,14 +26,6 @@ export function getEnvConfig(): {
 
 function getOptionalValue(name: string): string | undefined {
 	return process.env[name];
-}
-
-function getRequiredValue(name: string): string {
-	const value = process.env[name];
-	if (value === undefined) {
-		throw new Error(`Environment variable ${name} is required`);
-	}
-	return value;
 }
 
 function loadEnvironmentVariables(): void {

@@ -22,6 +22,7 @@ describe("search-content tool (in-memory e2e)", () => {
 
 				const content = res.content as readonly TextContent[];
 				const [first] = content;
+
 				expect(first?.type).toBe("text");
 
 				const results = JSON.parse(first?.text ?? "[]") as readonly SearchResult[];

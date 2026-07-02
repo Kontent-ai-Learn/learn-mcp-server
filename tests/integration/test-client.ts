@@ -2,7 +2,16 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createServer } from "../../lib/server.js";
 
-export const createTestClient = async () => {
+export const withTestClient = async <T>(fn: (client: Client) => Promise<T>): Promise<T> => {
+	const { client, close } = await createTestClient();
+	try {
+		return await fn(client);
+	} finally {
+		await close();
+	}
+};
+
+const createTestClient = async () => {
 	const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
 	const { server } = createServer();
 	const client = new Client({ name: "test-client", version: "0.0.0" });
@@ -15,14 +24,4 @@ export const createTestClient = async () => {
 	};
 
 	return { client, close } as const;
-};
-
-// Runs `fn` against a fresh connected client and always tears the pair down.
-export const withTestClient = async <T>(fn: (client: Client) => Promise<T>): Promise<T> => {
-	const { client, close } = await createTestClient();
-	try {
-		return await fn(client);
-	} finally {
-		await close();
-	}
 };

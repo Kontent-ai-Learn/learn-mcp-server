@@ -1,23 +1,17 @@
 import type { Database } from "@tursodatabase/database";
+import { logger } from "../utils/logger.js";
 import { getDbPath, SEARCH_LIMIT } from "./config.js";
+import { loadSourceDocs } from "./data.js";
 import { openDb, searchHybrid } from "./db.js";
+import { indexSourceDocuments } from "./documents.js";
 import { embedQuery } from "./embeddings.js";
 import type { SearchResult } from "./schema.js";
-import { syncIndex } from "./sync.js";
 
-/**
- * Process-level singleton. The index (Turso connection + populated data) is
- * built exactly once per process and shared by every request. Held on a const
- * object so concurrent callers await the same initialisation promise.
- *
- * IMPORTANT: never initialise inside `createServer` — that runs per HTTP
- * request. Initialise once in `main()` via `ensureIndexReady`.
- */
 let cachedDb: Database | null = null;
 
-export async function ensureIndexReady(): Promise<Database> {
+export async function getCachedDb(): Promise<Database> {
 	if (!cachedDb) {
-		cachedDb = await prepareDb();
+		cachedDb = await getDb();
 	}
 	return cachedDb;
 }
@@ -27,13 +21,24 @@ export async function search(query: string): Promise<readonly SearchResult[]> {
 	if (trimmed.length === 0) {
 		return [];
 	}
-	const db = await ensureIndexReady();
+	const db = await getCachedDb();
 	const vector = await embedQuery(trimmed);
 	return await searchHybrid({ db, queryVector: vector, queryText: trimmed, limit: SEARCH_LIMIT });
 }
 
-async function prepareDb(): Promise<Database> {
-	const db = await openDb(getDbPath());
-	await syncIndex(db);
-	return db;
+export async function syncDatabase(): Promise<Database> {
+	const db = await getDb();
+	const { success, error, data: documents } = await loadSourceDocs();
+
+	if (!success) {
+		logger.log({
+			message: `Failed to load source documents ${error instanceof Error ? error.message : "Unknown error"}`,
+		});
+		throw error;
+	}
+	return await indexSourceDocuments(db, documents);
+}
+
+async function getDb(): Promise<Database> {
+	return await openDb(getDbPath());
 }
