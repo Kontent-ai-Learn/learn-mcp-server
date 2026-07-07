@@ -2,11 +2,16 @@
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
+import { match } from "ts-pattern";
 import { syncDatabase } from "./indexing/search.js";
 import { createServer } from "./server.js";
 import { getEnvConfig } from "./utils/environment.utils.js";
 import { logger } from "./utils/logger.js";
 import { packageJsonName, packageJsonVersion } from "./utils/version.js";
+
+const transportTypes = ["stdio", "shttp"] as const;
+
+type TransportType = (typeof transportTypes)[number];
 
 function startStreamableHTTP() {
 	const app = express();
@@ -98,12 +103,23 @@ async function startStdio() {
 	await server.connect(transport);
 }
 
+function getTransportTypeFromArg(arg: string | undefined): TransportType | undefined {
+	return match(arg?.toLowerCase())
+		.returnType<TransportType | undefined>()
+		.with("stdio" satisfies TransportType, () => "stdio")
+		.with("shttp" satisfies TransportType, () => "shttp")
+		.otherwise(() => {
+			return undefined;
+		});
+}
+
 async function main() {
 	const args = process.argv.slice(2);
-	const transportType = args[0]?.toLowerCase();
 
-	if (!transportType || (transportType !== "stdio" && transportType !== "shttp")) {
-		logger.log({ type: "error", message: "Please specify a valid transport type: stdio or shttp" });
+	const transportType = getTransportTypeFromArg(args[0]);
+
+	if (!transportType) {
+		logger.log({ type: "error", message: `Please specify a valid transport type: ${transportTypes.join(", ")}` });
 		process.exit(1);
 	}
 
@@ -113,8 +129,12 @@ async function main() {
 
 	if (transportType === "stdio") {
 		await startStdio();
-	} else if (transportType === "shttp") {
+		return;
+	}
+
+	if (transportType === "shttp") {
 		startStreamableHTTP();
+		return;
 	}
 }
 

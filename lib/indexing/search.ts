@@ -32,7 +32,7 @@ export async function syncDatabase(): Promise<Database> {
 
 	if (!success) {
 		logger.log({
-			message: `Failed to load source documents ${error instanceof Error ? error.message : "Unknown error"}`,
+			message: `Failed to load source documents when syncing database. ${error instanceof Error ? error.message : "Unknown error"}`,
 		});
 		throw error;
 	}
