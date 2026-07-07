@@ -3,12 +3,12 @@ import { logger } from "../utils/logger.js";
 import { getDbPath, SEARCH_LIMIT } from "./config.js";
 import { loadSourceDocs } from "./data.js";
 import { openDb, searchHybrid } from "./db.js";
-import { indexSourceDocuments } from "./documents.js";
+import { type IndexDocumentsResult, indexSourceDocuments } from "./documents.js";
 import { embedQuery } from "./embeddings.js";
 import type { SearchResult } from "./schema.js";
 
 let cachedDb: Database | null = null;
-type SyncDbResult = {
+export type SyncDbResult = IndexDocumentsResult & {
 	readonly documentCount: number;
 	readonly database: Database;
 };
@@ -39,11 +39,11 @@ export async function syncDatabase(): Promise<SyncDbResult> {
 		});
 		throw error;
 	}
-	const db = await indexSourceDocuments(await getDb(), documents);
+	const indexResult = await indexSourceDocuments(await getDb(), documents);
 
 	return {
 		documentCount: documents.length,
-		database: db,
+		...indexResult,
 	};
 }
 

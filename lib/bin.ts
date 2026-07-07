@@ -89,10 +89,16 @@ function startStreamableHTTP() {
 
 	app.post("/index", async (_, res) => {
 		const { success, error } = await tryCatchAsync(async () => {
-			const { documentCount } = await syncDatabase();
+			const { documentCount, changedCount, removedCount, unchangedCount } = await syncDatabase();
 
 			res.json({
-				message: `Successfully indexed '${documentCount}' documents`,
+				message: `Successfully indexed '${documentCount}' documents.`,
+				result: {
+					changed: changedCount,
+					removed: removedCount,
+					unchanged: unchangedCount,
+					total: documentCount,
+				},
 				timestamp: new Date().toISOString(),
 				currentVersion: packageJsonVersion,
 			});

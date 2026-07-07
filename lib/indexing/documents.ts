@@ -8,24 +8,33 @@ import { deleteDocuments, getDocHashes, replaceDocument, selectChunksToEmbed, up
 import { embedTexts } from "./embeddings.js";
 import type { NormalizedDoc, SourceDoc } from "./schema.js";
 
+export type IndexDocumentsResult = {
+	readonly database: Database;
+	readonly changedCount: number;
+	readonly removedCount: number;
+	readonly unchangedCount: number;
+};
+
 /**
  * Bring the index up to date with the source: diff by content hash, re-chunk
  * changed docs, then embed any chunk lacking an embedding. Persistent +
  * incremental — unchanged docs keep their existing embeddings across restarts.
  */
-export async function indexSourceDocuments(db: Database, sourceDocuments: readonly SourceDoc[]): Promise<Database> {
+export async function indexSourceDocuments(db: Database, sourceDocuments: readonly SourceDoc[]): Promise<IndexDocumentsResult> {
 	const normalized = sourceDocuments.map(normalize);
 
-	await logger.logWithSpinnerAsync(async (spinner) => {
+	const result = await logger.logWithSpinnerAsync<IndexDocumentsResult>(async (spinner) => {
 		logger.log({ message: `Indexing ${colorize("yellow", normalized.length.toString())} source documents` });
-		const { changed, removed } = await applyDiff(db, normalized, spinner);
+		const { changed, removed, unchanged } = await applyDiff({ db, normalizedDocuments: normalized, spinner });
 		const embedded = await embedMissing(db, spinner);
 		spinner({
 			type: "completed",
-			message: `Index ready: ${colorize("yellow", normalized.length.toString())} docs (${colorize("green", changed.toString())} new/changed, ${colorize("red", removed.toString())} removed), ${colorize("yellow", embedded.toString())} chunks embedded`,
+			message: `Index ready: ${colorize("yellow", normalized.length.toString())} docs (${colorize("green", changed.toString())} new/changed, ${colorize("gray", unchanged.toString())} unchanged, ${colorize("red", removed.toString())} removed), ${colorize("yellow", embedded.toString())} chunks embedded`,
 		});
+
+		return { database: db, changedCount: changed, removedCount: removed, unchangedCount: unchanged };
 	});
-	return db;
+	return result;
 }
 
 function normalizeBody(body: string): string {
@@ -55,28 +64,38 @@ function toBatches<T>(items: readonly T[], size: number): readonly (readonly T[]
 }
 
 /** Apply structural changes (new/changed/removed docs), keeping unchanged docs untouched. */
-async function applyDiff(
-	db: Database,
-	normalized: readonly NormalizedDoc[],
-	spinner: SpinnerLog,
-): Promise<{ readonly changed: number; readonly removed: number }> {
+async function applyDiff({
+	db,
+	normalizedDocuments,
+	spinner,
+}: {
+	readonly db: Database;
+	readonly normalizedDocuments: readonly NormalizedDoc[];
+	readonly spinner: SpinnerLog;
+}): Promise<{ readonly changed: number; readonly removed: number; readonly unchanged: number }> {
 	const currentDocHashes = await getDocHashes(db);
-	const desiredIds = new Set(normalized.map((doc) => doc.id));
-	const removed = [...currentDocHashes.keys()].filter((id) => !desiredIds.has(id));
-	const changed = normalized.filter((doc) => currentDocHashes.get(doc.id) !== doc.contentHash);
+	const normalizedDocumentIds = new Set(normalizedDocuments.map((doc) => doc.id));
+	const removedDocumentIds: readonly string[] = [...currentDocHashes.keys()].filter((id) => !normalizedDocumentIds.has(id));
+	const changedDocuments: readonly NormalizedDoc[] = normalizedDocuments.filter(
+		(doc) => currentDocHashes.get(doc.id) !== doc.contentHash,
+	);
 
-	await deleteDocuments(db, removed);
-	spinner({ message: `Indexing documents ${colorize("yellow", "0")}/${colorize("yellow", changed.length.toString())}` });
-	for (const [index, doc] of changed.entries()) {
+	await deleteDocuments(db, removedDocumentIds);
+	spinner({ message: `Indexing documents ${colorize("yellow", "0")}/${colorize("yellow", changedDocuments.length.toString())}` });
+	for (const [index, doc] of changedDocuments.entries()) {
 		spinner({
-			message: `Indexing documents ${colorize("yellow", (index + 1).toString())}/${colorize("yellow", changed.length.toString())}`,
+			message: `Indexing documents ${colorize("yellow", (index + 1).toString())}/${colorize("yellow", changedDocuments.length.toString())}`,
 		});
 		await replaceDocument(db, doc, chunkDoc(doc));
 	}
 	logger.log({
 		message: `\nFinished indexing documents`,
 	});
-	return { changed: changed.length, removed: removed.length };
+	return {
+		changed: changedDocuments.length,
+		removed: removedDocumentIds.length,
+		unchanged: normalizedDocuments.length - changedDocuments.length,
+	};
 }
 
 /** Embed every chunk that is missing an embedding for the current model. */
