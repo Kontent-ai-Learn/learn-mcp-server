@@ -1,3 +1,4 @@
+import { tryCatchAsync } from "@kontent-ai/core-sdk";
 import cliSpinners from "cli-spinners";
 import { match } from "ts-pattern";
 
@@ -25,7 +26,7 @@ export const logger: Logger = {
 			process.stderr.write(`\r${frame} ${state.text}`);
 		};
 		const timer = setInterval(render, interval);
-		try {
+		const { success, error, data } = await tryCatchAsync(async () => {
 			const result = await operation((data) => {
 				state.text = data.message;
 				render();
@@ -33,11 +34,15 @@ export const logger: Logger = {
 			clearInterval(timer);
 			process.stderr.write(`\r${state.text}\n`);
 			return result;
-		} catch (error) {
+		});
+
+		if (!success) {
 			clearInterval(timer);
 			process.stderr.write(`\r${state.text}\n`);
 			throw error;
 		}
+
+		return data;
 	},
 };
 

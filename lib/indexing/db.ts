@@ -2,7 +2,7 @@ import { mkdir } from "node:fs/promises";
 import { dirname } from "node:path";
 import { connect, type Database } from "@tursodatabase/database";
 import { match, P } from "ts-pattern";
-import { buildCreateTableQuery, deleteFrom, insertInto, selectFrom, updateTable } from "../utils/db-utils.js";
+import { buildCreateTableQuery, deleteFrom, insertInto, selectFrom, updateTable } from "../utils/db.utils.js";
 import { CANDIDATE_LIMIT, RRF_K, STOPWORDS } from "./config.js";
 import type { DocChunk, MatchType, NormalizedDoc, SearchResult } from "./schema.js";
 import { CHUNKS_TABLE, DOCUMENTS_TABLE } from "./tables.js";

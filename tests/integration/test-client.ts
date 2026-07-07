@@ -1,14 +1,20 @@
+import { tryCatchAsync } from "@kontent-ai/core-sdk";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createServer } from "../../lib/server.js";
 
 export const withTestClient = async <T>(fn: (client: Client) => Promise<T>): Promise<T> => {
 	const { client, close } = await createTestClient();
-	try {
+	const { success, data, error } = await tryCatchAsync<T>(async () => {
 		return await fn(client);
-	} finally {
+	});
+
+	if (!success) {
 		await close();
+		throw error;
 	}
+
+	return data;
 };
 
 const createTestClient = async () => {

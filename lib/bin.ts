@@ -7,6 +7,7 @@ import { match } from "ts-pattern";
 import { syncDatabase } from "./indexing/search.js";
 import { createServer } from "./server.js";
 import { getEnvConfig } from "./utils/environment.utils.js";
+import { getErrorMessage } from "./utils/error.utils.js";
 import { logger } from "./utils/logger.js";
 import { packageJsonName, packageJsonVersion } from "./utils/version.js";
 
@@ -37,7 +38,7 @@ function startStreamableHTTP() {
 		if (!success) {
 			logger.log({
 				type: "error",
-				message: `${packageJsonName}@${packageJsonVersion} - Error handling MCP request: ${error instanceof Error ? error.message : String(error)}`,
+				message: `${packageJsonName}@${packageJsonVersion} - Error handling MCP request: ${getErrorMessage(error)}`,
 			});
 			if (!res.headersSent) {
 				res.status(500).json({
@@ -86,6 +87,35 @@ function startStreamableHTTP() {
 		});
 	});
 
+	app.post("/index", async (_, res) => {
+		const { success, error } = await tryCatchAsync(async () => {
+			const { documentCount } = await syncDatabase();
+
+			res.json({
+				message: `Successfully indexed '${documentCount}' documents`,
+				timestamp: new Date().toISOString(),
+				currentVersion: packageJsonVersion,
+			});
+		});
+
+		if (!success) {
+			logger.log({
+				type: "error",
+				message: `${packageJsonName}@${packageJsonVersion} - Error handling MCP request: ${getErrorMessage(error)}`,
+			});
+			if (!res.headersSent) {
+				res.status(500).json({
+					jsonrpc: "2.0",
+					error: {
+						code: -32603,
+						message: "Internal server error",
+					},
+					id: null,
+				});
+			}
+		}
+	});
+
 	app.use((err: Error, _req: express.Request, _res: express.Response, next: express.NextFunction) => {
 		next(err);
 	});
@@ -125,10 +155,6 @@ async function main() {
 		logger.log({ type: "error", message: `Please specify a valid transport type: ${transportTypes.join(", ")}` });
 		process.exit(1);
 	}
-
-	// Build the documentation index once, before serving any requests. The index
-	// is a process-level singleton shared across all requests/tool calls.
-	await syncDatabase();
 
 	if (transportType === "stdio") {
 		await startStdio();

@@ -8,6 +8,10 @@ import { embedQuery } from "./embeddings.js";
 import type { SearchResult } from "./schema.js";
 
 let cachedDb: Database | null = null;
+type SyncDbResult = {
+	readonly documentCount: number;
+	readonly database: Database;
+};
 
 export async function getCachedDb(): Promise<Database> {
 	if (!cachedDb) {
@@ -26,8 +30,7 @@ export async function search(query: string): Promise<readonly SearchResult[]> {
 	return await searchHybrid({ db, queryVector: vector, queryText: trimmed, limit: SEARCH_LIMIT });
 }
 
-export async function syncDatabase(): Promise<Database> {
-	const db = await getDb();
+export async function syncDatabase(): Promise<SyncDbResult> {
 	const { success, error, data: documents } = await loadSourceDocs();
 
 	if (!success) {
@@ -36,7 +39,12 @@ export async function syncDatabase(): Promise<Database> {
 		});
 		throw error;
 	}
-	return await indexSourceDocuments(db, documents);
+	const db = await indexSourceDocuments(await getDb(), documents);
+
+	return {
+		documentCount: documents.length,
+		database: db,
+	};
 }
 
 async function getDb(): Promise<Database> {

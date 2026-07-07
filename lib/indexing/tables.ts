@@ -1,4 +1,4 @@
-import type { TableDefinition } from "../utils/db-utils.js";
+import type { TableDefinition } from "../utils/db.utils.js";
 import { EMBEDDING_DIM } from "./config.js";
 
 export type DocumentRow = {

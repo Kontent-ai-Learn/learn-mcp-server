@@ -1,5 +1,8 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { tryCatch } from "@kontent-ai/core-sdk";
+import { getErrorMessage } from "../lib/utils/error.utils.js";
+import { logger } from "../lib/utils/logger.js";
 
 type PackageJson = {
 	readonly version: string;
@@ -80,9 +83,12 @@ const syncVersions = (): void => {
 	console.log(`   Updated ${serverJson.packages.length} package(s)`);
 };
 
-try {
+const { success, error } = tryCatch(() => {
 	syncVersions();
-} catch (error) {
-	console.error("❌ Error:", error instanceof Error ? error.message : error);
+	logger.log({ type: "info", message: "Version synced successfully" });
+});
+
+if (!success) {
+	logger.log({ type: "error", message: `Error syncing version: ${getErrorMessage(error)}` });
 	process.exit(1);
 }
