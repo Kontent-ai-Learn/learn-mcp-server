@@ -80,7 +80,7 @@ async function applyDiff(
 async function embedMissing(db: Database, spinner: SpinnerLog): Promise<number> {
 	const chunks = await selectChunksToEmbed(db, EMBEDDING_MODEL);
 	const batches = toBatches(chunks, EMBED_BATCH_SIZE);
-	spinner({
+	logger.log({
 		message: `Embedding ${colorize("yellow", chunks.length.toString())} chunks in ${colorize("yellow", batches.length.toString())} batches`,
 	});
 	for (const [batchIndex, batch] of batches.entries()) {
