@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { tryCatchAsync } from "@kontent-ai/core-sdk";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
@@ -18,7 +19,7 @@ function startStreamableHTTP() {
 	app.use(express.json());
 
 	app.post("/mcp", async (req, res) => {
-		try {
+		const { success, error } = await tryCatchAsync(async () => {
 			const { server } = createServer();
 			const transport = new StreamableHTTPServerTransport({
 				sessionIdGenerator: undefined,
@@ -31,7 +32,9 @@ function startStreamableHTTP() {
 
 			await server.connect(transport);
 			await transport.handleRequest(Object.assign(req, {}), res, req.body);
-		} catch (error) {
+		});
+
+		if (!success) {
 			logger.log({
 				type: "error",
 				message: `${packageJsonName}@${packageJsonVersion} - Error handling MCP request: ${error instanceof Error ? error.message : String(error)}`,
