@@ -68,11 +68,14 @@ async function applyDiff(
 	await deleteDocuments(db, removed);
 	spinner({ message: `Indexing documents ${colorize("yellow", "0")}/${colorize("yellow", changed.length.toString())}` });
 	for (const [index, doc] of changed.entries()) {
-		await replaceDocument(db, doc, chunkDoc(doc));
 		spinner({
 			message: `Indexing documents ${colorize("yellow", (index + 1).toString())}/${colorize("yellow", changed.length.toString())}`,
 		});
+		await replaceDocument(db, doc, chunkDoc(doc));
 	}
+	logger.log({
+		message: `\nFinished indexing documents`,
+	});
 	return { changed: changed.length, removed: removed.length };
 }
 
@@ -83,12 +86,16 @@ async function embedMissing(db: Database, spinner: SpinnerLog): Promise<number> 
 	logger.log({
 		message: `Embedding ${colorize("yellow", chunks.length.toString())} chunks in ${colorize("yellow", batches.length.toString())} batches`,
 	});
+	spinner({
+		message: `Batch ${colorize("yellow", "0")}/${colorize("yellow", batches.length.toString())}`,
+	});
 	for (const [batchIndex, batch] of batches.entries()) {
 		spinner({
-			message: `Batch ${colorize("yellow", batchIndex.toString())}/${colorize("yellow", batches.length.toString())}`,
+			message: `Batch ${colorize("yellow", (batchIndex + 1).toString())}/${colorize("yellow", batches.length.toString())}`,
 		});
 
 		const vectors = await embedTexts(batch.map((chunk) => chunk.text));
+
 		await updateEmbeddings(
 			db,
 			EMBEDDING_MODEL,
@@ -98,5 +105,9 @@ async function embedMissing(db: Database, spinner: SpinnerLog): Promise<number> 
 			}),
 		);
 	}
+
+	logger.log({
+		message: `\nFinished embedding chunks`,
+	});
 	return chunks.length;
 }
