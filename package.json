@@ -67,12 +67,12 @@
 		"zod": "^4"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.5.2",
+		"@biomejs/biome": "2.5.3",
 		"@kontent-ai/biome-config": "0.7.3",
 		"@kontent-ai/eslint-config": "2.4.1",
 		"@types/express": "5.0.6",
 		"@types/node": "26.1.1",
-		"@typescript/native-preview": "7.0.0-dev.20260628.1",
+		"@typescript/native-preview": "7.0.0-dev.20260707.2",
 		"esbuild": "0.28.1",
 		"eslint": "10.6.0",
 		"tsx": "4.23.0",
