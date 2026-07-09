@@ -1,8 +1,8 @@
 import z from "zod";
-import { defineReadOnlyTool } from "../core/tool-definitions.js";
-import { withToolHandler } from "../core/tool-handler.js";
-import type { ToolName } from "../core/tool-models.js";
 import { search } from "../indexing/search.js";
+import { defineReadOnlyTool } from "../tools-def/tool-definitions.js";
+import { withToolHandler } from "../tools-def/tool-handler.js";
+import type { ToolName } from "../tools-def/tool-models.js";
 
 const toolName: ToolName = "search-content";
 
