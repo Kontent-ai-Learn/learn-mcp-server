@@ -29,10 +29,12 @@
 	"bin": {
 		"@kontent-ai-learn/learn-mcp-server": "./build/bin.js"
 	},
+
 	"types": "./dist/public_api.d.ts",
 	"type": "module",
 	"sideEffects": false,
 	"scripts": {
+		"preinstall": "npx only-allow pnpm",
 		"prepublishOnly": "pnpm run build",
 		"eslint": "eslint -c eslint.config.mjs .",
 		"lint": "pnpm run biome:check && pnpm run eslint",

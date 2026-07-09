@@ -44,3 +44,6 @@ export const CHUNKS_TABLE: TableDefinition<"chunks", ChunkRow> = {
 		embeddingModel: { name: "embeddingModel", type: "TEXT" },
 	},
 };
+
+/** Serialise a vector for Turso's `vector32(?)` SQL function. */
+export const toVectorParam = (vector: Float32Array): string => JSON.stringify(Array.from(vector));

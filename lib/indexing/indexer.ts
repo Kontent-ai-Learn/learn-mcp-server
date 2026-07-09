@@ -3,10 +3,11 @@ import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
 import { logger, type SpinnerLog } from "../utils/logger.js";
 import { chunkDoc } from "./chunking.js";
-import { EMBED_BATCH_SIZE, EMBEDDING_MODEL } from "./config.js";
-import { deleteDocuments, getDocHashes, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "./db.js";
+import { EMBED_BATCH_SIZE, EMBEDDING_MODEL, getDbPath } from "./config.js";
+import { deleteDocuments, getDocHashes, openDb, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "./db.js";
 import { embedTexts } from "./embeddings.js";
-import type { NormalizedDoc, SourceDoc } from "./index.models.js";
+import type { NormalizedDoc, SourceDoc } from "./models.js";
+import { loadSourceDocs } from "./source.js";
 
 export type IndexDocumentsResult = {
 	readonly database: Database;
@@ -14,6 +15,28 @@ export type IndexDocumentsResult = {
 	readonly removedCount: number;
 	readonly unchangedCount: number;
 };
+
+export type SyncDbResult = IndexDocumentsResult & {
+	readonly documentCount: number;
+};
+
+/** Load the latest source documents from the content endpoint and index them into a fresh DB handle. */
+export async function syncDatabase(): Promise<SyncDbResult> {
+	const { success, error, data: documents } = await loadSourceDocs();
+
+	if (!success) {
+		logger.log({
+			message: `Failed to load source documents when syncing database. ${error instanceof Error ? error.message : "Unknown error"}`,
+		});
+		throw error;
+	}
+	const indexResult = await indexSourceDocuments(await openDb(getDbPath()), documents);
+
+	return {
+		documentCount: documents.length,
+		...indexResult,
+	};
+}
 
 /**
  * Bring the index up to date with the source: diff by content hash, re-chunk

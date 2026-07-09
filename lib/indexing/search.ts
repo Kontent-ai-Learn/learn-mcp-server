@@ -1,24 +1,12 @@
 import type { Database } from "@tursodatabase/database";
-import { logger } from "../utils/logger.js";
 import { getDbPath, SEARCH_LIMIT } from "./config.js";
-import { loadSourceDocs } from "./data.js";
-import { openDb, searchHybrid } from "./db.js";
-import { type IndexDocumentsResult, indexSourceDocuments } from "./documents.js";
+import { openDb } from "./db.js";
 import { embedQuery } from "./embeddings.js";
-import type { SearchResult } from "./index.models.js";
+import type { SearchResult } from "./models.js";
+import { searchHybrid } from "./retrieval.js";
 
-let cachedDb: Database | null = null;
-export type SyncDbResult = IndexDocumentsResult & {
-	readonly documentCount: number;
-	readonly database: Database;
-};
-
-export async function getCachedDb(): Promise<Database> {
-	if (!cachedDb) {
-		cachedDb = await getDb();
-	}
-	return cachedDb;
-}
+/** Lazily-opened, process-wide DB handle reused across queries. */
+const state: { db: Database | null } = { db: null };
 
 export async function search(query: string): Promise<readonly SearchResult[]> {
 	const trimmed = query.trim();
@@ -30,23 +18,7 @@ export async function search(query: string): Promise<readonly SearchResult[]> {
 	return await searchHybrid({ db, queryVector: vector, queryText: trimmed, limit: SEARCH_LIMIT });
 }
 
-export async function syncDatabase(): Promise<SyncDbResult> {
-	const { success, error, data: documents } = await loadSourceDocs();
-
-	if (!success) {
-		logger.log({
-			message: `Failed to load source documents when syncing database. ${error instanceof Error ? error.message : "Unknown error"}`,
-		});
-		throw error;
-	}
-	const indexResult = await indexSourceDocuments(await getDb(), documents);
-
-	return {
-		documentCount: documents.length,
-		...indexResult,
-	};
-}
-
-async function getDb(): Promise<Database> {
-	return await openDb(getDbPath());
+async function getCachedDb(): Promise<Database> {
+	state.db ??= await openDb(getDbPath());
+	return state.db;
 }

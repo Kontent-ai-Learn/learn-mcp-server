@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { chunkDoc, chunkPlainText } from "../../lib/indexing/chunking.js";
-import type { NormalizedDoc } from "../../lib/indexing/index.models.js";
+import type { NormalizedDoc } from "../../lib/indexing/models.js";
 
 const repeat = (word: string, times: number): string => Array.from({ length: times }, () => word).join(" ");
 

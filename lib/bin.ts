@@ -4,7 +4,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
 import { match } from "ts-pattern";
-import { syncDatabase } from "./indexing/search.js";
+import { syncDatabase } from "./indexing/indexer.js";
 import { createServer } from "./server.js";
 import { getEnvConfig } from "./utils/environment.utils.js";
 import { getErrorMessage } from "./utils/error.utils.js";
