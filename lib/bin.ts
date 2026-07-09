@@ -15,7 +15,7 @@ const transportTypes = ["stdio", "shttp"] as const;
 
 type TransportType = (typeof transportTypes)[number];
 
-function startStreamableHTTP() {
+function startStreamableHTTP(): void {
 	const app = express();
 	app.use(express.json());
 
@@ -129,13 +129,13 @@ function startStreamableHTTP() {
 	const port = getEnvConfig().port;
 	app.listen(port, () => {
 		console.log(
-			`${packageJsonName}@${packageJsonVersion} (Streamable HTTP) running on port ${port}. 
+			`${packageJsonName}@${packageJsonVersion} (Streamable HTTP) running on port ${port}.
 Available endpoint: /mcp`,
 		);
 	});
 }
 
-async function startStdio() {
+async function startStdio(): Promise<void> {
 	const { server } = createServer();
 	const transport = new StdioServerTransport();
 	logger.log({ type: "info", message: `${packageJsonName}@${packageJsonVersion} (stdio) starting` });
@@ -152,7 +152,7 @@ function getTransportTypeFromArg(arg: string | undefined): TransportType | undef
 		});
 }
 
-async function main() {
+async function main(): Promise<void> {
 	const args = process.argv.slice(2);
 
 	const transportType = getTransportTypeFromArg(args[0]);
