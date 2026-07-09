@@ -5,7 +5,7 @@ import { loadSourceDocs } from "./data.js";
 import { openDb, searchHybrid } from "./db.js";
 import { type IndexDocumentsResult, indexSourceDocuments } from "./documents.js";
 import { embedQuery } from "./embeddings.js";
-import type { SearchResult } from "./schema.js";
+import type { SearchResult } from "./index.models.js";
 
 let cachedDb: Database | null = null;
 export type SyncDbResult = IndexDocumentsResult & {

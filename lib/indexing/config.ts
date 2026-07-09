@@ -1,9 +1,3 @@
-/**
- * Single source of truth for indexing/search configuration. The embedding
- * model + pooling/normalisation MUST be identical at index time and query time,
- * so the model identity lives here and nowhere else.
- */
-
 import { getEnvConfig } from "../utils/environment.utils.js";
 
 /**

@@ -3,12 +3,14 @@ import path from "node:path";
 import { loadEnvFile } from "node:process";
 import { fileURLToPath } from "node:url";
 
-export function getEnvConfig(): {
+type EnvConfig = {
 	readonly port: number;
 	readonly dbPath: string;
 	readonly cacheDir: string;
 	readonly contentUrl: string | undefined;
-} {
+};
+
+export function getEnvConfig(): EnvConfig {
 	loadEnvironmentVariables();
 
 	const port = getOptionalValue("PORT");

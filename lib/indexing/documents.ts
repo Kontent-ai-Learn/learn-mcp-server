@@ -6,7 +6,7 @@ import { chunkDoc } from "./chunking.js";
 import { EMBED_BATCH_SIZE, EMBEDDING_MODEL } from "./config.js";
 import { deleteDocuments, getDocHashes, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "./db.js";
 import { embedTexts } from "./embeddings.js";
-import type { NormalizedDoc, SourceDoc } from "./schema.js";
+import type { NormalizedDoc, SourceDoc } from "./index.models.js";
 
 export type IndexDocumentsResult = {
 	readonly database: Database;
