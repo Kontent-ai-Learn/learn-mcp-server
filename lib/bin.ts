@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import { tryCatchAsync } from "@kontent-ai/core-sdk";
+import { type JsonValue, tryCatchAsync } from "@kontent-ai/core-sdk";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import express from "express";
+import express, { type Response } from "express";
 import { match } from "ts-pattern";
 import { syncDatabase } from "./indexing/indexer.js";
 import { createServer } from "./server.js";
@@ -19,7 +19,7 @@ function startStreamableHTTP(): void {
 	const app = express();
 	app.use(express.json());
 
-	app.post("/mcp", async (req, res) => {
+	app.post("/mcp", async (req, res): Promise<void> => {
 		const { success, error } = await tryCatchAsync(async () => {
 			const { server } = createServer();
 			const transport = new StreamableHTTPServerTransport({
@@ -36,51 +36,27 @@ function startStreamableHTTP(): void {
 		});
 
 		if (!success) {
+			const errorMessage = getErrorMessage(error);
 			logger.log({
 				type: "error",
-				message: `${packageJsonName}@${packageJsonVersion} - Error handling MCP request: ${getErrorMessage(error)}`,
+				message: `${packageJsonName}@${packageJsonVersion} - Error handling MCP request: ${errorMessage}`,
 			});
 			if (!res.headersSent) {
-				res.status(500).json({
-					jsonrpc: "2.0",
-					error: {
-						code: -32603,
-						message: "Internal server error",
-					},
-					id: null,
-				});
+				setInternalServerErrorResponse(res, errorMessage);
 			}
 		}
 	});
 
 	app.get("/mcp", (_, res) => {
-		res.writeHead(405).end(
-			JSON.stringify({
-				jsonrpc: "2.0",
-				error: {
-					code: -32000,
-					message: "Method not allowed.",
-				},
-				id: null,
-			}),
-		);
+		setMethodNotAllowedResponse(res);
 	});
 
 	app.delete("/mcp", (_, res) => {
-		res.writeHead(405).end(
-			JSON.stringify({
-				jsonrpc: "2.0",
-				error: {
-					code: -32000,
-					message: "Method not allowed.",
-				},
-				id: null,
-			}),
-		);
+		setMethodNotAllowedResponse(res);
 	});
 
 	app.get("/health", (_, res) => {
-		res.json({
+		setOkResponse(res, {
 			status: "ok",
 			timestamp: new Date().toISOString(),
 			currentVersion: packageJsonVersion,
@@ -91,7 +67,7 @@ function startStreamableHTTP(): void {
 		const { success, error } = await tryCatchAsync(async () => {
 			const { documentCount, changedCount, removedCount, unchangedCount } = await syncDatabase();
 
-			res.json({
+			setOkResponse(res, {
 				message: `Successfully indexed '${documentCount}' documents.`,
 				result: {
 					changed: changedCount,
@@ -105,19 +81,13 @@ function startStreamableHTTP(): void {
 		});
 
 		if (!success) {
+			const errorMessage = getErrorMessage(error);
 			logger.log({
 				type: "error",
-				message: `${packageJsonName}@${packageJsonVersion} - Error handling MCP request: ${getErrorMessage(error)}`,
+				message: `${packageJsonName}@${packageJsonVersion} - Error handling MCP request: ${errorMessage}`,
 			});
 			if (!res.headersSent) {
-				res.status(500).json({
-					jsonrpc: "2.0",
-					error: {
-						code: -32603,
-						message: "Internal server error",
-					},
-					id: null,
-				});
+				setInternalServerErrorResponse(res, errorMessage);
 			}
 		}
 	});
@@ -133,6 +103,50 @@ function startStreamableHTTP(): void {
 Available endpoint: /mcp`,
 		);
 	});
+}
+
+function setOkResponse(res: Response, json: JsonValue): void {
+	setResponse({ res, statusCode: 200, json });
+}
+
+function setInternalServerErrorResponse(res: Response, message: string = "Internal server error"): void {
+	setResponse({ res, statusCode: 500, json: { error: { code: -32603, message } } });
+}
+
+function setMethodNotAllowedResponse(res: Response): void {
+	setResponse({
+		res,
+		statusCode: 405,
+		json: {
+			error: {
+				code: -32601,
+				message: "Method not allowed",
+			},
+		},
+	});
+}
+
+function setResponse({
+	res,
+	statusCode,
+	json,
+}: {
+	readonly res: Response;
+	readonly statusCode: 500 | 200 | 405;
+	readonly json: JsonValue;
+}): void {
+	const jsonrpc = "2.0";
+	if (statusCode === 405) {
+		res.writeHead(statusCode).end({
+			jsonrpc,
+			json,
+		});
+	} else {
+		res.status(statusCode).json({
+			jsonrpc,
+			json,
+		});
+	}
 }
 
 async function startStdio(): Promise<void> {
