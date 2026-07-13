@@ -1,5 +1,5 @@
 import { EMBEDDING_DIM } from "../indexing/indexer.config.js";
-import type { TableDefinition } from "../utils/db.utils.js";
+import type { TableDefinition } from "./db.utils.js";
 
 export type DocumentRow = {
 	readonly id: string;
