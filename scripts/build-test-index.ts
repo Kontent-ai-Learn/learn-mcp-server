@@ -1,9 +1,9 @@
 import { readFile, rm } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import * as z from "zod/mini";
+import { mapSegmentToSourceDoc, segmentSchema } from "../lib/data/source.js";
 import { openDb } from "../lib/indexing/db.js";
 import { indexSourceDocuments } from "../lib/indexing/indexer.js";
-import { mapSegmentToSourceDoc, segmentSchema } from "../lib/indexing/source.js";
 
 // Must match env.DB_PATH in vitest.config.ts and vitest-integration.config.ts.
 const TEST_DB_PATH: string = "db/learn-test.db";

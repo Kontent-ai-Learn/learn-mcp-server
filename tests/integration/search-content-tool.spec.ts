@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { SearchResult } from "../../lib/indexing/models.js";
+import type { SearchResult } from "../../lib/indexing/indexing.models.js";
 import { withTestClient } from "./test-client.js";
 
 type TextContent = { readonly type: string; readonly text: string };

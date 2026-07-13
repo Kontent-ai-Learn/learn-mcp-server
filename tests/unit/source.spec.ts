@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mapSegmentToSourceDoc } from "../../lib/indexing/source.js";
+import { mapSegmentToSourceDoc } from "../../lib/data/source.js";
 
 describe("toSourceDoc", () => {
 	const segment = {

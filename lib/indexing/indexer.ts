@@ -1,13 +1,14 @@
 import { createHash } from "node:crypto";
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
+import type { SourceDoc } from "../data/data.models.js";
+import { loadSourceDocs } from "../data/source.js";
 import { logger, type SpinnerLog } from "../utils/logger.js";
 import { chunkDoc } from "./chunking.js";
-import { EMBED_BATCH_SIZE, EMBEDDING_MODEL, getDbPath } from "./config.js";
 import { deleteDocuments, getDocHashes, openDb, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "./db.js";
 import { embedTexts } from "./embeddings.js";
-import type { NormalizedDoc, SourceDoc } from "./models.js";
-import { loadSourceDocs } from "./source.js";
+import type { NormalizedDoc } from "./indexing.models.js";
+import { EMBED_BATCH_SIZE, EMBEDDING_MODEL, getDbPath } from "./indexing-config.js";
 
 export type IndexDocumentsResult = {
 	readonly database: Database;

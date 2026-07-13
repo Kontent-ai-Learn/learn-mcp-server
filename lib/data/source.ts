@@ -2,10 +2,10 @@ import { createFetchQuery, getDefaultHttpService, type TryCatchResult, tryCatchA
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import { NodeHtmlMarkdown } from "node-html-markdown";
 import * as z from "zod/mini";
+import { getContentUrl } from "../indexing/indexing-config.js";
 import { logger } from "../utils/logger.js";
 import { packageJsonName, packageJsonVersion } from "../utils/version.js";
-import { getContentUrl } from "./config.js";
-import type { SourceDoc } from "./models.js";
+import type { SourceDoc } from "./data.models.js";
 
 export const segmentSchema = z.readonly(
 	z.object({
