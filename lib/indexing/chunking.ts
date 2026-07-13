@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
-import type { DocChunk, NormalizedDoc } from "./indexing.models.js";
-import { CHUNK_OVERLAP_CHARS, CHUNK_TARGET_CHARS } from "./indexing-config.js";
+import { CHUNK_OVERLAP_CHARS, CHUNK_TARGET_CHARS } from "./indexer.config.js";
+import type { DocChunk, NormalizedDoc } from "./indexer.models.js";
 
 type PackState = {
 	readonly done: readonly string[];

@@ -1,11 +1,24 @@
 import { createFetchQuery, getDefaultHttpService, type TryCatchResult, tryCatchAsync } from "@kontent-ai/core-sdk";
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import { NodeHtmlMarkdown } from "node-html-markdown";
-import * as z from "zod/mini";
-import { getContentUrl } from "../indexing/indexing-config.js";
+import { z } from "zod/mini";
+import { getContentUrl } from "../indexing/indexer.config.js";
 import { logger } from "../utils/logger.js";
 import { packageJsonName, packageJsonVersion } from "../utils/version.js";
-import type { SearchRecord } from "./data.models.js";
+
+export const searchRecordShema = z.readonly(
+	z.object({
+		id: z.string().check(z.minLength(1)),
+		title: z.string().check(z.minLength(1)),
+		url: z.string().check(z.minLength(1)),
+		markdown: z.string(),
+		last_modified: z.optional(z.iso.datetime()),
+	}),
+);
+
+export const searchRecordsSchema = z.array(searchRecordShema);
+
+export type SearchRecord = z.infer<typeof searchRecordShema>;
 
 export const segmentSchema = z.readonly(
 	z.object({

@@ -1,8 +1,8 @@
 import type { Database } from "@tursodatabase/database";
+import { embedQuery } from "../indexing/embeddings.js";
+import { getDbPath, SEARCH_LIMIT } from "../indexing/indexer.config.js";
+import type { SearchResult } from "../indexing/indexer.models.js";
 import { openDb } from "./db.js";
-import { embedQuery } from "./embeddings.js";
-import type { SearchResult } from "./indexing.models.js";
-import { getDbPath, SEARCH_LIMIT } from "./indexing-config.js";
 import { searchHybrid } from "./retrieval.js";
 
 /** Lazily-opened, process-wide DB handle reused across queries. */

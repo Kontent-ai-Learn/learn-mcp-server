@@ -1,8 +1,8 @@
 import type { Database } from "@tursodatabase/database";
 import { match, P } from "ts-pattern";
+import { CANDIDATE_LIMIT, RRF_K, STOPWORDS } from "../indexing/indexer.config.js";
+import type { MatchType, SearchResult } from "../indexing/indexer.models.js";
 import { selectFrom } from "../utils/db.utils.js";
-import type { MatchType, SearchResult } from "./indexing.models.js";
-import { CANDIDATE_LIMIT, RRF_K, STOPWORDS } from "./indexing-config.js";
 import { CHUNKS_TABLE, DOCUMENTS_TABLE, toVectorParam } from "./tables.js";
 
 type DocRecord = { readonly title: string; readonly url: string; readonly body: string };

@@ -1,8 +1,8 @@
 import { mkdir } from "node:fs/promises";
 import { dirname } from "node:path";
 import { connect, type Database } from "@tursodatabase/database";
+import type { DocChunk, NormalizedDoc } from "../indexing/indexer.models.js";
 import { buildCreateTableQuery, deleteFrom, insertInto, selectFrom, updateTable } from "../utils/db.utils.js";
-import type { DocChunk, NormalizedDoc } from "./indexing.models.js";
 import { CHUNKS_TABLE, DOCUMENTS_TABLE, toVectorParam } from "./tables.js";
 
 export async function openDb(path: string): Promise<Database> {

@@ -2,7 +2,7 @@ import { readFile, rm } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import * as z from "zod/mini";
 import { mapSegmentToSourceDoc, segmentSchema } from "../lib/data/search-records.js";
-import { openDb } from "../lib/indexing/db.js";
+import { openDb } from "../lib/database/db.js";
 import { indexSourceDocuments } from "../lib/indexing/indexer.js";
 
 // Must match env.DB_PATH in vitest.config.ts and vitest-integration.config.ts.
