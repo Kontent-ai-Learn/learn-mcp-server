@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
-import type { SourceDoc } from "../data/data.models.js";
-import { loadSourceDocs } from "../data/source.js";
+import type { SearchRecord } from "../data/data.models.js";
+import { fetchSearchRecords } from "../data/search-records.js";
 import { logger, type SpinnerLog } from "../utils/logger.js";
 import { chunkDoc } from "./chunking.js";
 import { deleteDocuments, getDocHashes, openDb, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "./db.js";
@@ -23,7 +23,7 @@ export type SyncDbResult = IndexDocumentsResult & {
 
 /** Load the latest source documents from the content endpoint and index them into a fresh DB handle. */
 export async function syncDatabase(): Promise<SyncDbResult> {
-	const { success, error, data: documents } = await loadSourceDocs();
+	const { success, error, data: documents } = await fetchSearchRecords();
 
 	if (!success) {
 		logger.log({
@@ -44,7 +44,7 @@ export async function syncDatabase(): Promise<SyncDbResult> {
  * changed docs, then embed any chunk lacking an embedding. Persistent +
  * incremental — unchanged docs keep their existing embeddings across restarts.
  */
-export async function indexSourceDocuments(db: Database, sourceDocuments: readonly SourceDoc[]): Promise<IndexDocumentsResult> {
+export async function indexSourceDocuments(db: Database, sourceDocuments: readonly SearchRecord[]): Promise<IndexDocumentsResult> {
 	const normalized = sourceDocuments.map(normalize);
 
 	const result = await logger.logWithSpinnerAsync<IndexDocumentsResult>(async (spinner) => {
@@ -69,7 +69,7 @@ function hashContent(parts: readonly string[]): string {
 	return createHash("sha256").update(parts.join(" ")).digest("hex");
 }
 
-function normalize(doc: SourceDoc): NormalizedDoc {
+function normalize(doc: SearchRecord): NormalizedDoc {
 	const title = doc.title.trim();
 	const url = doc.url.trim();
 	const body = normalizeBody(doc.markdown);

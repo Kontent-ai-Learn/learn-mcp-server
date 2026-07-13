@@ -5,7 +5,7 @@ import * as z from "zod/mini";
 import { getContentUrl } from "../indexing/indexing-config.js";
 import { logger } from "../utils/logger.js";
 import { packageJsonName, packageJsonVersion } from "../utils/version.js";
-import type { SourceDoc } from "./data.models.js";
+import type { SearchRecord } from "./data.models.js";
 
 export const segmentSchema = z.readonly(
 	z.object({
@@ -24,7 +24,7 @@ const responseSchema = z.readonly(
 
 type Segment = z.infer<typeof segmentSchema>;
 
-export const loadSourceDocs = async (): Promise<TryCatchResult<readonly SourceDoc[]>> => {
+export const fetchSearchRecords = async (): Promise<TryCatchResult<readonly SearchRecord[]>> => {
 	return await tryCatchAsync(async () => {
 		logger.log({ message: "Fetching source documents" });
 
@@ -52,7 +52,7 @@ export const loadSourceDocs = async (): Promise<TryCatchResult<readonly SourceDo
 	});
 };
 
-export const mapSegmentToSourceDoc = (segment: Segment): SourceDoc => ({
+export const mapSegmentToSourceDoc = (segment: Segment): SearchRecord => ({
 	id: segment.id,
 	title: segment.title,
 	url: segment.url,

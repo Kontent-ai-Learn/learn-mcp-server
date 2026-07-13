@@ -1,7 +1,7 @@
 import { readFile, rm } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import * as z from "zod/mini";
-import { mapSegmentToSourceDoc, segmentSchema } from "../lib/data/source.js";
+import { mapSegmentToSourceDoc, segmentSchema } from "../lib/data/search-records.js";
 import { openDb } from "../lib/indexing/db.js";
 import { indexSourceDocuments } from "../lib/indexing/indexer.js";
 

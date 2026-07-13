@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const sourceDocSchema = z
+export const searchRecordShema = z
 	.object({
 		id: z.string().min(1),
 		title: z.string().min(1),
@@ -10,6 +10,6 @@ export const sourceDocSchema = z
 	})
 	.readonly();
 
-export const sourceDocsSchema = z.array(sourceDocSchema);
+export const searchRecordsSchema = z.array(searchRecordShema);
 
-export type SourceDoc = z.infer<typeof sourceDocSchema>;
+export type SearchRecord = z.infer<typeof searchRecordShema>;
