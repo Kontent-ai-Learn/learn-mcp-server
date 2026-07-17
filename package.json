@@ -61,7 +61,7 @@
 		"@huggingface/transformers": "4.2.0",
 		"@kontent-ai/core-sdk": "12.0.0-preview.42",
 		"@modelcontextprotocol/sdk": "1.29.0",
-		"@tursodatabase/database": "0.6.1",
+		"@tursodatabase/database": "0.7.0",
 		"cli-spinners": "3.4.0",
 		"express": "5.2.1",
 		"node-html-markdown": "2.0.0",
@@ -69,7 +69,7 @@
 		"zod": "^4"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.5.3",
+		"@biomejs/biome": "2.5.4",
 		"@kontent-ai/biome-config": "0.7.3",
 		"@kontent-ai/eslint-config": "2.4.1",
 		"@types/express": "5.0.6",
