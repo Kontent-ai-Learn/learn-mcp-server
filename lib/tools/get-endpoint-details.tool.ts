@@ -4,11 +4,11 @@ import { defineReadOnlyTool } from "../tools-def/tool-definitions.js";
 import { withToolHandler } from "../tools-def/tool-handler.js";
 import type { ToolName } from "../tools-def/tool-models.js";
 
-const toolName: ToolName = "search-content";
+const toolName: ToolName = "get-endpoint-details";
 
-export const searchContentTool = defineReadOnlyTool(
+export const getEndpointDetailsTools = defineReadOnlyTool(
 	toolName,
-	"Searches Kontent.ai Learn documentation and developer guides. Returns the most relevant documents in full (title, source URL, and complete content) so you can answer the user's question directly — there is no need to fetch the URLs.",
+	"",
 	{
 		text: z.string().describe("The user's question or search query"),
 	},

@@ -48,7 +48,6 @@ export async function replaceDocument(db: Database, doc: NormalizedDoc, chunks: 
 				url: doc.url,
 				body: doc.body,
 				contentHash: doc.contentHash,
-				lastModified: doc.lastModified,
 			},
 		});
 		for (const chunk of chunks) {

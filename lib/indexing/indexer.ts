@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
-import { fetchSearchRecords, type SearchRecord } from "../data/search-records.js";
+import { fetchLearnRecords, type SearchRecord } from "../data/learn-api.js";
 import { deleteDocuments, getDocHashes, openDb, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "../database/db.js";
 import { logger, type SpinnerLog } from "../utils/logger.js";
 import { chunkDoc } from "./chunking.js";
@@ -22,7 +22,7 @@ export type SyncDbResult = IndexDocumentsResult & {
 
 /** Load the latest source documents from the content endpoint and index them into a fresh DB handle. */
 export async function syncDatabase(): Promise<SyncDbResult> {
-	const { success, error, data: documents } = await fetchSearchRecords();
+	const { success, error, data } = await fetchLearnRecords();
 
 	if (!success) {
 		logger.log({
@@ -30,10 +30,10 @@ export async function syncDatabase(): Promise<SyncDbResult> {
 		});
 		throw error;
 	}
-	const indexResult = await indexSourceDocuments(await openDb(getDbPath()), documents);
+	const indexResult = await indexSourceDocuments(await openDb(getDbPath()), data.searchRecords);
 
 	return {
-		documentCount: documents.length,
+		documentCount: data.searchRecords.length,
 		...indexResult,
 	};
 }
@@ -71,14 +71,13 @@ function hashContent(parts: readonly string[]): string {
 function normalize(doc: SearchRecord): NormalizedDoc {
 	const title = doc.title.trim();
 	const url = doc.url.trim();
-	const body = normalizeBody(doc.markdown);
+	const body = normalizeBody(doc.markdownContent);
 	return {
 		id: doc.id,
 		title,
 		url,
 		body,
 		contentHash: hashContent([title, url, body]),
-		lastModified: doc.last_modified ?? null,
 	};
 }
 

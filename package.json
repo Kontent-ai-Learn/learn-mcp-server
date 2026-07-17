@@ -64,7 +64,6 @@
 		"@tursodatabase/database": "0.7.0",
 		"cli-spinners": "3.4.0",
 		"express": "5.2.1",
-		"node-html-markdown": "2.0.0",
 		"ts-pattern": "^5",
 		"zod": "^4"
 	},

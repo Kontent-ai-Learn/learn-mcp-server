@@ -4,7 +4,6 @@ export type NormalizedDoc = {
 	readonly url: string;
 	readonly body: string;
 	readonly contentHash: string;
-	readonly lastModified: string | null;
 };
 
 export type DocChunk = {
