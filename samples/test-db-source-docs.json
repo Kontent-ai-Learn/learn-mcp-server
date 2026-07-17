@@ -6,11 +6,7 @@
 			"title": "Introduction to Delivery REST API",
 			"markdownContent": "<h2>What is Delivery REST API?</h2><p>The Delivery REST API is a read-only API that serves published content to your applications over HTTPS.</p><ul><li>Retrieve content items and their elements</li><li>Filter, order and paginate large collections</li><li>Cache responses using ETags</li></ul><p>Keywords: delivery, content, items, endpoint, json.</p><pre><code>GET https://deliver.kontent.ai/{PROJECT_ID}/items</code></pre><p>This overview of Delivery REST API helps you understand where it fits in a Kontent.ai project.</p>",
 			"url": "https://kontent.ai/learn/docs/delivery-api/overview",
-			"endpoint": {
-				"endpointName": "List content items",
-				"endpointMethod": "GET",
-				"endpointUrl": "https://deliver.kontent.ai/{environment_id}/items"
-			}
+			"type": "section"
 		},
 		{
 			"id": "doc-002",
@@ -18,25 +14,23 @@
 			"title": "How to configure Delivery REST API",
 			"markdownContent": "<h2>Configuring Delivery REST API</h2><p>Follow these steps to set up Delivery REST API in your environment. The Delivery REST API is a read-only API that serves published content to your applications over HTTPS.</p><ul><li>Retrieve content items and their elements</li><li>Filter, order and paginate large collections</li><li>Cache responses using ETags</li></ul><p>Keywords: delivery, content, items, endpoint, json.</p><pre><code>GET https://deliver.kontent.ai/{PROJECT_ID}/items</code></pre><p>Once configured, Delivery REST API is ready to use across your content operations.</p>",
 			"url": "https://kontent.ai/learn/docs/delivery-api/configure",
-			"endpoint": {
-				"endpointName": "View a content item",
-				"endpointMethod": "GET",
-				"endpointUrl": "https://deliver.kontent.ai/{environment_id}/items/{codename}"
-			}
+			"type": "section"
 		},
 		{
 			"id": "doc-003",
 			"codename": "delivery_rest_api_best_practices",
 			"title": "Delivery REST API best practices",
 			"markdownContent": "<h2>Best practices for Delivery REST API</h2><p>Applying proven patterns to Delivery REST API keeps your project maintainable. The Delivery REST API is a read-only API that serves published content to your applications over HTTPS.</p><ul><li>Retrieve content items and their elements</li><li>Filter, order and paginate large collections</li><li>Cache responses using ETags</li></ul><p>Keywords: delivery, content, items, endpoint, json.</p><pre><code>GET https://deliver.kontent.ai/{PROJECT_ID}/items</code></pre><p>Adopting these Delivery REST API practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/delivery-api/best-practices"
+			"url": "https://kontent.ai/learn/docs/delivery-api/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-004",
 			"codename": "troubleshooting_delivery_rest_api",
 			"title": "Troubleshooting Delivery REST API",
 			"markdownContent": "<h2>Common Delivery REST API problems</h2><p>When Delivery REST API does not behave as expected, work through these checks. The Delivery REST API is a read-only API that serves published content to your applications over HTTPS.</p><ul><li>Retrieve content items and their elements</li><li>Filter, order and paginate large collections</li><li>Cache responses using ETags</li></ul><p>Keywords: delivery, content, items, endpoint, json.</p><pre><code>GET https://deliver.kontent.ai/{PROJECT_ID}/items</code></pre><p>Most Delivery REST API issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/delivery-api/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/delivery-api/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-005",
@@ -44,32 +38,31 @@
 			"title": "Introduction to Delivery API filtering",
 			"markdownContent": "<h2>What is Delivery API filtering?</h2><p>Filtering lets you request only the content items that match specific element values from the Delivery API.</p><ul><li>Combine system and element filters</li><li>Use range and containment operators</li><li>Filter linked items by codename</li></ul><p>Keywords: filter, query, operator, elements, delivery.</p><pre><code>?elements.category[contains]=news</code></pre><p>This overview of Delivery API filtering helps you understand where it fits in a Kontent.ai project.</p>",
 			"url": "https://kontent.ai/learn/docs/delivery-filtering/overview",
-			"endpoint": {
-				"endpointName": "List content items with filtering",
-				"endpointMethod": "GET",
-				"endpointUrl": "https://deliver.kontent.ai/{environment_id}/items"
-			}
+			"type": "section"
 		},
 		{
 			"id": "doc-006",
 			"codename": "how_to_configure_delivery_api_filtering",
 			"title": "How to configure Delivery API filtering",
 			"markdownContent": "<h2>Configuring Delivery API filtering</h2><p>Follow these steps to set up Delivery API filtering in your environment. Filtering lets you request only the content items that match specific element values from the Delivery API.</p><ul><li>Combine system and element filters</li><li>Use range and containment operators</li><li>Filter linked items by codename</li></ul><p>Keywords: filter, query, operator, elements, delivery.</p><pre><code>?elements.category[contains]=news</code></pre><p>Once configured, Delivery API filtering is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/delivery-filtering/configure"
+			"url": "https://kontent.ai/learn/docs/delivery-filtering/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-007",
 			"codename": "delivery_api_filtering_best_practices",
 			"title": "Delivery API filtering best practices",
 			"markdownContent": "<h2>Best practices for Delivery API filtering</h2><p>Applying proven patterns to Delivery API filtering keeps your project maintainable. Filtering lets you request only the content items that match specific element values from the Delivery API.</p><ul><li>Combine system and element filters</li><li>Use range and containment operators</li><li>Filter linked items by codename</li></ul><p>Keywords: filter, query, operator, elements, delivery.</p><pre><code>?elements.category[contains]=news</code></pre><p>Adopting these Delivery API filtering practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/delivery-filtering/best-practices"
+			"url": "https://kontent.ai/learn/docs/delivery-filtering/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-008",
 			"codename": "troubleshooting_delivery_api_filtering",
 			"title": "Troubleshooting Delivery API filtering",
 			"markdownContent": "<h2>Common Delivery API filtering problems</h2><p>When Delivery API filtering does not behave as expected, work through these checks. Filtering lets you request only the content items that match specific element values from the Delivery API.</p><ul><li>Combine system and element filters</li><li>Use range and containment operators</li><li>Filter linked items by codename</li></ul><p>Keywords: filter, query, operator, elements, delivery.</p><pre><code>?elements.category[contains]=news</code></pre><p>Most Delivery API filtering issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/delivery-filtering/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/delivery-filtering/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-009",
@@ -77,480 +70,543 @@
 			"title": "Introduction to Management API",
 			"markdownContent": "<h2>What is Management API?</h2><p>The Management API (MAPI) lets you programmatically create, update and delete content and content models.</p><ul><li>Import and migrate content at scale</li><li>Manage content types and taxonomy</li><li>Automate publishing workflows</li></ul><p>Keywords: management, mapi, write, import, automation.</p><pre><code>POST https://manage.kontent.ai/v2/projects/{PROJECT_ID}/items</code></pre><p>This overview of Management API helps you understand where it fits in a Kontent.ai project.</p>",
 			"url": "https://kontent.ai/learn/docs/management-api/overview",
-			"endpoint": {
-				"endpointName": "Add a content item",
-				"endpointMethod": "POST",
-				"endpointUrl": "https://manage.kontent.ai/v2/projects/{environment_id}/items"
-			}
+			"type": "section"
 		},
 		{
 			"id": "doc-010",
 			"codename": "how_to_configure_management_api",
 			"title": "How to configure Management API",
 			"markdownContent": "<h2>Configuring Management API</h2><p>Follow these steps to set up Management API in your environment. The Management API (MAPI) lets you programmatically create, update and delete content and content models.</p><ul><li>Import and migrate content at scale</li><li>Manage content types and taxonomy</li><li>Automate publishing workflows</li></ul><p>Keywords: management, mapi, write, import, automation.</p><pre><code>POST https://manage.kontent.ai/v2/projects/{PROJECT_ID}/items</code></pre><p>Once configured, Management API is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/management-api/configure"
+			"url": "https://kontent.ai/learn/docs/management-api/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-011",
 			"codename": "management_api_best_practices",
 			"title": "Management API best practices",
 			"markdownContent": "<h2>Best practices for Management API</h2><p>Applying proven patterns to Management API keeps your project maintainable. The Management API (MAPI) lets you programmatically create, update and delete content and content models.</p><ul><li>Import and migrate content at scale</li><li>Manage content types and taxonomy</li><li>Automate publishing workflows</li></ul><p>Keywords: management, mapi, write, import, automation.</p><pre><code>POST https://manage.kontent.ai/v2/projects/{PROJECT_ID}/items</code></pre><p>Adopting these Management API practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/management-api/best-practices"
+			"url": "https://kontent.ai/learn/docs/management-api/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-012",
 			"codename": "troubleshooting_management_api",
 			"title": "Troubleshooting Management API",
 			"markdownContent": "<h2>Common Management API problems</h2><p>When Management API does not behave as expected, work through these checks. The Management API (MAPI) lets you programmatically create, update and delete content and content models.</p><ul><li>Import and migrate content at scale</li><li>Manage content types and taxonomy</li><li>Automate publishing workflows</li></ul><p>Keywords: management, mapi, write, import, automation.</p><pre><code>POST https://manage.kontent.ai/v2/projects/{PROJECT_ID}/items</code></pre><p>Most Management API issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/management-api/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/management-api/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-013",
 			"codename": "introduction_to_webhooks",
 			"title": "Introduction to Webhooks",
 			"markdownContent": "<h2>What is Webhooks?</h2><p>Webhooks notify your services in real time whenever content is published, changed or deleted in Kontent.ai.</p><ul><li>Subscribe to content and workflow events</li><li>Deliver notifications to your endpoint over HTTPS</li><li>Retry failed deliveries automatically</li></ul><p>Keywords: webhook, notification, event, trigger, payload.</p><pre><code>{ \"data\": { \"items\": [ ... ] }, \"message\": { \"type\": \"content_item_variant\" } }</code></pre><p>This overview of Webhooks helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/webhooks/overview"
+			"url": "https://kontent.ai/learn/docs/webhooks/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-014",
 			"codename": "how_to_configure_webhooks",
 			"title": "How to configure Webhooks",
 			"markdownContent": "<h2>Configuring Webhooks</h2><p>Follow these steps to set up Webhooks in your environment. Webhooks notify your services in real time whenever content is published, changed or deleted in Kontent.ai.</p><ul><li>Subscribe to content and workflow events</li><li>Deliver notifications to your endpoint over HTTPS</li><li>Retry failed deliveries automatically</li></ul><p>Keywords: webhook, notification, event, trigger, payload.</p><pre><code>{ \"data\": { \"items\": [ ... ] }, \"message\": { \"type\": \"content_item_variant\" } }</code></pre><p>Once configured, Webhooks is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/webhooks/configure"
+			"url": "https://kontent.ai/learn/docs/webhooks/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-015",
 			"codename": "webhooks_best_practices",
 			"title": "Webhooks best practices",
 			"markdownContent": "<h2>Best practices for Webhooks</h2><p>Applying proven patterns to Webhooks keeps your project maintainable. Webhooks notify your services in real time whenever content is published, changed or deleted in Kontent.ai.</p><ul><li>Subscribe to content and workflow events</li><li>Deliver notifications to your endpoint over HTTPS</li><li>Retry failed deliveries automatically</li></ul><p>Keywords: webhook, notification, event, trigger, payload.</p><pre><code>{ \"data\": { \"items\": [ ... ] }, \"message\": { \"type\": \"content_item_variant\" } }</code></pre><p>Adopting these Webhooks practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/webhooks/best-practices"
+			"url": "https://kontent.ai/learn/docs/webhooks/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-016",
 			"codename": "troubleshooting_webhooks",
 			"title": "Troubleshooting Webhooks",
 			"markdownContent": "<h2>Common Webhooks problems</h2><p>When Webhooks does not behave as expected, work through these checks. Webhooks notify your services in real time whenever content is published, changed or deleted in Kontent.ai.</p><ul><li>Subscribe to content and workflow events</li><li>Deliver notifications to your endpoint over HTTPS</li><li>Retry failed deliveries automatically</li></ul><p>Keywords: webhook, notification, event, trigger, payload.</p><pre><code>{ \"data\": { \"items\": [ ... ] }, \"message\": { \"type\": \"content_item_variant\" } }</code></pre><p>Most Webhooks issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/webhooks/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/webhooks/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-017",
 			"codename": "introduction_to_webhook_security",
 			"title": "Introduction to Webhook security",
 			"markdownContent": "<h2>What is Webhook security?</h2><p>To secure a webhook you validate the signature Kontent.ai sends so you can trust the webhook payload came from us.</p><ul><li>Verify the X-KC-Signature header on every webhook request</li><li>Compute an HMAC-SHA256 hash with your secret to secure the webhook</li><li>Reject any webhook whose signature does not match</li><li>Always receive webhooks over a secure HTTPS endpoint</li></ul><p>Keywords: webhook, secure, security, signature, hmac, secret, validate.</p><pre><code>const hash = crypto.createHmac(\"sha256\", secret).update(body).digest(\"base64\");</code></pre><p>This overview of Webhook security helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/webhook-security/overview"
+			"url": "https://kontent.ai/learn/docs/webhook-security/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-018",
 			"codename": "how_to_configure_webhook_security",
 			"title": "How to configure Webhook security",
 			"markdownContent": "<h2>Configuring Webhook security</h2><p>Follow these steps to set up Webhook security in your environment. To secure a webhook you validate the signature Kontent.ai sends so you can trust the webhook payload came from us.</p><ul><li>Verify the X-KC-Signature header on every webhook request</li><li>Compute an HMAC-SHA256 hash with your secret to secure the webhook</li><li>Reject any webhook whose signature does not match</li><li>Always receive webhooks over a secure HTTPS endpoint</li></ul><p>Keywords: webhook, secure, security, signature, hmac, secret, validate.</p><pre><code>const hash = crypto.createHmac(\"sha256\", secret).update(body).digest(\"base64\");</code></pre><p>Once configured, Webhook security is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/webhook-security/configure"
+			"url": "https://kontent.ai/learn/docs/webhook-security/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-019",
 			"codename": "webhook_security_best_practices",
 			"title": "Webhook security best practices",
 			"markdownContent": "<h2>Best practices for Webhook security</h2><p>Applying proven patterns to Webhook security keeps your project maintainable. To secure a webhook you validate the signature Kontent.ai sends so you can trust the webhook payload came from us.</p><ul><li>Verify the X-KC-Signature header on every webhook request</li><li>Compute an HMAC-SHA256 hash with your secret to secure the webhook</li><li>Reject any webhook whose signature does not match</li><li>Always receive webhooks over a secure HTTPS endpoint</li></ul><p>Keywords: webhook, secure, security, signature, hmac, secret, validate.</p><pre><code>const hash = crypto.createHmac(\"sha256\", secret).update(body).digest(\"base64\");</code></pre><p>Adopting these Webhook security practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/webhook-security/best-practices"
+			"url": "https://kontent.ai/learn/docs/webhook-security/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-020",
 			"codename": "troubleshooting_webhook_security",
 			"title": "Troubleshooting Webhook security",
 			"markdownContent": "<h2>Common Webhook security problems</h2><p>When Webhook security does not behave as expected, work through these checks. To secure a webhook you validate the signature Kontent.ai sends so you can trust the webhook payload came from us.</p><ul><li>Verify the X-KC-Signature header on every webhook request</li><li>Compute an HMAC-SHA256 hash with your secret to secure the webhook</li><li>Reject any webhook whose signature does not match</li><li>Always receive webhooks over a secure HTTPS endpoint</li></ul><p>Keywords: webhook, secure, security, signature, hmac, secret, validate.</p><pre><code>const hash = crypto.createHmac(\"sha256\", secret).update(body).digest(\"base64\");</code></pre><p>Most Webhook security issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/webhook-security/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/webhook-security/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-021",
 			"codename": "introduction_to_content_modeling",
 			"title": "Introduction to Content modeling",
 			"markdownContent": "<h2>What is Content modeling?</h2><p>Content modeling is the practice of defining the structure of your content as reusable, presentation-agnostic types.</p><ul><li>Separate content from presentation</li><li>Design for reuse across channels</li><li>Model relationships with linked items</li></ul><p>Keywords: model, structure, reuse, content, design.</p><p>This overview of Content modeling helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/content-modeling/overview"
+			"url": "https://kontent.ai/learn/docs/content-modeling/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-022",
 			"codename": "how_to_configure_content_modeling",
 			"title": "How to configure Content modeling",
 			"markdownContent": "<h2>Configuring Content modeling</h2><p>Follow these steps to set up Content modeling in your environment. Content modeling is the practice of defining the structure of your content as reusable, presentation-agnostic types.</p><ul><li>Separate content from presentation</li><li>Design for reuse across channels</li><li>Model relationships with linked items</li></ul><p>Keywords: model, structure, reuse, content, design.</p><p>Once configured, Content modeling is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/content-modeling/configure"
+			"url": "https://kontent.ai/learn/docs/content-modeling/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-023",
 			"codename": "content_modeling_best_practices",
 			"title": "Content modeling best practices",
 			"markdownContent": "<h2>Best practices for Content modeling</h2><p>Applying proven patterns to Content modeling keeps your project maintainable. Content modeling is the practice of defining the structure of your content as reusable, presentation-agnostic types.</p><ul><li>Separate content from presentation</li><li>Design for reuse across channels</li><li>Model relationships with linked items</li></ul><p>Keywords: model, structure, reuse, content, design.</p><p>Adopting these Content modeling practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/content-modeling/best-practices"
+			"url": "https://kontent.ai/learn/docs/content-modeling/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-024",
 			"codename": "troubleshooting_content_modeling",
 			"title": "Troubleshooting Content modeling",
 			"markdownContent": "<h2>Common Content modeling problems</h2><p>When Content modeling does not behave as expected, work through these checks. Content modeling is the practice of defining the structure of your content as reusable, presentation-agnostic types.</p><ul><li>Separate content from presentation</li><li>Design for reuse across channels</li><li>Model relationships with linked items</li></ul><p>Keywords: model, structure, reuse, content, design.</p><p>Most Content modeling issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/content-modeling/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/content-modeling/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-025",
 			"codename": "introduction_to_content_types",
 			"title": "Introduction to Content types",
 			"markdownContent": "<h2>What is Content types?</h2><p>A content type is a blueprint that defines which elements a content item of that type can contain.</p><ul><li>Add text, rich text, number and asset elements</li><li>Set validation rules per element</li><li>Reuse elements with content type snippets</li></ul><p>Keywords: type, element, blueprint, schema, validation.</p><p>This overview of Content types helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/content-types/overview"
+			"url": "https://kontent.ai/learn/docs/content-types/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-026",
 			"codename": "how_to_configure_content_types",
 			"title": "How to configure Content types",
 			"markdownContent": "<h2>Configuring Content types</h2><p>Follow these steps to set up Content types in your environment. A content type is a blueprint that defines which elements a content item of that type can contain.</p><ul><li>Add text, rich text, number and asset elements</li><li>Set validation rules per element</li><li>Reuse elements with content type snippets</li></ul><p>Keywords: type, element, blueprint, schema, validation.</p><p>Once configured, Content types is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/content-types/configure"
+			"url": "https://kontent.ai/learn/docs/content-types/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-027",
 			"codename": "content_types_best_practices",
 			"title": "Content types best practices",
 			"markdownContent": "<h2>Best practices for Content types</h2><p>Applying proven patterns to Content types keeps your project maintainable. A content type is a blueprint that defines which elements a content item of that type can contain.</p><ul><li>Add text, rich text, number and asset elements</li><li>Set validation rules per element</li><li>Reuse elements with content type snippets</li></ul><p>Keywords: type, element, blueprint, schema, validation.</p><p>Adopting these Content types practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/content-types/best-practices"
+			"url": "https://kontent.ai/learn/docs/content-types/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-028",
 			"codename": "troubleshooting_content_types",
 			"title": "Troubleshooting Content types",
 			"markdownContent": "<h2>Common Content types problems</h2><p>When Content types does not behave as expected, work through these checks. A content type is a blueprint that defines which elements a content item of that type can contain.</p><ul><li>Add text, rich text, number and asset elements</li><li>Set validation rules per element</li><li>Reuse elements with content type snippets</li></ul><p>Keywords: type, element, blueprint, schema, validation.</p><p>Most Content types issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/content-types/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/content-types/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-029",
 			"codename": "introduction_to_content_type_snippets",
 			"title": "Introduction to Content type snippets",
 			"markdownContent": "<h2>What is Content type snippets?</h2><p>Content type snippets group elements so they can be reused across multiple content types.</p><ul><li>Define shared SEO or metadata elements once</li><li>Insert a snippet into any content type</li><li>Update the snippet to update every type</li></ul><p>Keywords: snippet, reuse, shared, elements, metadata.</p><p>This overview of Content type snippets helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/content-type-snippets/overview"
+			"url": "https://kontent.ai/learn/docs/content-type-snippets/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-030",
 			"codename": "how_to_configure_content_type_snippets",
 			"title": "How to configure Content type snippets",
 			"markdownContent": "<h2>Configuring Content type snippets</h2><p>Follow these steps to set up Content type snippets in your environment. Content type snippets group elements so they can be reused across multiple content types.</p><ul><li>Define shared SEO or metadata elements once</li><li>Insert a snippet into any content type</li><li>Update the snippet to update every type</li></ul><p>Keywords: snippet, reuse, shared, elements, metadata.</p><p>Once configured, Content type snippets is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/content-type-snippets/configure"
+			"url": "https://kontent.ai/learn/docs/content-type-snippets/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-031",
 			"codename": "content_type_snippets_best_practices",
 			"title": "Content type snippets best practices",
 			"markdownContent": "<h2>Best practices for Content type snippets</h2><p>Applying proven patterns to Content type snippets keeps your project maintainable. Content type snippets group elements so they can be reused across multiple content types.</p><ul><li>Define shared SEO or metadata elements once</li><li>Insert a snippet into any content type</li><li>Update the snippet to update every type</li></ul><p>Keywords: snippet, reuse, shared, elements, metadata.</p><p>Adopting these Content type snippets practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/content-type-snippets/best-practices"
+			"url": "https://kontent.ai/learn/docs/content-type-snippets/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-032",
 			"codename": "troubleshooting_content_type_snippets",
 			"title": "Troubleshooting Content type snippets",
 			"markdownContent": "<h2>Common Content type snippets problems</h2><p>When Content type snippets does not behave as expected, work through these checks. Content type snippets group elements so they can be reused across multiple content types.</p><ul><li>Define shared SEO or metadata elements once</li><li>Insert a snippet into any content type</li><li>Update the snippet to update every type</li></ul><p>Keywords: snippet, reuse, shared, elements, metadata.</p><p>Most Content type snippets issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/content-type-snippets/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/content-type-snippets/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-033",
 			"codename": "introduction_to_taxonomy",
 			"title": "Introduction to Taxonomy",
 			"markdownContent": "<h2>What is Taxonomy?</h2><p>Taxonomy groups let editors categorize content using predefined, hierarchical sets of terms.</p><ul><li>Create nested taxonomy terms</li><li>Tag content items with taxonomy elements</li><li>Filter delivery content by taxonomy</li></ul><p>Keywords: taxonomy, category, term, tag, hierarchy.</p><p>This overview of Taxonomy helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/taxonomy/overview"
+			"url": "https://kontent.ai/learn/docs/taxonomy/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-034",
 			"codename": "how_to_configure_taxonomy",
 			"title": "How to configure Taxonomy",
 			"markdownContent": "<h2>Configuring Taxonomy</h2><p>Follow these steps to set up Taxonomy in your environment. Taxonomy groups let editors categorize content using predefined, hierarchical sets of terms.</p><ul><li>Create nested taxonomy terms</li><li>Tag content items with taxonomy elements</li><li>Filter delivery content by taxonomy</li></ul><p>Keywords: taxonomy, category, term, tag, hierarchy.</p><p>Once configured, Taxonomy is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/taxonomy/configure"
+			"url": "https://kontent.ai/learn/docs/taxonomy/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-035",
 			"codename": "taxonomy_best_practices",
 			"title": "Taxonomy best practices",
 			"markdownContent": "<h2>Best practices for Taxonomy</h2><p>Applying proven patterns to Taxonomy keeps your project maintainable. Taxonomy groups let editors categorize content using predefined, hierarchical sets of terms.</p><ul><li>Create nested taxonomy terms</li><li>Tag content items with taxonomy elements</li><li>Filter delivery content by taxonomy</li></ul><p>Keywords: taxonomy, category, term, tag, hierarchy.</p><p>Adopting these Taxonomy practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/taxonomy/best-practices"
+			"url": "https://kontent.ai/learn/docs/taxonomy/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-036",
 			"codename": "troubleshooting_taxonomy",
 			"title": "Troubleshooting Taxonomy",
 			"markdownContent": "<h2>Common Taxonomy problems</h2><p>When Taxonomy does not behave as expected, work through these checks. Taxonomy groups let editors categorize content using predefined, hierarchical sets of terms.</p><ul><li>Create nested taxonomy terms</li><li>Tag content items with taxonomy elements</li><li>Filter delivery content by taxonomy</li></ul><p>Keywords: taxonomy, category, term, tag, hierarchy.</p><p>Most Taxonomy issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/taxonomy/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/taxonomy/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-037",
 			"codename": "introduction_to_localization_and_languages",
 			"title": "Introduction to Localization and languages",
 			"markdownContent": "<h2>What is Localization and languages?</h2><p>Localization lets you manage the same content in multiple languages using language variants.</p><ul><li>Configure default and secondary languages</li><li>Translate content per language variant</li><li>Fall back to a default language</li></ul><p>Keywords: language, localization, translation, variant, fallback.</p><p>This overview of Localization and languages helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/localization/overview"
+			"url": "https://kontent.ai/learn/docs/localization/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-038",
 			"codename": "how_to_configure_localization_and_languages",
 			"title": "How to configure Localization and languages",
 			"markdownContent": "<h2>Configuring Localization and languages</h2><p>Follow these steps to set up Localization and languages in your environment. Localization lets you manage the same content in multiple languages using language variants.</p><ul><li>Configure default and secondary languages</li><li>Translate content per language variant</li><li>Fall back to a default language</li></ul><p>Keywords: language, localization, translation, variant, fallback.</p><p>Once configured, Localization and languages is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/localization/configure"
+			"url": "https://kontent.ai/learn/docs/localization/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-039",
 			"codename": "localization_and_languages_best_practices",
 			"title": "Localization and languages best practices",
 			"markdownContent": "<h2>Best practices for Localization and languages</h2><p>Applying proven patterns to Localization and languages keeps your project maintainable. Localization lets you manage the same content in multiple languages using language variants.</p><ul><li>Configure default and secondary languages</li><li>Translate content per language variant</li><li>Fall back to a default language</li></ul><p>Keywords: language, localization, translation, variant, fallback.</p><p>Adopting these Localization and languages practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/localization/best-practices"
+			"url": "https://kontent.ai/learn/docs/localization/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-040",
 			"codename": "troubleshooting_localization_and_languages",
 			"title": "Troubleshooting Localization and languages",
 			"markdownContent": "<h2>Common Localization and languages problems</h2><p>When Localization and languages does not behave as expected, work through these checks. Localization lets you manage the same content in multiple languages using language variants.</p><ul><li>Configure default and secondary languages</li><li>Translate content per language variant</li><li>Fall back to a default language</li></ul><p>Keywords: language, localization, translation, variant, fallback.</p><p>Most Localization and languages issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/localization/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/localization/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-041",
 			"codename": "introduction_to_workflows",
 			"title": "Introduction to Workflows",
 			"markdownContent": "<h2>What is Workflows?</h2><p>Workflows define the steps a content item variant passes through from draft to published.</p><ul><li>Configure custom workflow steps</li><li>Restrict step transitions by role</li><li>Trigger webhooks on workflow changes</li></ul><p>Keywords: workflow, step, draft, publish, transition.</p><p>This overview of Workflows helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/workflow/overview"
+			"url": "https://kontent.ai/learn/docs/workflow/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-042",
 			"codename": "how_to_configure_workflows",
 			"title": "How to configure Workflows",
 			"markdownContent": "<h2>Configuring Workflows</h2><p>Follow these steps to set up Workflows in your environment. Workflows define the steps a content item variant passes through from draft to published.</p><ul><li>Configure custom workflow steps</li><li>Restrict step transitions by role</li><li>Trigger webhooks on workflow changes</li></ul><p>Keywords: workflow, step, draft, publish, transition.</p><p>Once configured, Workflows is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/workflow/configure"
+			"url": "https://kontent.ai/learn/docs/workflow/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-043",
 			"codename": "workflows_best_practices",
 			"title": "Workflows best practices",
 			"markdownContent": "<h2>Best practices for Workflows</h2><p>Applying proven patterns to Workflows keeps your project maintainable. Workflows define the steps a content item variant passes through from draft to published.</p><ul><li>Configure custom workflow steps</li><li>Restrict step transitions by role</li><li>Trigger webhooks on workflow changes</li></ul><p>Keywords: workflow, step, draft, publish, transition.</p><p>Adopting these Workflows practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/workflow/best-practices"
+			"url": "https://kontent.ai/learn/docs/workflow/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-044",
 			"codename": "troubleshooting_workflows",
 			"title": "Troubleshooting Workflows",
 			"markdownContent": "<h2>Common Workflows problems</h2><p>When Workflows does not behave as expected, work through these checks. Workflows define the steps a content item variant passes through from draft to published.</p><ul><li>Configure custom workflow steps</li><li>Restrict step transitions by role</li><li>Trigger webhooks on workflow changes</li></ul><p>Keywords: workflow, step, draft, publish, transition.</p><p>Most Workflows issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/workflow/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/workflow/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-045",
 			"codename": "introduction_to_roles_and_permissions",
 			"title": "Introduction to Roles and permissions",
 			"markdownContent": "<h2>What is Roles and permissions?</h2><p>Roles control what each user can see and do inside a Kontent.ai environment.</p><ul><li>Assign granular permissions per role</li><li>Scope access by language and content type</li><li>Follow least-privilege principles</li></ul><p>Keywords: role, permission, access, user, security.</p><p>This overview of Roles and permissions helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/roles-permissions/overview"
+			"url": "https://kontent.ai/learn/docs/roles-permissions/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-046",
 			"codename": "how_to_configure_roles_and_permissions",
 			"title": "How to configure Roles and permissions",
 			"markdownContent": "<h2>Configuring Roles and permissions</h2><p>Follow these steps to set up Roles and permissions in your environment. Roles control what each user can see and do inside a Kontent.ai environment.</p><ul><li>Assign granular permissions per role</li><li>Scope access by language and content type</li><li>Follow least-privilege principles</li></ul><p>Keywords: role, permission, access, user, security.</p><p>Once configured, Roles and permissions is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/roles-permissions/configure"
+			"url": "https://kontent.ai/learn/docs/roles-permissions/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-047",
 			"codename": "roles_and_permissions_best_practices",
 			"title": "Roles and permissions best practices",
 			"markdownContent": "<h2>Best practices for Roles and permissions</h2><p>Applying proven patterns to Roles and permissions keeps your project maintainable. Roles control what each user can see and do inside a Kontent.ai environment.</p><ul><li>Assign granular permissions per role</li><li>Scope access by language and content type</li><li>Follow least-privilege principles</li></ul><p>Keywords: role, permission, access, user, security.</p><p>Adopting these Roles and permissions practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/roles-permissions/best-practices"
+			"url": "https://kontent.ai/learn/docs/roles-permissions/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-048",
 			"codename": "troubleshooting_roles_and_permissions",
 			"title": "Troubleshooting Roles and permissions",
 			"markdownContent": "<h2>Common Roles and permissions problems</h2><p>When Roles and permissions does not behave as expected, work through these checks. Roles control what each user can see and do inside a Kontent.ai environment.</p><ul><li>Assign granular permissions per role</li><li>Scope access by language and content type</li><li>Follow least-privilege principles</li></ul><p>Keywords: role, permission, access, user, security.</p><p>Most Roles and permissions issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/roles-permissions/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/roles-permissions/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-049",
 			"codename": "introduction_to_rich_text_elements",
 			"title": "Introduction to Rich text elements",
 			"markdownContent": "<h2>What is Rich text elements?</h2><p>Rich text elements store formatted content, inline images, components and links to other content items.</p><ul><li>Embed components and linked items</li><li>Restrict allowed formatting</li><li>Resolve rich text on the client</li></ul><p>Keywords: rich, text, formatting, component, inline.</p><p>This overview of Rich text elements helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/rich-text/overview"
+			"url": "https://kontent.ai/learn/docs/rich-text/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-050",
 			"codename": "how_to_configure_rich_text_elements",
 			"title": "How to configure Rich text elements",
 			"markdownContent": "<h2>Configuring Rich text elements</h2><p>Follow these steps to set up Rich text elements in your environment. Rich text elements store formatted content, inline images, components and links to other content items.</p><ul><li>Embed components and linked items</li><li>Restrict allowed formatting</li><li>Resolve rich text on the client</li></ul><p>Keywords: rich, text, formatting, component, inline.</p><p>Once configured, Rich text elements is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/rich-text/configure"
+			"url": "https://kontent.ai/learn/docs/rich-text/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-051",
 			"codename": "rich_text_elements_best_practices",
 			"title": "Rich text elements best practices",
 			"markdownContent": "<h2>Best practices for Rich text elements</h2><p>Applying proven patterns to Rich text elements keeps your project maintainable. Rich text elements store formatted content, inline images, components and links to other content items.</p><ul><li>Embed components and linked items</li><li>Restrict allowed formatting</li><li>Resolve rich text on the client</li></ul><p>Keywords: rich, text, formatting, component, inline.</p><p>Adopting these Rich text elements practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/rich-text/best-practices"
+			"url": "https://kontent.ai/learn/docs/rich-text/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-052",
 			"codename": "troubleshooting_rich_text_elements",
 			"title": "Troubleshooting Rich text elements",
 			"markdownContent": "<h2>Common Rich text elements problems</h2><p>When Rich text elements does not behave as expected, work through these checks. Rich text elements store formatted content, inline images, components and links to other content items.</p><ul><li>Embed components and linked items</li><li>Restrict allowed formatting</li><li>Resolve rich text on the client</li></ul><p>Keywords: rich, text, formatting, component, inline.</p><p>Most Rich text elements issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/rich-text/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/rich-text/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-053",
 			"codename": "introduction_to_assets_and_the_asset_library",
 			"title": "Introduction to Assets and the asset library",
 			"markdownContent": "<h2>What is Assets and the asset library?</h2><p>The asset library stores images, videos and files that you can reference from content items.</p><ul><li>Organize assets into folders</li><li>Add descriptive metadata and alt text</li><li>Render responsive image variants</li></ul><p>Keywords: asset, image, file, library, media.</p><p>This overview of Assets and the asset library helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/assets/overview"
+			"url": "https://kontent.ai/learn/docs/assets/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-054",
 			"codename": "how_to_configure_assets_and_the_asset_library",
 			"title": "How to configure Assets and the asset library",
 			"markdownContent": "<h2>Configuring Assets and the asset library</h2><p>Follow these steps to set up Assets and the asset library in your environment. The asset library stores images, videos and files that you can reference from content items.</p><ul><li>Organize assets into folders</li><li>Add descriptive metadata and alt text</li><li>Render responsive image variants</li></ul><p>Keywords: asset, image, file, library, media.</p><p>Once configured, Assets and the asset library is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/assets/configure"
+			"url": "https://kontent.ai/learn/docs/assets/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-055",
 			"codename": "assets_and_the_asset_library_best_practices",
 			"title": "Assets and the asset library best practices",
 			"markdownContent": "<h2>Best practices for Assets and the asset library</h2><p>Applying proven patterns to Assets and the asset library keeps your project maintainable. The asset library stores images, videos and files that you can reference from content items.</p><ul><li>Organize assets into folders</li><li>Add descriptive metadata and alt text</li><li>Render responsive image variants</li></ul><p>Keywords: asset, image, file, library, media.</p><p>Adopting these Assets and the asset library practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/assets/best-practices"
+			"url": "https://kontent.ai/learn/docs/assets/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-056",
 			"codename": "troubleshooting_assets_and_the_asset_library",
 			"title": "Troubleshooting Assets and the asset library",
 			"markdownContent": "<h2>Common Assets and the asset library problems</h2><p>When Assets and the asset library does not behave as expected, work through these checks. The asset library stores images, videos and files that you can reference from content items.</p><ul><li>Organize assets into folders</li><li>Add descriptive metadata and alt text</li><li>Render responsive image variants</li></ul><p>Keywords: asset, image, file, library, media.</p><p>Most Assets and the asset library issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/assets/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/assets/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-057",
 			"codename": "introduction_to_content_items_and_variants",
 			"title": "Introduction to Content items and variants",
 			"markdownContent": "<h2>What is Content items and variants?</h2><p>A content item holds language variants, each representing the item's content in a single language.</p><ul><li>Create items from a content type</li><li>Manage variants per language</li><li>Track the workflow of each variant</li></ul><p>Keywords: item, variant, language, content, codename.</p><p>This overview of Content items and variants helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/content-items/overview"
+			"url": "https://kontent.ai/learn/docs/content-items/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-058",
 			"codename": "how_to_configure_content_items_and_variants",
 			"title": "How to configure Content items and variants",
 			"markdownContent": "<h2>Configuring Content items and variants</h2><p>Follow these steps to set up Content items and variants in your environment. A content item holds language variants, each representing the item's content in a single language.</p><ul><li>Create items from a content type</li><li>Manage variants per language</li><li>Track the workflow of each variant</li></ul><p>Keywords: item, variant, language, content, codename.</p><p>Once configured, Content items and variants is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/content-items/configure"
+			"url": "https://kontent.ai/learn/docs/content-items/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-059",
 			"codename": "content_items_and_variants_best_practices",
 			"title": "Content items and variants best practices",
 			"markdownContent": "<h2>Best practices for Content items and variants</h2><p>Applying proven patterns to Content items and variants keeps your project maintainable. A content item holds language variants, each representing the item's content in a single language.</p><ul><li>Create items from a content type</li><li>Manage variants per language</li><li>Track the workflow of each variant</li></ul><p>Keywords: item, variant, language, content, codename.</p><p>Adopting these Content items and variants practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/content-items/best-practices"
+			"url": "https://kontent.ai/learn/docs/content-items/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-060",
 			"codename": "troubleshooting_content_items_and_variants",
 			"title": "Troubleshooting Content items and variants",
 			"markdownContent": "<h2>Common Content items and variants problems</h2><p>When Content items and variants does not behave as expected, work through these checks. A content item holds language variants, each representing the item's content in a single language.</p><ul><li>Create items from a content type</li><li>Manage variants per language</li><li>Track the workflow of each variant</li></ul><p>Keywords: item, variant, language, content, codename.</p><p>Most Content items and variants issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/content-items/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/content-items/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-061",
 			"codename": "introduction_to_publishing_content",
 			"title": "Introduction to Publishing content",
 			"markdownContent": "<h2>What is Publishing content?</h2><p>Publishing makes a content item variant available through the Delivery API.</p><ul><li>Publish or schedule content</li><li>Unpublish to remove from delivery</li><li>Publish changes trigger webhooks</li></ul><p>Keywords: publish, schedule, unpublish, release, live.</p><p>This overview of Publishing content helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/publishing/overview"
+			"url": "https://kontent.ai/learn/docs/publishing/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-062",
 			"codename": "how_to_configure_publishing_content",
 			"title": "How to configure Publishing content",
 			"markdownContent": "<h2>Configuring Publishing content</h2><p>Follow these steps to set up Publishing content in your environment. Publishing makes a content item variant available through the Delivery API.</p><ul><li>Publish or schedule content</li><li>Unpublish to remove from delivery</li><li>Publish changes trigger webhooks</li></ul><p>Keywords: publish, schedule, unpublish, release, live.</p><p>Once configured, Publishing content is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/publishing/configure"
+			"url": "https://kontent.ai/learn/docs/publishing/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-063",
 			"codename": "publishing_content_best_practices",
 			"title": "Publishing content best practices",
 			"markdownContent": "<h2>Best practices for Publishing content</h2><p>Applying proven patterns to Publishing content keeps your project maintainable. Publishing makes a content item variant available through the Delivery API.</p><ul><li>Publish or schedule content</li><li>Unpublish to remove from delivery</li><li>Publish changes trigger webhooks</li></ul><p>Keywords: publish, schedule, unpublish, release, live.</p><p>Adopting these Publishing content practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/publishing/best-practices"
+			"url": "https://kontent.ai/learn/docs/publishing/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-064",
 			"codename": "troubleshooting_publishing_content",
 			"title": "Troubleshooting Publishing content",
 			"markdownContent": "<h2>Common Publishing content problems</h2><p>When Publishing content does not behave as expected, work through these checks. Publishing makes a content item variant available through the Delivery API.</p><ul><li>Publish or schedule content</li><li>Unpublish to remove from delivery</li><li>Publish changes trigger webhooks</li></ul><p>Keywords: publish, schedule, unpublish, release, live.</p><p>Most Publishing content issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/publishing/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/publishing/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-065",
 			"codename": "introduction_to_custom_elements",
 			"title": "Introduction to Custom elements",
 			"markdownContent": "<h2>What is Custom elements?</h2><p>Custom elements let you extend the editing experience with your own integrations built as web apps.</p><ul><li>Host a custom element as an iframe</li><li>Read and write element values via the SDK</li><li>Pass configuration as JSON</li></ul><p>Keywords: custom, element, iframe, integration, extend.</p><pre><code>CustomElement.setValue(JSON.stringify(value));</code></pre><p>This overview of Custom elements helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/custom-elements/overview"
+			"url": "https://kontent.ai/learn/docs/custom-elements/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-066",
 			"codename": "how_to_configure_custom_elements",
 			"title": "How to configure Custom elements",
 			"markdownContent": "<h2>Configuring Custom elements</h2><p>Follow these steps to set up Custom elements in your environment. Custom elements let you extend the editing experience with your own integrations built as web apps.</p><ul><li>Host a custom element as an iframe</li><li>Read and write element values via the SDK</li><li>Pass configuration as JSON</li></ul><p>Keywords: custom, element, iframe, integration, extend.</p><pre><code>CustomElement.setValue(JSON.stringify(value));</code></pre><p>Once configured, Custom elements is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/custom-elements/configure"
+			"url": "https://kontent.ai/learn/docs/custom-elements/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-067",
 			"codename": "custom_elements_best_practices",
 			"title": "Custom elements best practices",
 			"markdownContent": "<h2>Best practices for Custom elements</h2><p>Applying proven patterns to Custom elements keeps your project maintainable. Custom elements let you extend the editing experience with your own integrations built as web apps.</p><ul><li>Host a custom element as an iframe</li><li>Read and write element values via the SDK</li><li>Pass configuration as JSON</li></ul><p>Keywords: custom, element, iframe, integration, extend.</p><pre><code>CustomElement.setValue(JSON.stringify(value));</code></pre><p>Adopting these Custom elements practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/custom-elements/best-practices"
+			"url": "https://kontent.ai/learn/docs/custom-elements/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-068",
 			"codename": "troubleshooting_custom_elements",
 			"title": "Troubleshooting Custom elements",
 			"markdownContent": "<h2>Common Custom elements problems</h2><p>When Custom elements does not behave as expected, work through these checks. Custom elements let you extend the editing experience with your own integrations built as web apps.</p><ul><li>Host a custom element as an iframe</li><li>Read and write element values via the SDK</li><li>Pass configuration as JSON</li></ul><p>Keywords: custom, element, iframe, integration, extend.</p><pre><code>CustomElement.setValue(JSON.stringify(value));</code></pre><p>Most Custom elements issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/custom-elements/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/custom-elements/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-069",
 			"codename": "introduction_to_web_spotlight",
 			"title": "Introduction to Web Spotlight",
 			"markdownContent": "<h2>What is Web Spotlight?</h2><p>Web Spotlight adds a visual, page-based editing experience on top of your structured content.</p><ul><li>Model your site as a page tree</li><li>Preview pages in context</li><li>Edit content inline on the page</li></ul><p>Keywords: spotlight, page, preview, visual, website.</p><p>This overview of Web Spotlight helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/web-spotlight/overview"
+			"url": "https://kontent.ai/learn/docs/web-spotlight/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-070",
 			"codename": "how_to_configure_web_spotlight",
 			"title": "How to configure Web Spotlight",
 			"markdownContent": "<h2>Configuring Web Spotlight</h2><p>Follow these steps to set up Web Spotlight in your environment. Web Spotlight adds a visual, page-based editing experience on top of your structured content.</p><ul><li>Model your site as a page tree</li><li>Preview pages in context</li><li>Edit content inline on the page</li></ul><p>Keywords: spotlight, page, preview, visual, website.</p><p>Once configured, Web Spotlight is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/web-spotlight/configure"
+			"url": "https://kontent.ai/learn/docs/web-spotlight/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-071",
 			"codename": "web_spotlight_best_practices",
 			"title": "Web Spotlight best practices",
 			"markdownContent": "<h2>Best practices for Web Spotlight</h2><p>Applying proven patterns to Web Spotlight keeps your project maintainable. Web Spotlight adds a visual, page-based editing experience on top of your structured content.</p><ul><li>Model your site as a page tree</li><li>Preview pages in context</li><li>Edit content inline on the page</li></ul><p>Keywords: spotlight, page, preview, visual, website.</p><p>Adopting these Web Spotlight practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/web-spotlight/best-practices"
+			"url": "https://kontent.ai/learn/docs/web-spotlight/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-072",
 			"codename": "troubleshooting_web_spotlight",
 			"title": "Troubleshooting Web Spotlight",
 			"markdownContent": "<h2>Common Web Spotlight problems</h2><p>When Web Spotlight does not behave as expected, work through these checks. Web Spotlight adds a visual, page-based editing experience on top of your structured content.</p><ul><li>Model your site as a page tree</li><li>Preview pages in context</li><li>Edit content inline on the page</li></ul><p>Keywords: spotlight, page, preview, visual, website.</p><p>Most Web Spotlight issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/web-spotlight/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/web-spotlight/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-073",
 			"codename": "introduction_to_subpages_and_navigation",
 			"title": "Introduction to Subpages and navigation",
 			"markdownContent": "<h2>What is Subpages and navigation?</h2><p>Subpage elements let you build hierarchical navigation structures from linked content items.</p><ul><li>Model parent-child page relationships</li><li>Build menus from the page tree</li><li>Resolve URLs from navigation</li></ul><p>Keywords: navigation, subpage, menu, hierarchy, url.</p><p>This overview of Subpages and navigation helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/navigation/overview"
+			"url": "https://kontent.ai/learn/docs/navigation/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-074",
 			"codename": "how_to_configure_subpages_and_navigation",
 			"title": "How to configure Subpages and navigation",
 			"markdownContent": "<h2>Configuring Subpages and navigation</h2><p>Follow these steps to set up Subpages and navigation in your environment. Subpage elements let you build hierarchical navigation structures from linked content items.</p><ul><li>Model parent-child page relationships</li><li>Build menus from the page tree</li><li>Resolve URLs from navigation</li></ul><p>Keywords: navigation, subpage, menu, hierarchy, url.</p><p>Once configured, Subpages and navigation is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/navigation/configure"
+			"url": "https://kontent.ai/learn/docs/navigation/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-075",
 			"codename": "subpages_and_navigation_best_practices",
 			"title": "Subpages and navigation best practices",
 			"markdownContent": "<h2>Best practices for Subpages and navigation</h2><p>Applying proven patterns to Subpages and navigation keeps your project maintainable. Subpage elements let you build hierarchical navigation structures from linked content items.</p><ul><li>Model parent-child page relationships</li><li>Build menus from the page tree</li><li>Resolve URLs from navigation</li></ul><p>Keywords: navigation, subpage, menu, hierarchy, url.</p><p>Adopting these Subpages and navigation practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/navigation/best-practices"
+			"url": "https://kontent.ai/learn/docs/navigation/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-076",
 			"codename": "troubleshooting_subpages_and_navigation",
 			"title": "Troubleshooting Subpages and navigation",
 			"markdownContent": "<h2>Common Subpages and navigation problems</h2><p>When Subpages and navigation does not behave as expected, work through these checks. Subpage elements let you build hierarchical navigation structures from linked content items.</p><ul><li>Model parent-child page relationships</li><li>Build menus from the page tree</li><li>Resolve URLs from navigation</li></ul><p>Keywords: navigation, subpage, menu, hierarchy, url.</p><p>Most Subpages and navigation issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/navigation/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/navigation/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-077",
@@ -558,172 +614,271 @@
 			"title": "Introduction to GraphQL API",
 			"markdownContent": "<h2>What is GraphQL API?</h2><p>The GraphQL API lets you query exactly the content fields you need in a single request.</p><ul><li>Query nested linked content</li><li>Request only the fields you need</li><li>Explore the schema with introspection</li></ul><p>Keywords: graphql, query, schema, field, api.</p><pre><code>query { allArticle { items { title } } }</code></pre><p>This overview of GraphQL API helps you understand where it fits in a Kontent.ai project.</p>",
 			"url": "https://kontent.ai/learn/docs/graphql-api/overview",
-			"endpoint": {
-				"endpointName": "Run a GraphQL query",
-				"endpointMethod": "POST",
-				"endpointUrl": "https://graphql.kontent.ai/{environment_id}"
-			}
+			"type": "section"
 		},
 		{
 			"id": "doc-078",
 			"codename": "how_to_configure_graphql_api",
 			"title": "How to configure GraphQL API",
 			"markdownContent": "<h2>Configuring GraphQL API</h2><p>Follow these steps to set up GraphQL API in your environment. The GraphQL API lets you query exactly the content fields you need in a single request.</p><ul><li>Query nested linked content</li><li>Request only the fields you need</li><li>Explore the schema with introspection</li></ul><p>Keywords: graphql, query, schema, field, api.</p><pre><code>query { allArticle { items { title } } }</code></pre><p>Once configured, GraphQL API is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/graphql-api/configure"
+			"url": "https://kontent.ai/learn/docs/graphql-api/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-079",
 			"codename": "graphql_api_best_practices",
 			"title": "GraphQL API best practices",
 			"markdownContent": "<h2>Best practices for GraphQL API</h2><p>Applying proven patterns to GraphQL API keeps your project maintainable. The GraphQL API lets you query exactly the content fields you need in a single request.</p><ul><li>Query nested linked content</li><li>Request only the fields you need</li><li>Explore the schema with introspection</li></ul><p>Keywords: graphql, query, schema, field, api.</p><pre><code>query { allArticle { items { title } } }</code></pre><p>Adopting these GraphQL API practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/graphql-api/best-practices"
+			"url": "https://kontent.ai/learn/docs/graphql-api/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-080",
 			"codename": "troubleshooting_graphql_api",
 			"title": "Troubleshooting GraphQL API",
 			"markdownContent": "<h2>Common GraphQL API problems</h2><p>When GraphQL API does not behave as expected, work through these checks. The GraphQL API lets you query exactly the content fields you need in a single request.</p><ul><li>Query nested linked content</li><li>Request only the fields you need</li><li>Explore the schema with introspection</li></ul><p>Keywords: graphql, query, schema, field, api.</p><pre><code>query { allArticle { items { title } } }</code></pre><p>Most GraphQL API issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/graphql-api/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/graphql-api/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-081",
 			"codename": "introduction_to_sync_api",
 			"title": "Introduction to Sync API",
 			"markdownContent": "<h2>What is Sync API?</h2><p>The Sync API streams incremental content changes so you can keep an external store up to date.</p><ul><li>Initialize a sync token</li><li>Poll for changed and deleted items</li><li>Apply deltas to your cache</li></ul><p>Keywords: sync, incremental, delta, changes, token.</p><pre><code>GET https://deliver.kontent.ai/{PROJECT_ID}/sync</code></pre><p>This overview of Sync API helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/sync-api/overview"
+			"url": "https://kontent.ai/learn/docs/sync-api/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-082",
 			"codename": "how_to_configure_sync_api",
 			"title": "How to configure Sync API",
 			"markdownContent": "<h2>Configuring Sync API</h2><p>Follow these steps to set up Sync API in your environment. The Sync API streams incremental content changes so you can keep an external store up to date.</p><ul><li>Initialize a sync token</li><li>Poll for changed and deleted items</li><li>Apply deltas to your cache</li></ul><p>Keywords: sync, incremental, delta, changes, token.</p><pre><code>GET https://deliver.kontent.ai/{PROJECT_ID}/sync</code></pre><p>Once configured, Sync API is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/sync-api/configure"
+			"url": "https://kontent.ai/learn/docs/sync-api/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-083",
 			"codename": "sync_api_best_practices",
 			"title": "Sync API best practices",
 			"markdownContent": "<h2>Best practices for Sync API</h2><p>Applying proven patterns to Sync API keeps your project maintainable. The Sync API streams incremental content changes so you can keep an external store up to date.</p><ul><li>Initialize a sync token</li><li>Poll for changed and deleted items</li><li>Apply deltas to your cache</li></ul><p>Keywords: sync, incremental, delta, changes, token.</p><pre><code>GET https://deliver.kontent.ai/{PROJECT_ID}/sync</code></pre><p>Adopting these Sync API practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/sync-api/best-practices"
+			"url": "https://kontent.ai/learn/docs/sync-api/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-084",
 			"codename": "troubleshooting_sync_api",
 			"title": "Troubleshooting Sync API",
 			"markdownContent": "<h2>Common Sync API problems</h2><p>When Sync API does not behave as expected, work through these checks. The Sync API streams incremental content changes so you can keep an external store up to date.</p><ul><li>Initialize a sync token</li><li>Poll for changed and deleted items</li><li>Apply deltas to your cache</li></ul><p>Keywords: sync, incremental, delta, changes, token.</p><pre><code>GET https://deliver.kontent.ai/{PROJECT_ID}/sync</code></pre><p>Most Sync API issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/sync-api/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/sync-api/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-085",
 			"codename": "introduction_to_preview_and_preview_mode",
 			"title": "Introduction to Preview and preview mode",
 			"markdownContent": "<h2>What is Preview and preview mode?</h2><p>Preview mode lets you retrieve unpublished content so editors can review changes before going live.</p><ul><li>Use the preview Delivery API</li><li>Authenticate with a preview API key</li><li>Preview draft content in your app</li></ul><p>Keywords: preview, unpublished, draft, review, key.</p><pre><code>GET https://preview-deliver.kontent.ai/{PROJECT_ID}/items</code></pre><p>This overview of Preview and preview mode helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/preview-api/overview"
+			"url": "https://kontent.ai/learn/docs/preview-api/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-086",
 			"codename": "how_to_configure_preview_and_preview_mode",
 			"title": "How to configure Preview and preview mode",
 			"markdownContent": "<h2>Configuring Preview and preview mode</h2><p>Follow these steps to set up Preview and preview mode in your environment. Preview mode lets you retrieve unpublished content so editors can review changes before going live.</p><ul><li>Use the preview Delivery API</li><li>Authenticate with a preview API key</li><li>Preview draft content in your app</li></ul><p>Keywords: preview, unpublished, draft, review, key.</p><pre><code>GET https://preview-deliver.kontent.ai/{PROJECT_ID}/items</code></pre><p>Once configured, Preview and preview mode is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/preview-api/configure"
+			"url": "https://kontent.ai/learn/docs/preview-api/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-087",
 			"codename": "preview_and_preview_mode_best_practices",
 			"title": "Preview and preview mode best practices",
 			"markdownContent": "<h2>Best practices for Preview and preview mode</h2><p>Applying proven patterns to Preview and preview mode keeps your project maintainable. Preview mode lets you retrieve unpublished content so editors can review changes before going live.</p><ul><li>Use the preview Delivery API</li><li>Authenticate with a preview API key</li><li>Preview draft content in your app</li></ul><p>Keywords: preview, unpublished, draft, review, key.</p><pre><code>GET https://preview-deliver.kontent.ai/{PROJECT_ID}/items</code></pre><p>Adopting these Preview and preview mode practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/preview-api/best-practices"
+			"url": "https://kontent.ai/learn/docs/preview-api/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-088",
 			"codename": "troubleshooting_preview_and_preview_mode",
 			"title": "Troubleshooting Preview and preview mode",
 			"markdownContent": "<h2>Common Preview and preview mode problems</h2><p>When Preview and preview mode does not behave as expected, work through these checks. Preview mode lets you retrieve unpublished content so editors can review changes before going live.</p><ul><li>Use the preview Delivery API</li><li>Authenticate with a preview API key</li><li>Preview draft content in your app</li></ul><p>Keywords: preview, unpublished, draft, review, key.</p><pre><code>GET https://preview-deliver.kontent.ai/{PROJECT_ID}/items</code></pre><p>Most Preview and preview mode issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/preview-api/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/preview-api/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-089",
 			"codename": "introduction_to_sdks",
 			"title": "Introduction to SDKs",
 			"markdownContent": "<h2>What is SDKs?</h2><p>Official SDKs for JavaScript, TypeScript and .NET make it easier to consume Kontent.ai APIs.</p><ul><li>Strongly typed content models</li><li>Built-in retry and caching helpers</li><li>Rich text resolution utilities</li></ul><p>Keywords: sdk, javascript, dotnet, client, library.</p><pre><code>const client = createDeliveryClient({ environmentId });</code></pre><p>This overview of SDKs helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/sdks/overview"
+			"url": "https://kontent.ai/learn/docs/sdks/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-090",
 			"codename": "how_to_configure_sdks",
 			"title": "How to configure SDKs",
 			"markdownContent": "<h2>Configuring SDKs</h2><p>Follow these steps to set up SDKs in your environment. Official SDKs for JavaScript, TypeScript and .NET make it easier to consume Kontent.ai APIs.</p><ul><li>Strongly typed content models</li><li>Built-in retry and caching helpers</li><li>Rich text resolution utilities</li></ul><p>Keywords: sdk, javascript, dotnet, client, library.</p><pre><code>const client = createDeliveryClient({ environmentId });</code></pre><p>Once configured, SDKs is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/sdks/configure"
+			"url": "https://kontent.ai/learn/docs/sdks/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-091",
 			"codename": "sdks_best_practices",
 			"title": "SDKs best practices",
 			"markdownContent": "<h2>Best practices for SDKs</h2><p>Applying proven patterns to SDKs keeps your project maintainable. Official SDKs for JavaScript, TypeScript and .NET make it easier to consume Kontent.ai APIs.</p><ul><li>Strongly typed content models</li><li>Built-in retry and caching helpers</li><li>Rich text resolution utilities</li></ul><p>Keywords: sdk, javascript, dotnet, client, library.</p><pre><code>const client = createDeliveryClient({ environmentId });</code></pre><p>Adopting these SDKs practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/sdks/best-practices"
+			"url": "https://kontent.ai/learn/docs/sdks/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-092",
 			"codename": "troubleshooting_sdks",
 			"title": "Troubleshooting SDKs",
 			"markdownContent": "<h2>Common SDKs problems</h2><p>When SDKs does not behave as expected, work through these checks. Official SDKs for JavaScript, TypeScript and .NET make it easier to consume Kontent.ai APIs.</p><ul><li>Strongly typed content models</li><li>Built-in retry and caching helpers</li><li>Rich text resolution utilities</li></ul><p>Keywords: sdk, javascript, dotnet, client, library.</p><pre><code>const client = createDeliveryClient({ environmentId });</code></pre><p>Most SDKs issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/sdks/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/sdks/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-093",
 			"codename": "introduction_to_personalization",
 			"title": "Introduction to Personalization",
 			"markdownContent": "<h2>What is Personalization?</h2><p>Personalization delivers different content to different audiences based on rules and segments.</p><ul><li>Define audience segments</li><li>Vary content by segment</li><li>Measure personalized experiences</li></ul><p>Keywords: personalization, audience, segment, target, experience.</p><p>This overview of Personalization helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/personalization/overview"
+			"url": "https://kontent.ai/learn/docs/personalization/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-094",
 			"codename": "how_to_configure_personalization",
 			"title": "How to configure Personalization",
 			"markdownContent": "<h2>Configuring Personalization</h2><p>Follow these steps to set up Personalization in your environment. Personalization delivers different content to different audiences based on rules and segments.</p><ul><li>Define audience segments</li><li>Vary content by segment</li><li>Measure personalized experiences</li></ul><p>Keywords: personalization, audience, segment, target, experience.</p><p>Once configured, Personalization is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/personalization/configure"
+			"url": "https://kontent.ai/learn/docs/personalization/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-095",
 			"codename": "personalization_best_practices",
 			"title": "Personalization best practices",
 			"markdownContent": "<h2>Best practices for Personalization</h2><p>Applying proven patterns to Personalization keeps your project maintainable. Personalization delivers different content to different audiences based on rules and segments.</p><ul><li>Define audience segments</li><li>Vary content by segment</li><li>Measure personalized experiences</li></ul><p>Keywords: personalization, audience, segment, target, experience.</p><p>Adopting these Personalization practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/personalization/best-practices"
+			"url": "https://kontent.ai/learn/docs/personalization/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-096",
 			"codename": "troubleshooting_personalization",
 			"title": "Troubleshooting Personalization",
 			"markdownContent": "<h2>Common Personalization problems</h2><p>When Personalization does not behave as expected, work through these checks. Personalization delivers different content to different audiences based on rules and segments.</p><ul><li>Define audience segments</li><li>Vary content by segment</li><li>Measure personalized experiences</li></ul><p>Keywords: personalization, audience, segment, target, experience.</p><p>Most Personalization issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/personalization/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/personalization/troubleshoot",
+			"type": "section"
 		},
 		{
 			"id": "doc-097",
 			"codename": "introduction_to_smart_link_sdk",
 			"title": "Introduction to Smart Link SDK",
 			"markdownContent": "<h2>What is Smart Link SDK?</h2><p>The Smart Link SDK connects your rendered website back to the Kontent.ai editing experience.</p><ul><li>Add edit buttons to your site</li><li>Enable in-context editing</li><li>Refresh preview after changes</li></ul><p>Keywords: smart, link, edit, preview, context.</p><pre><code>KontentSmartLink.initialize();</code></pre><p>This overview of Smart Link SDK helps you understand where it fits in a Kontent.ai project.</p>",
-			"url": "https://kontent.ai/learn/docs/smart-link/overview"
+			"url": "https://kontent.ai/learn/docs/smart-link/overview",
+			"type": "section"
 		},
 		{
 			"id": "doc-098",
 			"codename": "how_to_configure_smart_link_sdk",
 			"title": "How to configure Smart Link SDK",
 			"markdownContent": "<h2>Configuring Smart Link SDK</h2><p>Follow these steps to set up Smart Link SDK in your environment. The Smart Link SDK connects your rendered website back to the Kontent.ai editing experience.</p><ul><li>Add edit buttons to your site</li><li>Enable in-context editing</li><li>Refresh preview after changes</li></ul><p>Keywords: smart, link, edit, preview, context.</p><pre><code>KontentSmartLink.initialize();</code></pre><p>Once configured, Smart Link SDK is ready to use across your content operations.</p>",
-			"url": "https://kontent.ai/learn/docs/smart-link/configure"
+			"url": "https://kontent.ai/learn/docs/smart-link/configure",
+			"type": "section"
 		},
 		{
 			"id": "doc-099",
 			"codename": "smart_link_sdk_best_practices",
 			"title": "Smart Link SDK best practices",
 			"markdownContent": "<h2>Best practices for Smart Link SDK</h2><p>Applying proven patterns to Smart Link SDK keeps your project maintainable. The Smart Link SDK connects your rendered website back to the Kontent.ai editing experience.</p><ul><li>Add edit buttons to your site</li><li>Enable in-context editing</li><li>Refresh preview after changes</li></ul><p>Keywords: smart, link, edit, preview, context.</p><pre><code>KontentSmartLink.initialize();</code></pre><p>Adopting these Smart Link SDK practices early avoids costly rework later.</p>",
-			"url": "https://kontent.ai/learn/docs/smart-link/best-practices"
+			"url": "https://kontent.ai/learn/docs/smart-link/best-practices",
+			"type": "section"
 		},
 		{
 			"id": "doc-100",
 			"codename": "troubleshooting_smart_link_sdk",
 			"title": "Troubleshooting Smart Link SDK",
 			"markdownContent": "<h2>Common Smart Link SDK problems</h2><p>When Smart Link SDK does not behave as expected, work through these checks. The Smart Link SDK connects your rendered website back to the Kontent.ai editing experience.</p><ul><li>Add edit buttons to your site</li><li>Enable in-context editing</li><li>Refresh preview after changes</li></ul><p>Keywords: smart, link, edit, preview, context.</p><pre><code>KontentSmartLink.initialize();</code></pre><p>Most Smart Link SDK issues come down to configuration or permissions.</p>",
-			"url": "https://kontent.ai/learn/docs/smart-link/troubleshoot"
+			"url": "https://kontent.ai/learn/docs/smart-link/troubleshoot",
+			"type": "section"
+		},
+		{
+			"id": "endpoint-001",
+			"codename": "list_content_items",
+			"title": "List content items",
+			"markdownContent": "Retrieve a list of content items from the specified environment. By default, the API returns an unfiltered paginated list of content items in the default language, ordered alphabetically by codename. The response size{#a-response-size#} is limited to 2000 items.\n\nThe `modular_content` object property will contain both components and linked items in the API response. See Linked content and components for more details.\n\nIf you need to export all content items, we recommend you enumerate content items.",
+			"url": "https://kontent.ai/learn/docs/api-reference/list_content_items",
+			"type": "endpoint"
+		},
+		{
+			"id": "endpoint-002",
+			"codename": "retrieve_a_content_item",
+			"title": "Retrieve a content item",
+			"markdownContent": "Retrieve a content item by its codename.\n\nThe response size{#a-response-size#} is limited to 2000 items.",
+			"url": "https://kontent.ai/learn/docs/api-reference/retrieve_a_content_item",
+			"type": "endpoint"
+		},
+		{
+			"id": "endpoint-003",
+			"codename": "enumerate_content_items",
+			"title": "Enumerate content items",
+			"markdownContent": "Retrieve a dynamically paginated list of content items ordered alphabetically by codename.\n\nWe recommend using this endpoint for scenarios such as:\n\n* Warming up your app's cache, that is getting all content into the cache after the app starts.\n* Exporting the content of your project's environment.\n\nThis endpoint, unlike the List content items endpoint, guarantees to enumerate all content items in the specified environment. The `modular_content` object property will contain only components used in rich text elements in the API response. See Linked content and components for more details.\n\n**Paging**\n\nIf the response comes with the `X-Continuation` header, it means that there are more pages to retrieve. To get the next page of results, send the `X-Continuation` header with your request as you received it.",
+			"url": "https://kontent.ai/learn/docs/api-reference/enumerate_content_items",
+			"type": "endpoint"
+		},
+		{
+			"id": "endpoint-004",
+			"codename": "list_items_that_reference_an_asset",
+			"title": "List items that reference an asset",
+			"markdownContent": "Returns a list of content items that contain references to a specific asset.\n\n**What is a used asset?**\n\nFor a content item to be included in the _Used in_ list of a specific asset, at least one of the following must occur:\n\n* The asset is inserted in a rich text element{#a-adding-content-items#} of another content item.\n* The asset is hyperlinked in a rich text element{#a-adding-links#} of another content item.\n* The asset is linked in an asset element of another content item.\n\n**References to unavailable assets**\n\nYou can use the endpoint even for assets that were deleted. For example, when you get a webhook notification about asset deletion, you can check whether the asset is still used anywhere in your published content.\n\n**Filtering**\n\nYou can filter the returned list of content items by the following content item `system` properties: `type`, `collection`, `workflow`, `workflow_step`, and `language`. For example, if you're interested only in items referencing the specified asset within a specific collection, you can filter by the `system.collection`.\n\n**Localization**\n\nBy default, the endpoint returns content items in the default language. If you want to check an asset's usage across multiple languages, you can specify the languages using the `system.language` parameter, for example `system.language[in]=english,spanish`.\n\nThe endpoint ignores language fallbacks{#a-language-fallbacks#}.\n\n**Paging**\n\nIf the response comes with the `X-Continuation` header, it means that there are more pages to retrieve. To get the next page of results, send the `X-Continuation` header with your request as you received it.",
+			"url": "https://kontent.ai/learn/docs/api-reference/list_items_that_reference_an_asset",
+			"type": "endpoint"
+		},
+		{
+			"id": "endpoint-005",
+			"codename": "dapi_items_used_in",
+			"title": "List items that reference an item",
+			"markdownContent": "Returns a list of content items that contain references to a specific content item.\n\n**What is a used content item?**\n\nFor an item to be included in the _Used in_ list of a specific content item, at least one of the following must occur:\n\n* The content item is inserted in a rich text element{#a-adding-content-items#} of another content item.\n* The content item is hyperlinked in a rich text element{#a-adding-links#} of another content item.\n* The content item is linked in a linked items element of another content item.\n* The content item links to itself within a rich text or linked items element.\n\n**References to unavailable items**\n\nYou can use the endpoint even for content items that were archived or deleted. For example, when you get a webhook notification about content item unpublishing or deletion, you can check whether the content item is still used anywhere in your published content.\n\n**Filtering**\n\nYou can filter the returned list of content items by the following content item `system` properties: `type`, `collection`, `workflow`, `workflow_step`, and `language`. For example, if you're interested only in items referencing the specified content item within a specific collection, you can filter by the `system.collection`.\n\n**Localization**\n\nBy default, the endpoint returns content items in the default language. If you want to check an item's usage across multiple languages, you can specify the languages using the `system.language` parameter, for example `system.language[in]=english,spanish`.\n\nThe endpoint ignores language fallbacks{#a-language-fallbacks#}.\n\n**Paging**\n\nIf the response comes with the `X-Continuation` header, it means that there are more pages to retrieve. To get the next page of results, send the `X-Continuation` header with your request as you received it.",
+			"url": "https://kontent.ai/learn/docs/api-reference/dapi_items_used_in",
+			"type": "endpoint"
+		},
+		{
+			"id": "endpoint-006",
+			"codename": "list_content_types",
+			"title": "List content types",
+			"markdownContent": "Retrieve a paginated list of content types. By default, the API returns all content types ordered alphabetically by codename.\n\nYou can customize pagination by specifying both the `skip` and `limit` query parameters.",
+			"url": "https://kontent.ai/learn/docs/api-reference/list_content_types",
+			"type": "endpoint"
+		},
+		{
+			"id": "endpoint-007",
+			"codename": "retrieve_a_content_type_384b00d",
+			"title": "Retrieve a content type",
+			"markdownContent": "Retrieve a specific content type.",
+			"url": "https://kontent.ai/learn/docs/api-reference/retrieve_a_content_type_384b00d",
+			"type": "endpoint"
+		},
+		{
+			"id": "endpoint-008",
+			"codename": "retrieve_a_content_element",
+			"title": "Retrieve a content type element",
+			"markdownContent": "Retrieve a content type element defined in a specific content type. Both the type and element must be specified by their codenames.",
+			"url": "https://kontent.ai/learn/docs/api-reference/retrieve_a_content_element",
+			"type": "endpoint"
+		},
+		{
+			"id": "endpoint-009",
+			"codename": "list_languages_f72e9ef",
+			"title": "List languages",
+			"markdownContent": "Retrieve a list of active languages. By default, the API returns all languages ordered alphabetically by codename.",
+			"url": "https://kontent.ai/learn/docs/api-reference/list_languages_f72e9ef",
+			"type": "endpoint"
+		},
+		{
+			"id": "endpoint-010",
+			"codename": "list_taxonomy_groups",
+			"title": "List taxonomy groups",
+			"markdownContent": "Retrieve a paginated list of taxonomy groups. By default, the API returns all taxonomy groups ordered alphabetically by codename.\n\nYou can customize pagination by specifying both the `skip` and `limit` query parameters.",
+			"url": "https://kontent.ai/learn/docs/api-reference/list_taxonomy_groups",
+			"type": "endpoint"
 		}
 	],
 	"apiReferenceRecords": [
@@ -733,6 +888,7 @@
 			"title": "List content items",
 			"markdownContent": "Retrieve a list of content items from the specified environment. By default, the API returns an unfiltered paginated list of content items in the default language, ordered alphabetically by codename. The response size{#a-response-size#} is limited to 2000 items.\n\nThe `modular_content` object property will contain both components and linked items in the API response. See Linked content and components for more details.\n\nIf you need to export all content items, we recommend you enumerate content items.",
 			"httpMethod": "get",
+			"url": "https://kontent.ai/learn/docs/api-reference/list_content_items",
 			"endpointUrls": [
 				"https://deliver.kontent.ai/{environment_id}/items",
 				"https://preview-deliver.kontent.ai/{environment_id}/items"
@@ -1171,6 +1327,7 @@
 			"title": "Retrieve a content item",
 			"markdownContent": "Retrieve a content item by its codename.\n\nThe response size{#a-response-size#} is limited to 2000 items.",
 			"httpMethod": "get",
+			"url": "https://kontent.ai/learn/docs/api-reference/retrieve_a_content_item",
 			"endpointUrls": [
 				"https://deliver.kontent.ai/{environment_id}/items/{item_codename}",
 				"https://preview-deliver.kontent.ai/{environment_id}/items/{item_codename}"
@@ -1537,6 +1694,7 @@
 			"title": "Enumerate content items",
 			"markdownContent": "Retrieve a dynamically paginated list of content items ordered alphabetically by codename.\n\nWe recommend using this endpoint for scenarios such as:\n\n* Warming up your app's cache, that is getting all content into the cache after the app starts.\n* Exporting the content of your project's environment.\n\nThis endpoint, unlike the List content items endpoint, guarantees to enumerate all content items in the specified environment. The `modular_content` object property will contain only components used in rich text elements in the API response. See Linked content and components for more details.\n\n**Paging**\n\nIf the response comes with the `X-Continuation` header, it means that there are more pages to retrieve. To get the next page of results, send the `X-Continuation` header with your request as you received it.",
 			"httpMethod": "get",
+			"url": "https://kontent.ai/learn/docs/api-reference/enumerate_content_items",
 			"endpointUrls": [
 				"https://deliver.kontent.ai/{environment_id}/items-feed",
 				"https://preview-deliver.kontent.ai/{environment_id}/items-feed"
@@ -1851,6 +2009,7 @@
 			"title": "List items that reference an asset",
 			"markdownContent": "Returns a list of content items that contain references to a specific asset.\n\n**What is a used asset?**\n\nFor a content item to be included in the _Used in_ list of a specific asset, at least one of the following must occur:\n\n* The asset is inserted in a rich text element{#a-adding-content-items#} of another content item.\n* The asset is hyperlinked in a rich text element{#a-adding-links#} of another content item.\n* The asset is linked in an asset element of another content item.\n\n**References to unavailable assets**\n\nYou can use the endpoint even for assets that were deleted. For example, when you get a webhook notification about asset deletion, you can check whether the asset is still used anywhere in your published content.\n\n**Filtering**\n\nYou can filter the returned list of content items by the following content item `system` properties: `type`, `collection`, `workflow`, `workflow_step`, and `language`. For example, if you're interested only in items referencing the specified asset within a specific collection, you can filter by the `system.collection`.\n\n**Localization**\n\nBy default, the endpoint returns content items in the default language. If you want to check an asset's usage across multiple languages, you can specify the languages using the `system.language` parameter, for example `system.language[in]=english,spanish`.\n\nThe endpoint ignores language fallbacks{#a-language-fallbacks#}.\n\n**Paging**\n\nIf the response comes with the `X-Continuation` header, it means that there are more pages to retrieve. To get the next page of results, send the `X-Continuation` header with your request as you received it.",
 			"httpMethod": "get",
+			"url": "https://kontent.ai/learn/docs/api-reference/list_items_that_reference_an_asset",
 			"endpointUrls": [
 				"https://deliver.kontent.ai/{environment_id}/assets/{asset_codename}/used-in",
 				"https://preview-deliver.kontent.ai/{environment_id}/assets/{asset_codename}/used-in"
@@ -2004,6 +2163,7 @@
 			"title": "List items that reference an item",
 			"markdownContent": "Returns a list of content items that contain references to a specific content item.\n\n**What is a used content item?**\n\nFor an item to be included in the _Used in_ list of a specific content item, at least one of the following must occur:\n\n* The content item is inserted in a rich text element{#a-adding-content-items#} of another content item.\n* The content item is hyperlinked in a rich text element{#a-adding-links#} of another content item.\n* The content item is linked in a linked items element of another content item.\n* The content item links to itself within a rich text or linked items element.\n\n**References to unavailable items**\n\nYou can use the endpoint even for content items that were archived or deleted. For example, when you get a webhook notification about content item unpublishing or deletion, you can check whether the content item is still used anywhere in your published content.\n\n**Filtering**\n\nYou can filter the returned list of content items by the following content item `system` properties: `type`, `collection`, `workflow`, `workflow_step`, and `language`. For example, if you're interested only in items referencing the specified content item within a specific collection, you can filter by the `system.collection`.\n\n**Localization**\n\nBy default, the endpoint returns content items in the default language. If you want to check an item's usage across multiple languages, you can specify the languages using the `system.language` parameter, for example `system.language[in]=english,spanish`.\n\nThe endpoint ignores language fallbacks{#a-language-fallbacks#}.\n\n**Paging**\n\nIf the response comes with the `X-Continuation` header, it means that there are more pages to retrieve. To get the next page of results, send the `X-Continuation` header with your request as you received it.",
 			"httpMethod": "get",
+			"url": "https://kontent.ai/learn/docs/api-reference/dapi_items_used_in",
 			"endpointUrls": [
 				"https://deliver.kontent.ai/{environment_id}/items/{item_codename}/used-in",
 				"https://preview-deliver.kontent.ai/{environment_id}/items/{item_codename}/used-in"
@@ -2157,6 +2317,7 @@
 			"title": "List content types",
 			"markdownContent": "Retrieve a paginated list of content types. By default, the API returns all content types ordered alphabetically by codename.\n\nYou can customize pagination by specifying both the `skip` and `limit` query parameters.",
 			"httpMethod": "get",
+			"url": "https://kontent.ai/learn/docs/api-reference/list_content_types",
 			"endpointUrls": [
 				"https://deliver.kontent.ai/{environment_id}/types",
 				"https://preview-deliver.kontent.ai/{environment_id}/types"
@@ -2361,6 +2522,7 @@
 			"title": "Retrieve a content type",
 			"markdownContent": "Retrieve a specific content type.",
 			"httpMethod": "get",
+			"url": "https://kontent.ai/learn/docs/api-reference/retrieve_a_content_type_384b00d",
 			"endpointUrls": [
 				"https://deliver.kontent.ai/{environment_id}/types/{type_codename}",
 				"https://preview-deliver.kontent.ai/{environment_id}/types/{type_codename}"
@@ -2547,6 +2709,7 @@
 			"title": "Retrieve a content type element",
 			"markdownContent": "Retrieve a content type element defined in a specific content type. Both the type and element must be specified by their codenames.",
 			"httpMethod": "get",
+			"url": "https://kontent.ai/learn/docs/api-reference/retrieve_a_content_element",
 			"endpointUrls": [
 				"https://deliver.kontent.ai/{environment_id}/types/{type_codename}/elements/{element_codename}",
 				"https://preview-deliver.kontent.ai/{environment_id}/types/{type_codename}/elements/{element_codename}"
@@ -2768,6 +2931,7 @@
 			"title": "List languages",
 			"markdownContent": "Retrieve a list of active languages. By default, the API returns all languages ordered alphabetically by codename.",
 			"httpMethod": "get",
+			"url": "https://kontent.ai/learn/docs/api-reference/list_languages_f72e9ef",
 			"endpointUrls": [
 				"https://deliver.kontent.ai/{environment_id}/languages",
 				"https://preview-deliver.kontent.ai/{environment_id}/languages"
@@ -2930,6 +3094,7 @@
 			"title": "List taxonomy groups",
 			"markdownContent": "Retrieve a paginated list of taxonomy groups. By default, the API returns all taxonomy groups ordered alphabetically by codename.\n\nYou can customize pagination by specifying both the `skip` and `limit` query parameters.",
 			"httpMethod": "get",
+			"url": "https://kontent.ai/learn/docs/api-reference/list_taxonomy_groups",
 			"endpointUrls": [
 				"https://deliver.kontent.ai/{environment_id}/taxonomies",
 				"https://preview-deliver.kontent.ai/{environment_id}/taxonomies"

@@ -75,6 +75,7 @@ function normalize(doc: SearchRecord): NormalizedDoc {
 	return {
 		id: doc.id,
 		title,
+		type: doc.type,
 		url,
 		body,
 		contentHash: hashContent([title, url, body]),

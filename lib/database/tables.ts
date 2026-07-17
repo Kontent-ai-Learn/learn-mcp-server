@@ -1,5 +1,5 @@
+import type { SearchRecordType } from "../data/learn-api.js";
 import { EMBEDDING_DIM } from "../indexing/indexer.config.js";
-import type { EndpointReference } from "../indexing/indexer.models.js";
 import type { TableDefinition } from "./db.utils.js";
 
 export type DocumentRow = {
@@ -10,7 +10,7 @@ export type DocumentRow = {
 	readonly body: string;
 	readonly contentHash: string;
 	readonly lastModified: string | null;
-	readonly endpoint: EndpointReference | null;
+	readonly type: SearchRecordType;
 };
 
 export type ChunkRow = {
@@ -31,7 +31,7 @@ export const DOCUMENTS_TABLE: TableDefinition<"documents", DocumentRow> = {
 		title: { name: "title", type: "TEXT", notNull: true },
 		url: { name: "url", type: "TEXT", notNull: true },
 		body: { name: "body", type: "TEXT", notNull: true },
-		endpoint: { name: "endpoint", type: "JSON" },
+		type: { name: "type", type: "TEXT", notNull: true },
 		contentHash: { name: "contentHash", type: "TEXT", notNull: true },
 		lastModified: { name: "lastModified", type: "TEXT" },
 	},

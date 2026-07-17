@@ -1,10 +1,10 @@
 import z from "zod";
+import { fetchLearnRecords } from "../data/learn-api.js";
 import { search } from "../database/search.js";
-import type { EndpointReference } from "../indexing/indexer.models.js";
-import type { SearchResult } from "../public_api.js";
 import { defineReadOnlyTool } from "../tools-def/tool-definitions.js";
 import { withToolHandler } from "../tools-def/tool-handler.js";
 import type { ToolName } from "../tools-def/tool-models.js";
+import { getErrorMessage } from "../utils/error.utils.js";
 
 const toolName: ToolName = "get-endpoint-details";
 
@@ -22,20 +22,30 @@ export const getEndpointDetailsTools = defineReadOnlyTool(
 		return await withToolHandler({
 			toolName,
 			handler: async () => {
-				// first we try finding the proper endpoint
+				// first try finding the proper endpoint
 				const searchResults = await search(text);
-				const endpointResults = searchResults.filter(isEndpointResult);
+				const endpointResults = searchResults.filter((m) => m.type === "endpoint");
 				const topResult = endpointResults.at(0);
 
 				if (!topResult) {
 					return "Could not find endpoint details for the given input.";
 				}
-				return [];
+
+				// take the top result and return its details
+				const { success, data, error } = await fetchLearnRecords();
+
+				if (!success) {
+					return `Could not fetch learn records. Error: ${getErrorMessage(error)}`;
+				}
+
+				const fullDetails = data.apiReferenceRecords.find((record) => record.codename === topResult.codename);
+
+				if (!fullDetails) {
+					return `Found candidate endpoint but could not retrieve its details. Requested codename: ${topResult.codename}`;
+				}
+
+				return fullDetails;
 			},
 		});
 	},
 );
-
-function isEndpointResult(result: SearchResult): result is SearchResult & { endpoint: EndpointReference } {
-	return result.endpoint !== null;
-}

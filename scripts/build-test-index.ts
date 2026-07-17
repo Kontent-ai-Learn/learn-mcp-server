@@ -1,7 +1,7 @@
 import { readFile, rm } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import * as z from "zod/mini";
-import { aiApiReferenceRecordSchema, searchRecordSchema } from "../lib/data/learn-api.js";
+import { apiReferenceRecordSchema, searchRecordSchema } from "../lib/data/learn-api.js";
 import { openDb } from "../lib/database/db.js";
 import { indexSourceDocuments } from "../lib/indexing/indexer.js";
 
@@ -12,7 +12,7 @@ const samplesPath = fileURLToPath(new URL("../samples/test-db-source-docs.json",
 const sourceSchema = z.readonly(
 	z.object({
 		searchRecords: z.array(searchRecordSchema),
-		apiReferenceRecords: z.array(aiApiReferenceRecordSchema),
+		apiReferenceRecords: z.array(apiReferenceRecordSchema),
 	}),
 );
 

@@ -1,3 +1,5 @@
+import type { SearchRecordType } from "../data/learn-api.js";
+
 export type NormalizedDoc = {
 	readonly id: string;
 	readonly title: string;
@@ -5,6 +7,7 @@ export type NormalizedDoc = {
 	readonly body: string;
 	readonly contentHash: string;
 	readonly codename: string;
+	readonly type: SearchRecordType;
 };
 
 export type DocChunk = {
@@ -16,18 +19,13 @@ export type DocChunk = {
 
 export type MatchType = "vector" | "lexical" | "hybrid";
 
-export type EndpointReference = {
-	readonly endpointUrl: string;
-	readonly endpointName: string;
-	readonly endpointMethod: string;
-};
-
 export type SearchResult = {
 	readonly title: string;
 	readonly url: string;
 	readonly body: string;
-	readonly endpoint: EndpointReference | null;
+	readonly codename: string;
 	readonly matchType: MatchType;
+	readonly type: SearchRecordType;
 	readonly score: number;
 	readonly scores: {
 		/** Cosine similarity (0–1); `null` if no vector match. */

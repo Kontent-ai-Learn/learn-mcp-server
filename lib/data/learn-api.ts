@@ -5,13 +5,9 @@ import { getContentUrl } from "../indexing/indexer.config.js";
 import { logger } from "../utils/logger.js";
 import { packageJsonName, packageJsonVersion } from "../utils/version.js";
 
-export const searchRecordApiReferenceSchema = z.readonly(
-	z.object({
-		endpointUrl: z.string(),
-		endpointName: z.string(),
-		endpointMethod: z.string(),
-	}),
-);
+export const searchRecordTypeSchema = z.literal(["endpoint", "section"]);
+
+export type SearchRecordType = z.infer<typeof searchRecordTypeSchema>;
 
 export const searchRecordSchema = z.readonly(
 	z.object({
@@ -20,73 +16,74 @@ export const searchRecordSchema = z.readonly(
 		title: z.string(),
 		markdownContent: z.string(),
 		url: z.url(),
-		endpoint: z.optional(searchRecordApiReferenceSchema),
+		type: searchRecordTypeSchema,
 	}),
 );
 
 export type SearchRecord = z.infer<typeof searchRecordSchema>;
 
-export type AiApiReferenceProperty = {
+export type ApiReferenceProperty = {
 	readonly name: string;
 	readonly description: string;
 	readonly type: string;
 	readonly modifiers: readonly string[];
-	readonly nestedProperties: readonly AiApiReferenceProperty[];
+	readonly nestedProperties: readonly ApiReferenceProperty[];
 };
 
 // Hand-written type + explicit annotation break the self-reference cycle that TS
 // cannot infer; the getter defers evaluation until the const is initialised.
-export const aiApiReferencePropertySchema: z.ZodMiniType<AiApiReferenceProperty> = z.readonly(
+export const apiReferencePropertySchema: z.ZodMiniType<ApiReferenceProperty> = z.readonly(
 	z.object({
 		name: z.string(),
 		description: z.string(),
 		type: z.string(),
 		modifiers: z.readonly(z.array(z.string())),
 		get nestedProperties() {
-			return z.readonly(z.array(aiApiReferencePropertySchema));
+			return z.readonly(z.array(apiReferencePropertySchema));
 		},
 	}),
 );
 
-export const aiApiReferenceCodeSampleSchema = z.readonly(
+export const apiReferenceCodeSampleSchema = z.readonly(
 	z.object({
 		language: z.string(),
 		code: z.string(),
 	}),
 );
 
-export type AiApiReferenceCodeSample = z.infer<typeof aiApiReferenceCodeSampleSchema>;
+export type ApiReferenceCodeSample = z.infer<typeof apiReferenceCodeSampleSchema>;
 
 export const aiApiReferenceResponseSchema = z.readonly(
 	z.object({
 		statusCode: z.number(),
 		description: z.string(),
-		properties: z.readonly(z.array(aiApiReferencePropertySchema)),
-		samples: z.readonly(z.array(aiApiReferenceCodeSampleSchema)),
+		properties: z.readonly(z.array(apiReferencePropertySchema)),
+		samples: z.readonly(z.array(apiReferenceCodeSampleSchema)),
 	}),
 );
 
-export type AiApiReferenceResponse = z.infer<typeof aiApiReferenceResponseSchema>;
+export type ApiReferenceResponse = z.infer<typeof aiApiReferenceResponseSchema>;
 
-export const aiApiReferenceRecordSchema = z.readonly(
+export const apiReferenceRecordSchema = z.readonly(
 	z.object({
 		id: z.string(),
 		codename: z.string(),
 		title: z.string(),
 		markdownContent: z.string(),
 		httpMethod: z.string(),
+		url: z.optional(z.url()),
 		endpointUrls: z.readonly(z.array(z.string())),
-		queryParameters: z.readonly(z.array(aiApiReferencePropertySchema)),
-		headerParameters: z.readonly(z.array(aiApiReferencePropertySchema)),
-		endpointParameters: z.readonly(z.array(aiApiReferencePropertySchema)),
-		bodyParameters: z.readonly(z.array(aiApiReferencePropertySchema)),
+		queryParameters: z.readonly(z.array(apiReferencePropertySchema)),
+		headerParameters: z.readonly(z.array(apiReferencePropertySchema)),
+		endpointParameters: z.readonly(z.array(apiReferencePropertySchema)),
+		bodyParameters: z.readonly(z.array(apiReferencePropertySchema)),
 		tags: z.readonly(z.array(z.string())),
-		usageCodeSamples: z.readonly(z.array(aiApiReferenceCodeSampleSchema)),
+		usageCodeSamples: z.readonly(z.array(apiReferenceCodeSampleSchema)),
 		responses: z.readonly(z.array(aiApiReferenceResponseSchema)),
 	}),
 );
 
-export type AiApiReferenceRecord = z.infer<typeof aiApiReferenceRecordSchema>;
+export type AiApiReferenceRecord = z.infer<typeof apiReferenceRecordSchema>;
 
 export type LearnRecords = {
 	readonly searchRecords: readonly SearchRecord[];
@@ -98,7 +95,7 @@ const responseSchema = z.readonly(
 		data: z.readonly(
 			z.object({
 				searchRecords: z.readonly(z.array(searchRecordSchema)),
-				apiReferenceRecords: z.readonly(z.array(aiApiReferenceRecordSchema)),
+				apiReferenceRecords: z.readonly(z.array(apiReferenceRecordSchema)),
 			}),
 		),
 	}),
