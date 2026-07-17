@@ -45,6 +45,7 @@ export async function replaceDocument(db: Database, doc: NormalizedDoc, chunks: 
 			values: {
 				id: doc.id,
 				title: doc.title,
+				codename: doc.codename,
 				url: doc.url,
 				body: doc.body,
 				contentHash: doc.contentHash,

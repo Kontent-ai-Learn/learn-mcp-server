@@ -1,13 +1,16 @@
 import { EMBEDDING_DIM } from "../indexing/indexer.config.js";
+import type { EndpointReference } from "../indexing/indexer.models.js";
 import type { TableDefinition } from "./db.utils.js";
 
 export type DocumentRow = {
 	readonly id: string;
+	readonly codename: string;
 	readonly title: string;
 	readonly url: string;
 	readonly body: string;
 	readonly contentHash: string;
 	readonly lastModified: string | null;
+	readonly endpoint: EndpointReference | null;
 };
 
 export type ChunkRow = {
@@ -24,9 +27,11 @@ export const DOCUMENTS_TABLE: TableDefinition<"documents", DocumentRow> = {
 	tableName: "documents",
 	columns: {
 		id: { name: "id", type: "TEXT", primaryKey: true },
+		codename: { name: "codename", type: "TEXT", notNull: true },
 		title: { name: "title", type: "TEXT", notNull: true },
 		url: { name: "url", type: "TEXT", notNull: true },
 		body: { name: "body", type: "TEXT", notNull: true },
+		endpoint: { name: "endpoint", type: "JSON" },
 		contentHash: { name: "contentHash", type: "TEXT", notNull: true },
 		lastModified: { name: "lastModified", type: "TEXT" },
 	},

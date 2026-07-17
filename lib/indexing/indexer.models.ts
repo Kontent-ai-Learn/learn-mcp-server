@@ -4,6 +4,7 @@ export type NormalizedDoc = {
 	readonly url: string;
 	readonly body: string;
 	readonly contentHash: string;
+	readonly codename: string;
 };
 
 export type DocChunk = {
@@ -15,10 +16,17 @@ export type DocChunk = {
 
 export type MatchType = "vector" | "lexical" | "hybrid";
 
+export type EndpointReference = {
+	readonly endpointUrl: string;
+	readonly endpointName: string;
+	readonly endpointMethod: string;
+};
+
 export type SearchResult = {
 	readonly title: string;
 	readonly url: string;
 	readonly body: string;
+	readonly endpoint: EndpointReference | null;
 	readonly matchType: MatchType;
 	readonly score: number;
 	readonly scores: {

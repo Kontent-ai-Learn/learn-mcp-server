@@ -5,12 +5,22 @@ import { getContentUrl } from "../indexing/indexer.config.js";
 import { logger } from "../utils/logger.js";
 import { packageJsonName, packageJsonVersion } from "../utils/version.js";
 
+export const searchRecordApiReferenceSchema = z.readonly(
+	z.object({
+		endpointUrl: z.string(),
+		endpointName: z.string(),
+		endpointMethod: z.string(),
+	}),
+);
+
 export const searchRecordSchema = z.readonly(
 	z.object({
 		id: z.string(),
+		codename: z.string(),
 		title: z.string(),
 		markdownContent: z.string(),
 		url: z.url(),
+		endpoint: z.optional(searchRecordApiReferenceSchema),
 	}),
 );
 
@@ -61,6 +71,7 @@ export type AiApiReferenceResponse = z.infer<typeof aiApiReferenceResponseSchema
 export const aiApiReferenceRecordSchema = z.readonly(
 	z.object({
 		id: z.string(),
+		codename: z.string(),
 		title: z.string(),
 		markdownContent: z.string(),
 		httpMethod: z.string(),

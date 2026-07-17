@@ -1,11 +1,17 @@
 import type { Database } from "@tursodatabase/database";
 import { match, P } from "ts-pattern";
 import { CANDIDATE_LIMIT, RRF_K, STOPWORDS } from "../indexing/indexer.config.js";
-import type { MatchType, SearchResult } from "../indexing/indexer.models.js";
+import type { EndpointReference, MatchType, SearchResult } from "../indexing/indexer.models.js";
 import { selectFrom } from "./db.utils.js";
 import { CHUNKS_TABLE, DOCUMENTS_TABLE, toVectorParam } from "./tables.js";
 
-type DocRecord = { readonly title: string; readonly url: string; readonly body: string };
+type DocRecord = {
+	readonly title: string;
+	readonly url: string;
+	readonly body: string;
+	readonly endpoint: EndpointReference | null;
+	readonly codename: string;
+};
 
 type Retriever = "vector" | "lexical";
 
@@ -153,8 +159,10 @@ async function getDocuments({
 	}
 	const rows = await selectFrom(db, {
 		definition: DOCUMENTS_TABLE,
-		columns: ["id", "title", "url", "body"],
+		columns: ["id", "title", "url", "body", "endpoint", "codename"],
 		where: { column: "id", operator: "IN", values: ids },
 	});
-	return new Map(rows.map((row) => [row.id, { title: row.title, url: row.url, body: row.body }]));
+	return new Map(
+		rows.map((row) => [row.id, { title: row.title, url: row.url, body: row.body, endpoint: row.endpoint, codename: row.codename }]),
+	);
 }

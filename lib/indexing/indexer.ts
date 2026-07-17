@@ -78,6 +78,7 @@ function normalize(doc: SearchRecord): NormalizedDoc {
 		url,
 		body,
 		contentHash: hashContent([title, url, body]),
+		codename: doc.codename,
 	};
 }
 
