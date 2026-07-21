@@ -7,29 +7,37 @@ type EnvConfig = {
 	readonly port: number;
 	readonly dbPath: string;
 	readonly cacheDir: string;
-	readonly learnHost: string | undefined;
-	readonly searchRecordsPath: string;
-	readonly apiReferenceRecordsPath: string;
+	readonly learnHost: string;
+	readonly learnUrls: {
+		readonly searchRecordsUrl: string;
+		readonly apiReferenceRecordsUrl: string;
+	};
 };
 
 export function getEnvConfig(): EnvConfig {
 	loadEnvironmentVariables();
 
 	const port = getOptionalValue("PORT");
-	const dbPath = getOptionalValue("DB_PATH");
-	const cacheDir = getOptionalValue("CACHE_DIR");
-	const learnHost = getOptionalValue("LearnHost");
+	const dbPath = getOptionalValue("DB_PATH") ?? "db/learn.db";
+	const cacheDir = getOptionalValue("CACHE_DIR") ?? ".cache/transformers";
+	const learnHost = getOptionalValue("LearnHost") ?? "http://localhost:3000";
 	const searchRecordsPath = getOptionalValue("SearchRecordsUrl") ?? "/learn/api/ai/getSearchRecords";
 	const apiReferenceRecordsPath = getOptionalValue("ApiReferenceRecordsUrl") ?? "/learn/api/ai/getApiReferenceRecords";
 
 	return {
 		port: port ? +port : 3002,
-		dbPath: dbPath ?? "db/learn.db",
-		cacheDir: cacheDir ?? ".cache/transformers",
+		dbPath,
+		cacheDir,
 		learnHost,
-		searchRecordsPath,
-		apiReferenceRecordsPath,
+		learnUrls: {
+			apiReferenceRecordsUrl: composeUrl(learnHost, apiReferenceRecordsPath),
+			searchRecordsUrl: composeUrl(learnHost, searchRecordsPath),
+		},
 	};
+}
+
+function composeUrl(host: string, path: string): string {
+	return new URL(path, host).toString();
 }
 
 function getOptionalValue(name: string): string | undefined {

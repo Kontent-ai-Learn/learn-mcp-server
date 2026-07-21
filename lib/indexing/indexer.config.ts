@@ -28,21 +28,22 @@ export const SEARCH_LIMIT = 10;
 export const getDbPath = (): string => getEnvConfig().dbPath;
 
 /** transformers.js model cache directory. */
-export const getCacheDir = (): string => getEnvConfig().cacheDir;
+export const getTransformersCacheDir = (): string => getEnvConfig().cacheDir;
 
-/** Full URL of the search-records endpoint, composed from `LearnHost` + path; undefined when no host is configured. */
-export const getSearchRecordsUrl = (): string | undefined => {
-	const { learnHost, searchRecordsPath } = getEnvConfig();
-	return composeUrl(learnHost, searchRecordsPath);
+export const getSearchRecordsUrl = (): string => {
+	const {
+		learnUrls: { searchRecordsUrl },
+	} = getEnvConfig();
+	return searchRecordsUrl;
 };
 
-/** Full URL of the API-reference-records endpoint, composed from `LearnHost` + path; undefined when no host is configured. */
-export const getApiReferenceRecordsUrl = (): string | undefined => {
-	const { learnHost, apiReferenceRecordsPath } = getEnvConfig();
-	return composeUrl(learnHost, apiReferenceRecordsPath);
+/** Full URL of the API-reference-records endpoint, composed from `LearnHost` + path */
+export const getApiReferenceRecordsUrl = (): string => {
+	const {
+		learnUrls: { apiReferenceRecordsUrl },
+	} = getEnvConfig();
+	return apiReferenceRecordsUrl;
 };
-
-const composeUrl = (host: string | undefined, path: string): string | undefined => (host ? new URL(path, host).toString() : undefined);
 
 // Common words carry little lexical signal and inflate generic documents in the
 // (IDF-less) term-frequency scorer, so they are dropped from the lexical side.

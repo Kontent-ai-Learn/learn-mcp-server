@@ -1,6 +1,6 @@
 import z from "zod";
 import { fetchApiReferenceRecords } from "../data/api-reference-records.js";
-import { search } from "../database/search.js";
+import { search } from "../search/search.js";
 import { defineReadOnlyTool } from "../tools-def/tool-definitions.js";
 import { withToolHandler } from "../tools-def/tool-handler.js";
 import type { ToolName } from "../tools-def/tool-models.js";

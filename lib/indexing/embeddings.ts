@@ -1,7 +1,7 @@
 import { env, type FeatureExtractionPipeline, pipeline } from "@huggingface/transformers";
-import { EMBEDDING_MODEL, getCacheDir } from "./indexer.config.js";
+import { EMBEDDING_MODEL, getTransformersCacheDir } from "./indexer.config.js";
 
-env.cacheDir = getCacheDir();
+env.cacheDir = getTransformersCacheDir();
 
 /**
  * Lazily-initialised pipeline singleton. The pipeline is an expensive, stateful

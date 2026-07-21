@@ -3,13 +3,10 @@ import type { z } from "zod/mini";
 import { packageJsonName, packageJsonVersion } from "../utils/version.js";
 
 export async function fetchFromEndpoint<TResponse extends JsonValue, TResult>(
-	url: string | undefined,
+	url: string,
 	schema: z.ZodMiniType<TResponse>,
 	select: (payload: TResponse) => TResult,
 ): Promise<TResult> {
-	if (!url) {
-		throw new Error("Invalid source docs url");
-	}
 	const query = createFetchQuery({
 		url,
 		config: {

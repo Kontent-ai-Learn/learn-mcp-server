@@ -29,7 +29,7 @@ type DocScore = {
 	readonly lexical: number | null; // best term-hit count across the doc's lexical matches
 };
 
-export async function searchHybrid({
+export async function getDocumentsFromDb({
 	db,
 	queryVector,
 	queryText,
