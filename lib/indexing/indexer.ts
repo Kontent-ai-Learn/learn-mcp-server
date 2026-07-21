@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
-import { fetchLearnRecords, type SearchRecord } from "../data/learn-api.js";
+import { fetchSearchRecords, type SearchRecord } from "../data/search-records.js";
 import { deleteDocuments, getDocHashes, openDb, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "../database/db.js";
 import { logger, type SpinnerLog } from "../utils/logger.js";
 import { chunkDoc } from "./chunking.js";
@@ -22,7 +22,7 @@ export type SyncDbResult = IndexDocumentsResult & {
 
 /** Load the latest source documents from the content endpoint and index them into a fresh DB handle. */
 export async function syncDatabase(): Promise<SyncDbResult> {
-	const { success, error, data } = await fetchLearnRecords();
+	const { success, error, data } = await fetchSearchRecords();
 
 	if (!success) {
 		logger.log({
@@ -30,10 +30,10 @@ export async function syncDatabase(): Promise<SyncDbResult> {
 		});
 		throw error;
 	}
-	const indexResult = await indexSourceDocuments(await openDb(getDbPath()), data.searchRecords);
+	const indexResult = await indexSourceDocuments(await openDb(getDbPath()), data);
 
 	return {
-		documentCount: data.searchRecords.length,
+		documentCount: data.length,
 		...indexResult,
 	};
 }

@@ -1,7 +1,8 @@
 import { readFile, rm } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import * as z from "zod/mini";
-import { apiReferenceRecordSchema, searchRecordSchema } from "../lib/data/learn-api.js";
+import { apiReferenceRecordSchema } from "../lib/data/api-reference-records.js";
+import { searchRecordSchema } from "../lib/data/search-records.js";
 import { openDb } from "../lib/database/db.js";
 import { indexSourceDocuments } from "../lib/indexing/indexer.js";
 

@@ -1,4 +1,4 @@
-import type { SearchRecordType } from "../data/learn-api.js";
+import type { SearchRecordType } from "../data/search-records.js";
 
 export type NormalizedDoc = {
 	readonly id: string;

@@ -7,7 +7,9 @@ type EnvConfig = {
 	readonly port: number;
 	readonly dbPath: string;
 	readonly cacheDir: string;
-	readonly contentUrl: string | undefined;
+	readonly learnHost: string | undefined;
+	readonly searchRecordsPath: string;
+	readonly apiReferenceRecordsPath: string;
 };
 
 export function getEnvConfig(): EnvConfig {
@@ -16,13 +18,17 @@ export function getEnvConfig(): EnvConfig {
 	const port = getOptionalValue("PORT");
 	const dbPath = getOptionalValue("DB_PATH");
 	const cacheDir = getOptionalValue("CACHE_DIR");
-	const contentUrl = getOptionalValue("CONTENT_URL");
+	const learnHost = getOptionalValue("LearnHost");
+	const searchRecordsPath = getOptionalValue("SearchRecordsUrl") ?? "/learn/api/ai/getSearchRecords";
+	const apiReferenceRecordsPath = getOptionalValue("ApiReferenceRecordsUrl") ?? "/learn/api/ai/getApiReferenceRecords";
 
 	return {
 		port: port ? +port : 3002,
 		dbPath: dbPath ?? "db/learn.db",
 		cacheDir: cacheDir ?? ".cache/transformers",
-		contentUrl,
+		learnHost,
+		searchRecordsPath,
+		apiReferenceRecordsPath,
 	};
 }
 

@@ -30,8 +30,19 @@ export const getDbPath = (): string => getEnvConfig().dbPath;
 /** transformers.js model cache directory. */
 export const getCacheDir = (): string => getEnvConfig().cacheDir;
 
-/** URL of the live content endpoint; when unset, indexing falls back to the bundled sample data. */
-export const getContentUrl = (): string | undefined => getEnvConfig().contentUrl;
+/** Full URL of the search-records endpoint, composed from `LearnHost` + path; undefined when no host is configured. */
+export const getSearchRecordsUrl = (): string | undefined => {
+	const { learnHost, searchRecordsPath } = getEnvConfig();
+	return composeUrl(learnHost, searchRecordsPath);
+};
+
+/** Full URL of the API-reference-records endpoint, composed from `LearnHost` + path; undefined when no host is configured. */
+export const getApiReferenceRecordsUrl = (): string | undefined => {
+	const { learnHost, apiReferenceRecordsPath } = getEnvConfig();
+	return composeUrl(learnHost, apiReferenceRecordsPath);
+};
+
+const composeUrl = (host: string | undefined, path: string): string | undefined => (host ? new URL(path, host).toString() : undefined);
 
 // Common words carry little lexical signal and inflate generic documents in the
 // (IDF-less) term-frequency scorer, so they are dropped from the lexical side.

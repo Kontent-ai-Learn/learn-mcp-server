@@ -1,6 +1,6 @@
 import type { Database } from "@tursodatabase/database";
 import { match, P } from "ts-pattern";
-import type { SearchRecordType } from "../data/learn-api.js";
+import type { SearchRecordType } from "../data/search-records.js";
 import { CANDIDATE_LIMIT, RRF_K, STOPWORDS } from "../indexing/indexer.config.js";
 import type { MatchType, SearchResult } from "../indexing/indexer.models.js";
 import { selectFrom } from "./db.utils.js";

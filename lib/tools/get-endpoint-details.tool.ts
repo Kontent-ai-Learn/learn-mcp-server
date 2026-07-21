@@ -1,5 +1,5 @@
 import z from "zod";
-import { fetchLearnRecords } from "../data/learn-api.js";
+import { fetchApiReferenceRecords } from "../data/api-reference-records.js";
 import { search } from "../database/search.js";
 import { defineReadOnlyTool } from "../tools-def/tool-definitions.js";
 import { withToolHandler } from "../tools-def/tool-handler.js";
@@ -32,13 +32,13 @@ export const getEndpointDetailsTools = defineReadOnlyTool(
 				}
 
 				// take the top result and return its details
-				const { success, data, error } = await fetchLearnRecords();
+				const { success, data, error } = await fetchApiReferenceRecords();
 
 				if (!success) {
 					return `Could not fetch learn records. Error: ${getErrorMessage(error)}`;
 				}
 
-				const fullDetails = data.apiReferenceRecords.find((record) => record.codename === topResult.codename);
+				const fullDetails = data.find((record) => record.codename === topResult.codename);
 
 				if (!fullDetails) {
 					return `Found candidate endpoint but could not retrieve its details. Requested codename: ${topResult.codename}`;

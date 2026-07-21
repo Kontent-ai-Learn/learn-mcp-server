@@ -1,4 +1,4 @@
-import type { SearchRecordType } from "../data/learn-api.js";
+import type { SearchRecordType } from "../data/search-records.js";
 import { EMBEDDING_DIM } from "../indexing/indexer.config.js";
 import type { TableDefinition } from "./db.utils.js";
 

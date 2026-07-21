@@ -1,135 +1,28 @@
-import { createFetchQuery, getDefaultHttpService, type TryCatchResult, tryCatchAsync } from "@kontent-ai/core-sdk";
-import { colorize } from "@kontent-ai/core-sdk/devkit";
-import { z } from "zod/mini";
-import { getContentUrl } from "../indexing/indexer.config.js";
-import { logger } from "../utils/logger.js";
+import { createFetchQuery, getDefaultHttpService, type JsonValue } from "@kontent-ai/core-sdk";
+import type { z } from "zod/mini";
 import { packageJsonName, packageJsonVersion } from "../utils/version.js";
 
-export const searchRecordTypeSchema = z.literal(["endpoint", "section"]);
-
-export type SearchRecordType = z.infer<typeof searchRecordTypeSchema>;
-
-export const searchRecordSchema = z.readonly(
-	z.object({
-		id: z.string(),
-		codename: z.string(),
-		title: z.string(),
-		markdownContent: z.string(),
-		url: z.url(),
-		type: searchRecordTypeSchema,
-	}),
-);
-
-export type SearchRecord = z.infer<typeof searchRecordSchema>;
-
-export type ApiReferenceProperty = {
-	readonly name: string;
-	readonly description: string;
-	readonly type: string;
-	readonly modifiers: readonly string[];
-	readonly nestedProperties: readonly ApiReferenceProperty[];
-};
-
-// Hand-written type + explicit annotation break the self-reference cycle that TS
-// cannot infer; the getter defers evaluation until the const is initialised.
-export const apiReferencePropertySchema: z.ZodMiniType<ApiReferenceProperty> = z.readonly(
-	z.object({
-		name: z.string(),
-		description: z.string(),
-		type: z.string(),
-		modifiers: z.readonly(z.array(z.string())),
-		get nestedProperties() {
-			return z.readonly(z.array(apiReferencePropertySchema));
+export async function fetchFromEndpoint<TResponse extends JsonValue, TResult>(
+	url: string | undefined,
+	schema: z.ZodMiniType<TResponse>,
+	select: (payload: TResponse) => TResult,
+): Promise<TResult> {
+	if (!url) {
+		throw new Error("Invalid source docs url");
+	}
+	const query = createFetchQuery({
+		url,
+		config: {
+			httpService: getDefaultHttpService(),
+			runtimeValidation: { validateResponses: true },
 		},
-	}),
-);
-
-export const apiReferenceCodeSampleSchema = z.readonly(
-	z.object({
-		language: z.string(),
-		code: z.string(),
-	}),
-);
-
-export type ApiReferenceCodeSample = z.infer<typeof apiReferenceCodeSampleSchema>;
-
-export const aiApiReferenceResponseSchema = z.readonly(
-	z.object({
-		statusCode: z.number(),
-		description: z.string(),
-		properties: z.readonly(z.array(apiReferencePropertySchema)),
-		samples: z.readonly(z.array(apiReferenceCodeSampleSchema)),
-	}),
-);
-
-export type ApiReferenceResponse = z.infer<typeof aiApiReferenceResponseSchema>;
-
-export const apiReferenceRecordSchema = z.readonly(
-	z.object({
-		id: z.string(),
-		codename: z.string(),
-		title: z.string(),
-		markdownContent: z.string(),
-		httpMethod: z.string(),
-		url: z.optional(z.url()),
-		endpointUrls: z.readonly(z.array(z.string())),
-		queryParameters: z.readonly(z.array(apiReferencePropertySchema)),
-		headerParameters: z.readonly(z.array(apiReferencePropertySchema)),
-		endpointParameters: z.readonly(z.array(apiReferencePropertySchema)),
-		bodyParameters: z.readonly(z.array(apiReferencePropertySchema)),
-		tags: z.readonly(z.array(z.string())),
-		usageCodeSamples: z.readonly(z.array(apiReferenceCodeSampleSchema)),
-		responses: z.readonly(z.array(aiApiReferenceResponseSchema)),
-	}),
-);
-
-export type AiApiReferenceRecord = z.infer<typeof apiReferenceRecordSchema>;
-
-export type LearnRecords = {
-	readonly searchRecords: readonly SearchRecord[];
-	readonly apiReferenceRecords: readonly AiApiReferenceRecord[];
-};
-
-const responseSchema = z.readonly(
-	z.object({
-		data: z.readonly(
-			z.object({
-				searchRecords: z.readonly(z.array(searchRecordSchema)),
-				apiReferenceRecords: z.readonly(z.array(apiReferenceRecordSchema)),
-			}),
-		),
-	}),
-);
-
-export const fetchLearnRecords = async (): Promise<TryCatchResult<LearnRecords>> => {
-	return await tryCatchAsync(async () => {
-		logger.log({ message: "Fetching source documents" });
-
-		const url = getContentUrl();
-		if (!url) {
-			throw new Error("Invalid source docs url");
-		}
-		const query = createFetchQuery({
-			url,
-			config: {
-				httpService: getDefaultHttpService(),
-				runtimeValidation: { validateResponses: true },
-			},
-			schema: responseSchema,
-			sdkInfo: { name: packageJsonName, version: packageJsonVersion, host: "npmjs.com" },
-			mapMetadata: () => ({}),
-			mapError: (error) => error,
-			mapExtraResponseProps: () => ({}),
-		});
-		const { payload } = await query.fetch();
-
-		logger.log({
-			message: `Loaded ${colorize("yellow", payload.data.searchRecords.length.toString())} search records & ${colorize("yellow", payload.data.apiReferenceRecords.length.toString())} API reference records`,
-		});
-
-		return {
-			searchRecords: payload.data.searchRecords,
-			apiReferenceRecords: payload.data.apiReferenceRecords,
-		};
+		schema,
+		sdkInfo: { name: packageJsonName, version: packageJsonVersion, host: "npmjs.com" },
+		mapMetadata: () => ({}),
+		mapError: (error) => error,
+		mapExtraResponseProps: () => ({}),
 	});
-};
+	const { payload } = await query.fetch();
+
+	return select(payload);
+}
