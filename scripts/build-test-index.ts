@@ -1,13 +1,13 @@
 import { readFile, rm } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import * as z from "zod/mini";
-import { apiReferenceRecordSchema } from "../lib/data/api-reference-records.js";
-import { searchRecordSchema } from "../lib/data/search-records.js";
+import { apiReferenceRecordSchema } from "../lib/content/api-reference-records.js";
+import { searchRecordSchema } from "../lib/content/search-records.js";
 import { openDb } from "../lib/database/db.js";
 import { indexSourceDocuments } from "../lib/indexing/indexer.js";
 
 // Must match env.DB_PATH in vitest.config.ts and vitest-integration.config.ts.
-const TEST_DB_PATH: string = "db/learn-test.db";
+const TEST_DB_PATH: string = "data/search-test.db";
 const samplesPath = fileURLToPath(new URL("../samples/test-db-source-docs.json", import.meta.url));
 
 const sourceSchema = z.readonly(

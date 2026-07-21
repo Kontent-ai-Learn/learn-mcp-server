@@ -1,7 +1,7 @@
 import { type TryCatchResult, tryCatchAsync } from "@kontent-ai/core-sdk";
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import { z } from "zod/mini";
-import { getApiReferenceRecordsUrl } from "../indexing/indexer.config.js";
+import { getApiReferenceRecordsUrl } from "../config.js";
 import { logger } from "../utils/logger.js";
 import { fetchFromEndpoint } from "./learn-api.js";
 
@@ -36,7 +36,7 @@ export const apiReferenceCodeSampleSchema = z.readonly(
 
 export type ApiReferenceCodeSample = z.infer<typeof apiReferenceCodeSampleSchema>;
 
-export const aiApiReferenceResponseSchema = z.readonly(
+export const apiReferenceResponseSchema = z.readonly(
 	z.object({
 		statusCode: z.number(),
 		description: z.string(),
@@ -45,7 +45,7 @@ export const aiApiReferenceResponseSchema = z.readonly(
 	}),
 );
 
-export type ApiReferenceResponse = z.infer<typeof aiApiReferenceResponseSchema>;
+export type ApiReferenceResponse = z.infer<typeof apiReferenceResponseSchema>;
 
 export const apiReferenceRecordSchema = z.readonly(
 	z.object({
@@ -62,7 +62,7 @@ export const apiReferenceRecordSchema = z.readonly(
 		bodyParameters: z.readonly(z.array(apiReferencePropertySchema)),
 		tags: z.readonly(z.array(z.string())),
 		usageCodeSamples: z.readonly(z.array(apiReferenceCodeSampleSchema)),
-		responses: z.readonly(z.array(aiApiReferenceResponseSchema)),
+		responses: z.readonly(z.array(apiReferenceResponseSchema)),
 	}),
 );
 

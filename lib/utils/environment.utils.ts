@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 type EnvConfig = {
 	readonly port: number;
-	readonly dbPath: string;
+	readonly dataPath: string;
 	readonly cacheDir: string;
 	readonly learnHost: string;
 	readonly learnUrls: {
@@ -17,16 +17,16 @@ type EnvConfig = {
 export function getEnvConfig(): EnvConfig {
 	loadEnvironmentVariables();
 
-	const port = getOptionalValue("PORT");
-	const dbPath = getOptionalValue("DB_PATH") ?? "db/learn.db";
-	const cacheDir = getOptionalValue("CACHE_DIR") ?? ".cache/transformers";
+	const port = getOptionalValue("Port");
+	const dataPath = getOptionalValue("DataPath") ?? "data";
+	const cacheDir = getOptionalValue("CacheDir") ?? ".cache/transformers";
 	const learnHost = getOptionalValue("LearnHost") ?? "http://localhost:3000";
 	const searchRecordsPath = getOptionalValue("SearchRecordsUrl") ?? "/learn/api/ai/getSearchRecords";
 	const apiReferenceRecordsPath = getOptionalValue("ApiReferenceRecordsUrl") ?? "/learn/api/ai/getApiReferenceRecords";
 
 	return {
 		port: port ? +port : 3002,
-		dbPath,
+		dataPath,
 		cacheDir,
 		learnHost,
 		learnUrls: {

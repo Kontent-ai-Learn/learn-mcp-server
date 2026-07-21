@@ -1,7 +1,7 @@
 import { type TryCatchResult, tryCatchAsync } from "@kontent-ai/core-sdk";
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import { z } from "zod/mini";
-import { getSearchRecordsUrl } from "../indexing/indexer.config.js";
+import { getSearchRecordsUrl } from "../config.js";
 import { logger } from "../utils/logger.js";
 import { fetchFromEndpoint } from "./learn-api.js";
 

@@ -1,10 +1,10 @@
 import { Database } from "@tursodatabase/database";
 import { z } from "zod/mini";
-import { getOrSetFromCache } from "../cache/cache.js";
+import { getOrSetFromMemoryCache } from "../cache/memory-cache.js";
+import { getDbPath, SEARCH_LIMIT } from "../config.js";
 import { openDb } from "../database/db.js";
 import { getDocumentsFromDb } from "../database/retrieval.js";
 import { embedQuery } from "../indexing/embeddings.js";
-import { getDbPath, SEARCH_LIMIT } from "../indexing/indexer.config.js";
 import type { SearchResult } from "../indexing/indexer.models.js";
 
 export async function search(query: string): Promise<readonly SearchResult[]> {
@@ -18,7 +18,7 @@ export async function search(query: string): Promise<readonly SearchResult[]> {
 }
 
 async function getCachedDb(): Promise<Database> {
-	return await getOrSetFromCache({
+	return await getOrSetFromMemoryCache({
 		key: "db",
 		value: async () => await openDb(getDbPath()),
 		schema: z.instanceof(Database),

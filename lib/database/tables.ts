@@ -1,5 +1,5 @@
-import type { SearchRecordType } from "../data/search-records.js";
-import { EMBEDDING_DIM } from "../indexing/indexer.config.js";
+import { EMBEDDING_DIM } from "../config.js";
+import type { SearchRecordType } from "../content/search-records.js";
 import type { TableDefinition } from "./db.utils.js";
 
 export type DocumentRow = {

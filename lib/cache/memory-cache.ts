@@ -4,7 +4,7 @@ type Cache = Map<string, unknown>;
 
 const cache: Cache = new Map();
 
-export async function getOrSetFromCache<T>({
+export async function getOrSetFromMemoryCache<T>({
 	key,
 	value,
 	schema,

@@ -1,6 +1,6 @@
 import z from "zod";
-import { getOrSetFromCache } from "../cache/cache.js";
-import { type ApiReferenceRecord, apiReferenceRecordSchema, fetchApiReferenceRecords } from "../data/api-reference-records.js";
+import { getOrSetFromMemoryCache } from "../cache/memory-cache.js";
+import { type ApiReferenceRecord, apiReferenceRecordSchema, fetchApiReferenceRecords } from "../content/api-reference-records.js";
 import { search } from "../search/search.js";
 import { getErrorMessage } from "../utils/error.utils.js";
 import { defineReadOnlyTool } from "./shared/tool-definitions.js";
@@ -52,7 +52,7 @@ export const getEndpointDetailsTools = defineReadOnlyTool(
 );
 
 async function getApiReferenceRecordsFromCache(): Promise<readonly ApiReferenceRecord[] | string> {
-	return await getOrSetFromCache<readonly ApiReferenceRecord[] | string>({
+	return await getOrSetFromMemoryCache<readonly ApiReferenceRecord[] | string>({
 		key: "api-reference-records",
 		schema: z.union([z.readonly(z.array(apiReferenceRecordSchema)), z.string()]),
 		value: async () => {

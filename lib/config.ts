@@ -1,4 +1,4 @@
-import { getEnvConfig } from "../utils/environment.utils.js";
+import { getEnvConfig } from "./utils/environment.utils.js";
 
 /**
  * The recommended transformer model for semantic search
@@ -25,7 +25,7 @@ export const CANDIDATE_LIMIT = 30;
 export const SEARCH_LIMIT = 10;
 
 /** Persistent Turso DB path; overridable for deployment. */
-export const getDbPath = (): string => getEnvConfig().dbPath;
+export const getDbPath = (): string => `${getEnvConfig().dataPath}/search.db`;
 
 /** transformers.js model cache directory. */
 export const getTransformersCacheDir = (): string => getEnvConfig().cacheDir;
