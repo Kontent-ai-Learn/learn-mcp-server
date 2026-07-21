@@ -66,7 +66,7 @@ export const apiReferenceRecordSchema = z.readonly(
 	}),
 );
 
-export type AiApiReferenceRecord = z.infer<typeof apiReferenceRecordSchema>;
+export type ApiReferenceRecord = z.infer<typeof apiReferenceRecordSchema>;
 
 const apiReferenceRecordsResponseSchema = z.readonly(
 	z.object({
@@ -74,7 +74,7 @@ const apiReferenceRecordsResponseSchema = z.readonly(
 	}),
 );
 
-export async function fetchApiReferenceRecords(): Promise<TryCatchResult<readonly AiApiReferenceRecord[]>> {
+export async function fetchApiReferenceRecords(): Promise<TryCatchResult<readonly ApiReferenceRecord[]>> {
 	return await tryCatchAsync(async () => {
 		logger.log({ message: "Fetching API reference records" });
 

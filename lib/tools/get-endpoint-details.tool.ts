@@ -1,5 +1,6 @@
 import z from "zod";
-import { fetchApiReferenceRecords } from "../data/api-reference-records.js";
+import { getOrSetFromCache } from "../cache/cache.js";
+import { type ApiReferenceRecord, apiReferenceRecordSchema, fetchApiReferenceRecords } from "../data/api-reference-records.js";
 import { search } from "../search/search.js";
 import { getErrorMessage } from "../utils/error.utils.js";
 import { defineReadOnlyTool } from "./shared/tool-definitions.js";
@@ -32,13 +33,13 @@ export const getEndpointDetailsTools = defineReadOnlyTool(
 				}
 
 				// take the top result and return its details
-				const { success, data, error } = await fetchApiReferenceRecords();
+				const apiReferenceRecordsOrMessage = await getApiReferenceRecordsFromCache();
 
-				if (!success) {
-					return `Could not fetch learn records. Error: ${getErrorMessage(error)}`;
+				if (!isApiReferenceRecords(apiReferenceRecordsOrMessage)) {
+					return `Could not fetch learn records. Error: ${apiReferenceRecordsOrMessage}`;
 				}
 
-				const fullDetails = data.find((record) => record.codename === topResult.codename);
+				const fullDetails = apiReferenceRecordsOrMessage.find((record) => record.codename === topResult.codename);
 
 				if (!fullDetails) {
 					return `Found candidate endpoint but could not retrieve its details. Requested codename: ${topResult.codename}`;
@@ -49,3 +50,23 @@ export const getEndpointDetailsTools = defineReadOnlyTool(
 		});
 	},
 );
+
+async function getApiReferenceRecordsFromCache(): Promise<readonly ApiReferenceRecord[] | string> {
+	return await getOrSetFromCache<readonly ApiReferenceRecord[] | string>({
+		key: "api-reference-records",
+		schema: z.union([z.readonly(z.array(apiReferenceRecordSchema)), z.string()]),
+		value: async () => {
+			const { success, data, error } = await fetchApiReferenceRecords();
+
+			if (!success) {
+				return `Could not fetch learn records. Error: ${getErrorMessage(error)}`;
+			}
+
+			return data;
+		},
+	});
+}
+
+function isApiReferenceRecords(value: readonly ApiReferenceRecord[] | string): value is readonly ApiReferenceRecord[] {
+	return Array.isArray(value);
+}
