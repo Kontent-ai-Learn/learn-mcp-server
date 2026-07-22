@@ -1,16 +1,21 @@
+import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
-import type { SearchRecordType } from "../content/models/search-records.models.js";
+import { z } from "zod/mini";
 import type { SearchResult } from "../indexing/indexer.models.js";
 import { CHUNKS_TABLE, DOCUMENTS_TABLE, toVectorParam } from "./tables.js";
 
-type DocumentDistanceRow = {
-	readonly title: string;
-	readonly url: string;
-	readonly body: string;
-	readonly type: SearchRecordType;
-	readonly codename: string;
-	readonly distance: number;
-};
+const documentDistanceRow = z.readonly(
+	z.object({
+		title: z.string(),
+		url: z.url(),
+		body: z.string(),
+		type: z.literal(["endpoint", "section"]),
+		codename: z.string(),
+		distance: z.number(),
+	}),
+);
+
+type DocumentDistanceRow = z.infer<typeof documentDistanceRow>;
 
 export async function getDocumentsFromDb({
 	db,
@@ -33,9 +38,17 @@ export async function getDocumentsFromDb({
 		GROUP BY doc.${d.id.name}
 		ORDER BY distance ASC
 		LIMIT ?`;
-	const rows = (await db.all(sql, toVectorParam(queryVector), limit)) as readonly DocumentDistanceRow[];
+	const rows = await db.all(sql, toVectorParam(queryVector), limit);
 
-	return rows.map((row) => ({
+	const invalidRows = rows.filter((row) => !isDocumentDistanceRow(row));
+
+	if (invalidRows.length > 0) {
+		throw new Error(
+			`Unexpected result from database. Out of ${colorize("yellow", rows.length.toString())} rows, ${colorize("red", invalidRows.length.toString())} do not match the expected schema.`,
+		);
+	}
+
+	return rows.filter(isDocumentDistanceRow).map((row) => ({
 		title: row.title,
 		url: row.url,
 		body: row.body,
@@ -43,6 +56,10 @@ export async function getDocumentsFromDb({
 		codename: row.codename,
 		score: round(1 - row.distance, 4),
 	}));
+}
+
+function isDocumentDistanceRow(data: unknown): data is DocumentDistanceRow {
+	return documentDistanceRow.safeParse(data).success;
 }
 
 function round(value: number, places: number): number {
