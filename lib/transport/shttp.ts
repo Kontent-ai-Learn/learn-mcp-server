@@ -58,15 +58,21 @@ export function startStreamableHTTP(): void {
 
 	app.post("/init", async (_, res) => {
 		const { success, error } = await tryCatchAsync(async () => {
-			const { documentCount, changedCount, removedCount, unchangedCount } = await initializeAll();
+			const { dbName, searchRecordsCount, apiReferenceRecordsCount, index } = await initializeAll();
 
 			setOkResponse(res, {
-				message: `Successfully indexed '${documentCount}' documents.`,
+				message: `Successfully indexed '${index.total}' documents into '${dbName}'.`,
 				result: {
-					changed: changedCount,
-					removed: removedCount,
-					unchanged: unchangedCount,
-					total: documentCount,
+					dbName,
+					searchRecordsCount,
+					apiReferenceRecordsCount,
+					index: {
+						added: index.added,
+						changed: index.changed,
+						removed: index.removed,
+						unchanged: index.unchanged,
+						total: index.total,
+					},
 				},
 				timestamp: new Date().toISOString(),
 				currentVersion: packageJsonVersion,

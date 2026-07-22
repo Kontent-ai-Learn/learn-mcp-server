@@ -8,8 +8,21 @@ import { getProdDbPath, getTestDbPath } from "../config.js";
 import { apiReferenceRecordSchema, initializeApiReferenceRecords } from "../content/api-reference-records.js";
 import { initializeSearchRecords, searchRecordSchema } from "../content/search-records.js";
 import { openDb } from "../database/db.js";
-import { indexSearchRecords } from "../indexing/indexer.js";
+import { type IndexDocumentsResult, indexSearchRecords } from "../indexing/indexer.js";
 import { logger } from "../utils/logger.js";
+
+export type InitializeResult = {
+	readonly dbName: string;
+	readonly searchRecordsCount: number;
+	readonly apiReferenceRecordsCount: number;
+	readonly index: {
+		readonly added: number;
+		readonly changed: number;
+		readonly removed: number;
+		readonly unchanged: number;
+		readonly total: number;
+	};
+};
 
 const testSearchRecordsPath = fileURLToPath(new URL("../../samples/test-db-source-docs.json", import.meta.url));
 
@@ -20,14 +33,10 @@ const sourceSchema = z.readonly(
 	}),
 );
 
-export async function initializeAll(options?: { readonly isTest?: boolean }): Promise<void> {
+export async function initializeAll(options?: { readonly isTest?: boolean }): Promise<InitializeResult> {
 	logger.log({ message: `Initializing ${colorize("yellow", options?.isTest ? "test" : "prod")} data...` });
 
-	if (options?.isTest) {
-		await initializeTestData();
-	} else {
-		await initializeProdData();
-	}
+	return options?.isTest ? await initializeTestData() : await initializeProdData();
 }
 
 export async function cleanData(options?: Parameters<typeof initializeAll>[0]): Promise<void> {
@@ -40,14 +49,16 @@ export async function cleanData(options?: Parameters<typeof initializeAll>[0]): 
 	);
 }
 
-async function initializeProdData(): Promise<void> {
-	await initializeApiReferenceRecords();
+async function initializeProdData(): Promise<InitializeResult> {
+	const apiReferenceRecords = await initializeApiReferenceRecords();
 	const searchRecords = await initializeSearchRecords();
 
-	await indexSearchRecords(await getDb({ isTest: false }), searchRecords);
+	const index = await indexSearchRecords(await getDb({ isTest: false }), searchRecords);
+
+	return toInitializeResult({ isTest: false, searchRecords, apiReferenceRecords, index });
 }
 
-async function initializeTestData(): Promise<void> {
+async function initializeTestData(): Promise<InitializeResult> {
 	const { searchRecords, apiReferenceRecords } = await getTestData();
 
 	setToFileCache({
@@ -62,7 +73,34 @@ async function initializeTestData(): Promise<void> {
 		schema: z.readonly(z.array(searchRecordSchema)),
 	});
 
-	await indexSearchRecords(await getDb({ isTest: true }), searchRecords);
+	const index = await indexSearchRecords(await getDb({ isTest: true }), searchRecords);
+
+	return toInitializeResult({ isTest: true, searchRecords, apiReferenceRecords, index });
+}
+
+function toInitializeResult({
+	isTest,
+	searchRecords,
+	apiReferenceRecords,
+	index,
+}: {
+	readonly isTest: boolean;
+	readonly searchRecords: readonly unknown[];
+	readonly apiReferenceRecords: readonly unknown[];
+	readonly index: IndexDocumentsResult;
+}): InitializeResult {
+	return {
+		dbName: getDbPath({ isTest }),
+		searchRecordsCount: searchRecords.length,
+		apiReferenceRecordsCount: apiReferenceRecords.length,
+		index: {
+			added: index.addedCount,
+			changed: index.changedCount,
+			removed: index.removedCount,
+			unchanged: index.unchangedCount,
+			total: searchRecords.length,
+		},
+	};
 }
 
 function getDbPath(options?: Parameters<typeof initializeAll>[0]): string {

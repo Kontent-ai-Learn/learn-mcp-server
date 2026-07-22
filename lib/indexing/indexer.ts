@@ -10,14 +10,10 @@ import { embedTexts } from "./embeddings.js";
 import type { NormalizedDoc } from "./indexer.models.js";
 
 export type IndexDocumentsResult = {
-	readonly database: Database;
+	readonly addedCount: number;
 	readonly changedCount: number;
 	readonly removedCount: number;
 	readonly unchangedCount: number;
-};
-
-export type SyncDbResult = IndexDocumentsResult & {
-	readonly documentCount: number;
 };
 
 /**
@@ -30,14 +26,14 @@ export async function indexSearchRecords(db: Database, searchRecords: readonly S
 
 	const result = await logger.logWithSpinnerAsync<IndexDocumentsResult>(async (spinner) => {
 		logger.log({ message: `Indexing ${colorize("yellow", normalized.length.toString())} source documents` });
-		const { changed, removed, unchanged } = await applyDiff({ db, normalizedDocuments: normalized, spinner });
+		const { added, changed, removed, unchanged } = await applyDiff({ db, normalizedDocuments: normalized, spinner });
 		const embedded = await embedMissing(db, spinner);
 		spinner({
 			type: "completed",
-			message: `Index ready: ${colorize("yellow", normalized.length.toString())} docs (${colorize("green", changed.toString())} new/changed, ${colorize("gray", unchanged.toString())} unchanged, ${colorize("red", removed.toString())} removed), ${colorize("yellow", embedded.toString())} chunks embedded`,
+			message: `Index ready: ${colorize("yellow", normalized.length.toString())} docs (${colorize("green", added.toString())} added, ${colorize("green", changed.toString())} changed, ${colorize("gray", unchanged.toString())} unchanged, ${colorize("red", removed.toString())} removed), ${colorize("yellow", embedded.toString())} chunks embedded`,
 		});
 
-		return { database: db, changedCount: changed, removedCount: removed, unchangedCount: unchanged };
+		return { addedCount: added, changedCount: changed, removedCount: removed, unchangedCount: unchanged };
 	});
 	return result;
 }
@@ -78,13 +74,14 @@ async function applyDiff({
 	readonly db: Database;
 	readonly normalizedDocuments: readonly NormalizedDoc[];
 	readonly spinner: SpinnerLog;
-}): Promise<{ readonly changed: number; readonly removed: number; readonly unchanged: number }> {
+}): Promise<{ readonly added: number; readonly changed: number; readonly removed: number; readonly unchanged: number }> {
 	const currentDocHashes = await getDocHashes(db);
 	const normalizedDocumentIds = new Set(normalizedDocuments.map((doc) => doc.id));
 	const removedDocumentIds: readonly string[] = [...currentDocHashes.keys()].filter((id) => !normalizedDocumentIds.has(id));
 	const changedDocuments: readonly NormalizedDoc[] = normalizedDocuments.filter(
 		(doc) => currentDocHashes.get(doc.id) !== doc.contentHash,
 	);
+	const addedDocuments: readonly NormalizedDoc[] = changedDocuments.filter((doc) => !currentDocHashes.has(doc.id));
 
 	await deleteDocuments(db, removedDocumentIds);
 	spinner({ message: `Indexing documents ${colorize("yellow", "0")}/${colorize("yellow", changedDocuments.length.toString())}` });
@@ -98,7 +95,8 @@ async function applyDiff({
 		message: `\nFinished indexing documents`,
 	});
 	return {
-		changed: changedDocuments.length,
+		added: addedDocuments.length,
+		changed: changedDocuments.length - addedDocuments.length,
 		removed: removedDocumentIds.length,
 		unchanged: normalizedDocuments.length - changedDocuments.length,
 	};
