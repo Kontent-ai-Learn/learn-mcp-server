@@ -29,15 +29,10 @@ describe("search-content tool (in-memory e2e)", () => {
 				expect(results.length).toBeGreaterThan(0);
 				expect(results.some((r) => /webhook/i.test(r.title) || /webhook/i.test(r.body))).toBe(true);
 
-				// Every result is annotated with how it matched and its scores.
+				// Every result carries its cosine-similarity score.
 				for (const result of results) {
-					expect(["vector", "lexical", "hybrid"]).toContain(result.matchType);
 					expect(typeof result.score).toBe("number");
-					expect(result.scores).toHaveProperty("vector");
-					expect(result.scores).toHaveProperty("lexical");
 				}
-				// A query sharing exact terms with a doc ("webhook") should hybrid-match.
-				expect(results.some((r) => r.matchType === "hybrid")).toBe(true);
 			}),
 		120_000,
 	);

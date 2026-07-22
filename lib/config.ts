@@ -15,12 +15,6 @@ export const EMBED_BATCH_SIZE = 32;
 export const CHUNK_TARGET_CHARS = 1200;
 export const CHUNK_OVERLAP_CHARS = 200;
 
-/** Reciprocal Rank Fusion constant (standard default). */
-export const RRF_K = 60;
-
-/** Candidates pulled from each retriever before fusion. */
-export const CANDIDATE_LIMIT = 30;
-
 /** Parent documents returned to the caller (bounds the response size). */
 export const SEARCH_LIMIT = 10;
 
@@ -48,40 +42,3 @@ export const getApiReferenceRecordsUrl = (): string => {
 	} = getEnvConfig();
 	return apiReferenceRecordsUrl;
 };
-
-// Common words carry little lexical signal and inflate generic documents in the
-// (IDF-less) term-frequency scorer, so they are dropped from the lexical side.
-export const STOPWORDS: ReadonlySet<string> = new Set([
-	"a",
-	"an",
-	"and",
-	"are",
-	"as",
-	"at",
-	"be",
-	"by",
-	"can",
-	"do",
-	"for",
-	"from",
-	"how",
-	"i",
-	"in",
-	"into",
-	"is",
-	"it",
-	"of",
-	"on",
-	"or",
-	"should",
-	"that",
-	"the",
-	"to",
-	"what",
-	"when",
-	"where",
-	"which",
-	"with",
-	"you",
-	"your",
-]);

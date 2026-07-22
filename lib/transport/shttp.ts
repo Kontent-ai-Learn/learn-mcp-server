@@ -1,7 +1,7 @@
 import { type JsonValue, tryCatchAsync } from "@kontent-ai/core-sdk";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express, { type Response } from "express";
-import { syncDatabase } from "../indexing/indexer.js";
+import { initializeAll } from "../initialization/initialization.js";
 import { createServer } from "../server.js";
 import { getEnvConfig } from "../utils/environment.utils.js";
 import { getErrorMessage } from "../utils/error.utils.js";
@@ -56,9 +56,9 @@ export function startStreamableHTTP(): void {
 		});
 	});
 
-	app.post("/index", async (_, res) => {
+	app.post("/init", async (_, res) => {
 		const { success, error } = await tryCatchAsync(async () => {
-			const { documentCount, changedCount, removedCount, unchangedCount } = await syncDatabase();
+			const { documentCount, changedCount, removedCount, unchangedCount } = await initializeAll();
 
 			setOkResponse(res, {
 				message: `Successfully indexed '${documentCount}' documents.`,

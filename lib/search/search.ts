@@ -14,7 +14,7 @@ export async function search(query: string): Promise<readonly SearchResult[]> {
 	}
 	const db = await getCachedDb();
 	const vector = await embedQuery(trimmed);
-	return await getDocumentsFromDb({ db, queryVector: vector, queryText: trimmed, limit: SEARCH_LIMIT });
+	return await getDocumentsFromDb({ db, queryVector: vector, limit: SEARCH_LIMIT });
 }
 
 async function getCachedDb(): Promise<Database> {

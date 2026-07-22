@@ -17,20 +17,12 @@ export type DocChunk = {
 	readonly text: string;
 };
 
-export type MatchType = "vector" | "lexical" | "hybrid";
-
 export type SearchResult = {
 	readonly title: string;
 	readonly url: string;
 	readonly body: string;
 	readonly codename: string;
-	readonly matchType: MatchType;
 	readonly type: SearchRecordType;
+	/** Cosine similarity (0–1) of the document's best-matching chunk. */
 	readonly score: number;
-	readonly scores: {
-		/** Cosine similarity (0–1); `null` if no vector match. */
-		readonly vector: number | null;
-		/** Term-hit count; `null` if no lexical match. */
-		readonly lexical: number | null;
-	};
 };
