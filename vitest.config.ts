@@ -6,7 +6,7 @@ export default defineConfig({
 		dir: "tests",
 		globals: true,
 		environment: "node",
-		env: { DB_PATH: "db/learn-test.db" },
+		env: { DbPath: "data/search-records-vector-test.db" },
 	},
 	build: {
 		target: "esnext",

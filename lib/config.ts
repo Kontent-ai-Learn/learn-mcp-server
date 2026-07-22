@@ -28,6 +28,9 @@ export const SEARCH_LIMIT = 10;
 export const getProdDbPath = (): string => `${getEnvConfig().dataPath}/search-records-vector.db`;
 export const getTestDbPath = (): string => `${getEnvConfig().dataPath}/search-records-vector-test.db`;
 
+/** DB path used at query time; `DbPath` env override lets tests target the test DB. */
+export const getDbPath = (): string => process.env.DbPath ?? getProdDbPath();
+
 /** If enabled, requests will fallback to file cache if the API is unavailable. */
 export const fallbackToFileCache: boolean = true;
 
