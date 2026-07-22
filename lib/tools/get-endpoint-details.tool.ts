@@ -1,8 +1,6 @@
 import z from "zod";
-import { getOrSetFromMemoryCache } from "../cache/memory-cache.js";
-import { type ApiReferenceRecord, apiReferenceRecordSchema, fetchApiReferenceRecords } from "../content/api-reference-records.js";
+import { getApiReferenceRecordsFromCache } from "../content/api-reference-records.js";
 import { search } from "../search/search.js";
-import { getErrorMessage } from "../utils/error.utils.js";
 import { defineReadOnlyTool } from "./shared/tool-definitions.js";
 import { withToolHandler } from "./shared/tool-handler.js";
 import type { ToolName } from "./shared/tool-models.js";
@@ -33,13 +31,13 @@ export const getEndpointDetailsTools = defineReadOnlyTool(
 				}
 
 				// take the top result and return its details
-				const apiReferenceRecordsOrMessage = await getApiReferenceRecordsFromCache();
+				const apiReferenceRecords = await getApiReferenceRecordsFromCache();
 
-				if (!isApiReferenceRecords(apiReferenceRecordsOrMessage)) {
-					return `Could not fetch learn records. Error: ${apiReferenceRecordsOrMessage}`;
+				if (!apiReferenceRecords) {
+					return `Could not fetch learn records. Run indexer to initialize the cache.`;
 				}
 
-				const fullDetails = apiReferenceRecordsOrMessage.find((record) => record.codename === topResult.codename);
+				const fullDetails = apiReferenceRecords.find((record) => record.codename === topResult.codename);
 
 				if (!fullDetails) {
 					return `Found candidate endpoint but could not retrieve its details. Requested codename: ${topResult.codename}`;
@@ -50,23 +48,3 @@ export const getEndpointDetailsTools = defineReadOnlyTool(
 		});
 	},
 );
-
-async function getApiReferenceRecordsFromCache(): Promise<readonly ApiReferenceRecord[] | string> {
-	return await getOrSetFromMemoryCache<readonly ApiReferenceRecord[] | string>({
-		key: "api-reference-records",
-		schema: z.union([z.readonly(z.array(apiReferenceRecordSchema)), z.string()]),
-		value: async () => {
-			const { success, data, error } = await fetchApiReferenceRecords();
-
-			if (!success) {
-				return `Could not fetch learn records. Error: ${getErrorMessage(error)}`;
-			}
-
-			return data;
-		},
-	});
-}
-
-function isApiReferenceRecords(value: readonly ApiReferenceRecord[] | string): value is readonly ApiReferenceRecord[] {
-	return Array.isArray(value);
-}

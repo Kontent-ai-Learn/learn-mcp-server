@@ -1,9 +1,10 @@
-import { type TryCatchResult, tryCatchAsync } from "@kontent-ai/core-sdk";
-import { colorize } from "@kontent-ai/core-sdk/devkit";
 import { z } from "zod/mini";
+import { type FileCacheKey, getFromFileCache } from "../cache/file-cache.js";
+import { getOrSetFromMemoryCache } from "../cache/memory-cache.js";
 import { getSearchRecordsUrl } from "../config.js";
-import { logger } from "../utils/logger.js";
-import { fetchFromEndpoint } from "./learn-api.js";
+import { initializeLearnEndpointData } from "./learn-api.js";
+
+const cacheKey: FileCacheKey = "search-records";
 
 export const searchRecordTypeSchema = z.literal(["endpoint", "section"]);
 
@@ -28,18 +29,26 @@ const searchRecordsResponseSchema = z.readonly(
 	}),
 );
 
-export async function fetchSearchRecords(): Promise<TryCatchResult<readonly SearchRecord[]>> {
-	return await tryCatchAsync(async () => {
-		logger.log({ message: "Fetching search records" });
+export async function initializeSearchRecords(): Promise<readonly SearchRecord[]> {
+	return await initializeLearnEndpointData({
+		url: getSearchRecordsUrl(),
+		cacheKey,
+		schema: searchRecordsResponseSchema,
+		select: (payload) => payload.data.searchRecords,
+	});
+}
 
-		const records = await fetchFromEndpoint(
-			getSearchRecordsUrl(),
-			searchRecordsResponseSchema,
-			(payload) => payload.data.searchRecords,
-		);
+export async function fetchSearchRecordsFromCache(): Promise<readonly SearchRecord[] | undefined> {
+	return await getOrSetFromMemoryCache<readonly SearchRecord[] | undefined>({
+		key: cacheKey,
+		schema: z.union([z.readonly(z.array(searchRecordSchema)), z.undefined()]),
+		value: async () => {
+			const dataFromCache = getFromFileCache<readonly SearchRecord[]>({
+				cacheKey,
+				schema: z.readonly(z.array(searchRecordSchema)),
+			});
 
-		logger.log({ message: `Loaded ${colorize("yellow", records.length.toString())} search records` });
-
-		return records;
+			return await Promise.resolve(dataFromCache);
+		},
 	});
 }

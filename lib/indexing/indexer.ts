@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
-import { EMBED_BATCH_SIZE, EMBEDDING_MODEL, getDbPath } from "../config.js";
-import { fetchSearchRecords, type SearchRecord } from "../content/search-records.js";
-import { deleteDocuments, getDocHashes, openDb, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "../database/db.js";
+import { EMBED_BATCH_SIZE, EMBEDDING_MODEL } from "../config.js";
+import type { SearchRecord } from "../content/search-records.js";
+import { deleteDocuments, getDocHashes, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "../database/db.js";
 import { logger, type SpinnerLog } from "../utils/logger.js";
 import { chunkDoc } from "./chunking.js";
 import { embedTexts } from "./embeddings.js";
@@ -20,31 +20,13 @@ export type SyncDbResult = IndexDocumentsResult & {
 	readonly documentCount: number;
 };
 
-/** Load the latest source documents from the content endpoint and index them into a fresh DB handle. */
-export async function syncDatabase(): Promise<SyncDbResult> {
-	const { success, error, data } = await fetchSearchRecords();
-
-	if (!success) {
-		logger.log({
-			message: `Failed to load source documents when syncing database. ${error instanceof Error ? error.message : "Unknown error"}`,
-		});
-		throw error;
-	}
-	const indexResult = await indexSourceDocuments(await openDb(getDbPath()), data);
-
-	return {
-		documentCount: data.length,
-		...indexResult,
-	};
-}
-
 /**
  * Bring the index up to date with the source: diff by content hash, re-chunk
  * changed docs, then embed any chunk lacking an embedding. Persistent +
  * incremental — unchanged docs keep their existing embeddings across restarts.
  */
-export async function indexSourceDocuments(db: Database, sourceDocuments: readonly SearchRecord[]): Promise<IndexDocumentsResult> {
-	const normalized = sourceDocuments.map(normalize);
+export async function indexSearchRecords(db: Database, searchRecords: readonly SearchRecord[]): Promise<IndexDocumentsResult> {
+	const normalized = searchRecords.map(normalize);
 
 	const result = await logger.logWithSpinnerAsync<IndexDocumentsResult>(async (spinner) => {
 		logger.log({ message: `Indexing ${colorize("yellow", normalized.length.toString())} source documents` });

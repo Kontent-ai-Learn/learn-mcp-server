@@ -25,7 +25,11 @@ export const CANDIDATE_LIMIT = 30;
 export const SEARCH_LIMIT = 10;
 
 /** Persistent Turso DB path; overridable for deployment. */
-export const getDbPath = (): string => `${getEnvConfig().dataPath}/search.db`;
+export const getProdDbPath = (): string => `${getEnvConfig().dataPath}/search-records-vector.db`;
+export const getTestDbPath = (): string => `${getEnvConfig().dataPath}/search-records-vector-test.db`;
+
+/** If enabled, requests will fallback to file cache if the API is unavailable. */
+export const fallbackToFileCache: boolean = true;
 
 /** transformers.js model cache directory. */
 export const getTransformersCacheDir = (): string => getEnvConfig().cacheDir;

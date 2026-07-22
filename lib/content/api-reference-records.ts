@@ -1,9 +1,10 @@
-import { type TryCatchResult, tryCatchAsync } from "@kontent-ai/core-sdk";
-import { colorize } from "@kontent-ai/core-sdk/devkit";
 import { z } from "zod/mini";
+import { type FileCacheKey, getFromFileCache } from "../cache/file-cache.js";
+import { getOrSetFromMemoryCache } from "../cache/memory-cache.js";
 import { getApiReferenceRecordsUrl } from "../config.js";
-import { logger } from "../utils/logger.js";
-import { fetchFromEndpoint } from "./learn-api.js";
+import { initializeLearnEndpointData } from "./learn-api.js";
+
+const cacheKey: FileCacheKey = "api-reference-records";
 
 export type ApiReferenceProperty = {
 	readonly name: string;
@@ -74,18 +75,26 @@ const apiReferenceRecordsResponseSchema = z.readonly(
 	}),
 );
 
-export async function fetchApiReferenceRecords(): Promise<TryCatchResult<readonly ApiReferenceRecord[]>> {
-	return await tryCatchAsync(async () => {
-		logger.log({ message: "Fetching API reference records" });
+export async function initializeApiReferenceRecords(): Promise<readonly ApiReferenceRecord[]> {
+	return await initializeLearnEndpointData({
+		url: getApiReferenceRecordsUrl(),
+		cacheKey,
+		schema: apiReferenceRecordsResponseSchema,
+		select: (payload) => payload.data.apiReferenceRecords,
+	});
+}
 
-		const records = await fetchFromEndpoint(
-			getApiReferenceRecordsUrl(),
-			apiReferenceRecordsResponseSchema,
-			(payload) => payload.data.apiReferenceRecords,
-		);
+export async function getApiReferenceRecordsFromCache(): Promise<readonly ApiReferenceRecord[] | undefined> {
+	return await getOrSetFromMemoryCache<readonly ApiReferenceRecord[] | undefined>({
+		key: cacheKey,
+		schema: z.union([z.readonly(z.array(apiReferenceRecordSchema)), z.undefined()]),
+		value: async () => {
+			const dataFromCache = getFromFileCache<readonly ApiReferenceRecord[]>({
+				cacheKey,
+				schema: z.readonly(z.array(apiReferenceRecordSchema)),
+			});
 
-		logger.log({ message: `Loaded ${colorize("yellow", records.length.toString())} API reference records` });
-
-		return records;
+			return await Promise.resolve(dataFromCache);
+		},
 	});
 }
