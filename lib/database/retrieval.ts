@@ -1,5 +1,5 @@
 import type { Database } from "@tursodatabase/database";
-import type { SearchRecordType } from "../content/search-records.js";
+import type { SearchRecordType } from "../content/models/search-records.models.js";
 import type { SearchResult } from "../indexing/indexer.models.js";
 import { CHUNKS_TABLE, DOCUMENTS_TABLE, toVectorParam } from "./tables.js";
 

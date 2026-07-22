@@ -1,4 +1,4 @@
-import type { SearchRecordType } from "../content/search-records.js";
+import type { SearchRecordType } from "../content/models/search-records.models.js";
 
 export type NormalizedDoc = {
 	readonly id: string;

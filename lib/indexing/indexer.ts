@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
 import { EMBED_BATCH_SIZE, EMBEDDING_MODEL } from "../config.js";
-import type { SearchRecord } from "../content/search-records.js";
+import type { SearchRecord } from "../content/models/search-records.models.js";
 import { deleteDocuments, getDocHashes, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "../database/db.js";
 import { logger, type SpinnerLog } from "../utils/logger.js";
 import { chunkDoc } from "./chunking.js";

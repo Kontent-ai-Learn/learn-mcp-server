@@ -1,5 +1,5 @@
 import { EMBEDDING_DIM } from "../config.js";
-import type { SearchRecordType } from "../content/search-records.js";
+import type { SearchRecordType } from "../content/models/search-records.models.js";
 import type { TableDefinition } from "./db.utils.js";
 
 export type DocumentRow = {

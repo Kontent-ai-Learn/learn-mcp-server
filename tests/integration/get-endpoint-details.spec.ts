@@ -1,6 +1,6 @@
 import { tryCatch } from "@kontent-ai/core-sdk";
 import { describe, expect, it } from "vitest";
-import { type ApiReferenceRecord, apiReferenceRecordSchema } from "../../lib/content/api-reference-records.js";
+import { type ApiReferenceRecord, apiReferenceRecordSchema } from "../../lib/content/models/api-reference-records.models.js";
 import { withTestClient } from "./test-client.js";
 
 type TextContent = { readonly type: string; readonly text: string };
