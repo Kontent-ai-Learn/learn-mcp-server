@@ -68,7 +68,7 @@
 		"zod": "^4"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.5.4",
+		"@biomejs/biome": "2.5.5",
 		"@kontent-ai/biome-config": "0.7.3",
 		"@kontent-ai/eslint-config": "2.4.1",
 		"@types/express": "5.0.6",
