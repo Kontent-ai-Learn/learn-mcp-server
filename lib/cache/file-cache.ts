@@ -64,5 +64,7 @@ export function getFromFileCache<T extends JsonValue>({
 }
 
 export function getFullPath(cacheKey: FileCacheKey): string {
-	return `./${getEnvConfig().dataPath}/${cacheKey}.json`;
+	const { dataPath, isTest } = getEnvConfig();
+	const suffix = isTest ? "-test" : "";
+	return `./${dataPath}/${cacheKey}${suffix}.json`;
 }

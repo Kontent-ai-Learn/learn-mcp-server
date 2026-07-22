@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
 import { z } from "zod/mini";
+import { setToFileCache } from "../cache/file-cache.js";
 import { getProdDbPath, getTestDbPath } from "../config.js";
 import { apiReferenceRecordSchema, initializeApiReferenceRecords } from "../content/api-reference-records.js";
 import { initializeSearchRecords, searchRecordSchema } from "../content/search-records.js";
@@ -47,7 +48,20 @@ async function initializeProdData(): Promise<void> {
 }
 
 async function initializeTestData(): Promise<void> {
-	const { searchRecords } = await getTestData();
+	const { searchRecords, apiReferenceRecords } = await getTestData();
+
+	setToFileCache({
+		cacheKey: "api-reference-records",
+		value: apiReferenceRecords,
+		schema: z.readonly(z.array(apiReferenceRecordSchema)),
+	});
+
+	setToFileCache({
+		cacheKey: "search-records",
+		value: searchRecords,
+		schema: z.readonly(z.array(searchRecordSchema)),
+	});
+
 	await indexSearchRecords(await getDb({ isTest: true }), searchRecords);
 }
 

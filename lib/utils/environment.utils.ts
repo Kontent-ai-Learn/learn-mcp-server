@@ -8,6 +8,7 @@ type EnvConfig = {
 	readonly dataPath: string;
 	readonly cacheDir: string;
 	readonly learnHost: string;
+	readonly isTest: boolean;
 	readonly learnUrls: {
 		readonly searchRecordsUrl: string;
 		readonly apiReferenceRecordsUrl: string;
@@ -23,12 +24,14 @@ export function getEnvConfig(): EnvConfig {
 	const learnHost = getOptionalValue("LearnHost") ?? "http://localhost:3000";
 	const searchRecordsPath = getOptionalValue("SearchRecordsUrl") ?? "/learn/api/ai/getSearchRecords";
 	const apiReferenceRecordsPath = getOptionalValue("ApiReferenceRecordsUrl") ?? "/learn/api/ai/getApiReferenceRecords";
+	const isTest = getOptionalValue("IsTest") === "true";
 
 	return {
 		port: port ? +port : 3002,
 		dataPath,
 		cacheDir,
 		learnHost,
+		isTest,
 		learnUrls: {
 			apiReferenceRecordsUrl: composeUrl(learnHost, apiReferenceRecordsPath),
 			searchRecordsUrl: composeUrl(learnHost, searchRecordsPath),
