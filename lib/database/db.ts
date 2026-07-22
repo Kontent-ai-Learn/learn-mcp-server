@@ -42,15 +42,7 @@ export async function replaceDocument(db: Database, doc: NormalizedDoc, chunks: 
 		await deleteFrom(db, { definition: DOCUMENTS_TABLE, where: { column: "id", operator: "=", value: doc.id } });
 		await insertInto(db, {
 			definition: DOCUMENTS_TABLE,
-			values: {
-				id: doc.id,
-				title: doc.title,
-				codename: doc.codename,
-				url: doc.url,
-				body: doc.body,
-				contentHash: doc.contentHash,
-				type: doc.type,
-			},
+			values: doc,
 		});
 		for (const chunk of chunks) {
 			await insertInto(db, {
