@@ -12,6 +12,7 @@ type EnvConfig = {
 	readonly learnUrls: {
 		readonly searchRecordsUrl: string;
 		readonly apiReferenceRecordsUrl: string;
+		readonly apiReferenceObjectsUrl: string;
 	};
 };
 
@@ -24,6 +25,7 @@ export function getEnvConfig(): EnvConfig {
 	const learnHost = getOptionalValue("LearnHost") ?? "http://localhost:3000";
 	const searchRecordsPath = getOptionalValue("SearchRecordsUrl") ?? "/learn/api/ai/getSearchRecords";
 	const apiReferenceRecordsPath = getOptionalValue("ApiReferenceRecordsUrl") ?? "/learn/api/ai/getApiReferenceRecords";
+	const apiReferenceObjectsPath = getOptionalValue("ApiReferenceObjectsUrl") ?? "/learn/api/ai/getApiReferenceObjects";
 	const isTest = getOptionalValue("IsTest") === "true";
 
 	return {
@@ -34,6 +36,7 @@ export function getEnvConfig(): EnvConfig {
 		isTest,
 		learnUrls: {
 			apiReferenceRecordsUrl: composeUrl(learnHost, apiReferenceRecordsPath),
+			apiReferenceObjectsUrl: composeUrl(learnHost, apiReferenceObjectsPath),
 			searchRecordsUrl: composeUrl(learnHost, searchRecordsPath),
 		},
 	};

@@ -16,6 +16,6 @@ export type McpToolSuccessResponse = {
 	isError?: false;
 };
 
-export type ToolName = "search-content" | "get-endpoint-details";
+export type ToolName = "search-content" | "get-endpoint-details" | "get-object-details";
 
 export type McpToolResponse = McpToolErrorResponse | McpToolSuccessResponse;

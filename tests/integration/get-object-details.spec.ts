@@ -1,6 +1,6 @@
 import { tryCatch } from "@kontent-ai/core-sdk";
 import { describe, expect, it } from "vitest";
-import { type ApiReferenceRecord, apiReferenceRecordSchema } from "../../lib/content/models/api-reference-records.models.js";
+import { type ApiReferenceObject, apiReferenceObjectSchema } from "../../lib/content/models/api-reference-objects.models.js";
 import type { ToolName } from "../../lib/tools/shared/tool-models.js";
 import { withTestClient } from "./test-client.js";
 
@@ -8,7 +8,7 @@ type TextContent = { readonly type: string; readonly text: string };
 
 type Result =
 	| {
-			readonly record: ApiReferenceRecord;
+			readonly record: ApiReferenceObject;
 			readonly success: true;
 			readonly error?: never;
 	  }
@@ -18,9 +18,9 @@ type Result =
 			readonly success: false;
 	  };
 
-const callGetEndpointDetails = async (text: string): Promise<Result> =>
+const callGetObjectDetails = async (text: string): Promise<Result> =>
 	withTestClient(async (client) => {
-		const res = await client.callTool({ name: "get-endpoint-details" satisfies ToolName, arguments: { text } });
+		const res = await client.callTool({ name: "get-object-details" satisfies ToolName, arguments: { text } });
 		expect(res.isError).toBeFalsy();
 
 		const content = res.content as readonly TextContent[];
@@ -34,7 +34,7 @@ const callGetEndpointDetails = async (text: string): Promise<Result> =>
 			};
 		}
 
-		const { data, error } = apiReferenceRecordSchema.safeParse(parsedItem);
+		const { data, error } = apiReferenceObjectSchema.safeParse(parsedItem);
 		if (data) {
 			return {
 				record: data,
@@ -47,14 +47,14 @@ const callGetEndpointDetails = async (text: string): Promise<Result> =>
 		};
 	});
 
-describe("get-endpoint-details tool (in-memory e2e)", () => {
-	it("returns the endpoint matching a specific URL", async () => {
-		const result = await callGetEndpointDetails("How do I get content type?");
-		expect(result.record?.codename).toBe("retrieve_a_content_type_384b00d");
+describe("get-object-details tool (in-memory e2e)", () => {
+	it("returns the object matching a description", async () => {
+		const result = await callGetObjectDetails("What fields does the error object contain?");
+		expect(result.record?.codename).toBe("error_object");
 	});
 
-	it("returns the endpoint matching an action description", async () => {
-		const result = await callGetEndpointDetails("I want to fetch all taxonomy groups in my project");
-		expect(result.record?.codename).toBe("list_taxonomy_groups");
+	it("returns the object matching its name", async () => {
+		const result = await callGetObjectDetails("object representing a language");
+		expect(result.record?.codename).toBe("dapi_language");
 	});
 });

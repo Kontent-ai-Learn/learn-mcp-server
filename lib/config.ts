@@ -48,3 +48,11 @@ export const getApiReferenceRecordsUrl = (): string => {
 	} = getEnvConfig();
 	return apiReferenceRecordsUrl;
 };
+
+/** Full URL of the API-reference-objects endpoint, composed from `LearnHost` + path */
+export const getApiReferenceObjectsUrl = (): string => {
+	const {
+		learnUrls: { apiReferenceObjectsUrl },
+	} = getEnvConfig();
+	return apiReferenceObjectsUrl;
+};

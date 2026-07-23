@@ -2789,22 +2789,13 @@
 						}
 					],
 					"samples": [
-						{
-							"language": "json",
-							"code": "{\"type\": \"asset\",\"name\": \"Teaser image\",\"codename\": \"teaser_image\"}"
-						},
+						{ "language": "json", "code": "{\"type\": \"asset\",\"name\": \"Teaser image\",\"codename\": \"teaser_image\"}" },
 						{
 							"language": "json",
 							"code": "{\"type\": \"custom\",\"name\": \"Markdown editor\",\"codename\": \"markdown_editor\"}"
 						},
-						{
-							"language": "json",
-							"code": "{\"type\": \"date_time\",\"name\": \"Post date\",\"codename\": \"post_date\"}"
-						},
-						{
-							"language": "json",
-							"code": "{\"type\": \"modular_content\",\"name\": \"Author\",\"codename\": \"author\"}"
-						},
+						{ "language": "json", "code": "{\"type\": \"date_time\",\"name\": \"Post date\",\"codename\": \"post_date\"}" },
+						{ "language": "json", "code": "{\"type\": \"modular_content\",\"name\": \"Author\",\"codename\": \"author\"}" },
 						{
 							"language": "json",
 							"code": "{\"type\": \"multiple_choice\",\"name\": \"Show image border\",\"options\": [\n   {\n      \"name\": \"True\",\n      \"codename\": \"true\"\n  },\n  {\n      \"name\": \"False\",\n      \"codename\": \"false\"\n  }\n],\"codename\": \"show_image_border\"}"
@@ -2813,26 +2804,14 @@
 							"language": "json",
 							"code": "{\"type\": \"number\",\"name\": \"Days since last accident\",\"codename\": \"days_since_last_accident\"}"
 						},
-						{
-							"language": "json",
-							"code": "{\"type\": \"modular_content\",\"name\": \"Subpages\",\"codename\": \"subpages\"}"
-						},
+						{ "language": "json", "code": "{\"type\": \"modular_content\",\"name\": \"Subpages\",\"codename\": \"subpages\"}" },
 						{
 							"language": "json",
 							"code": "{\"type\": \"taxonomy\",\"name\": \"Category\",\"taxonomy_group\": \"category\",\"codename\": \"category\"}"
 						},
-						{
-							"language": "json",
-							"code": "{\"type\": \"text\",\"name\": \"Meta keywords\",\"codename\": \"meta_keywords\"}"
-						},
-						{
-							"language": "json",
-							"code": "{\"type\": \"rich_text\",\"name\": \"Description\",\"codename\": \"description\"}"
-						},
-						{
-							"language": "json",
-							"code": "{\"type\": \"url_slug\",\"name\": \"URL\",\"codename\": \"url\"}"
-						},
+						{ "language": "json", "code": "{\"type\": \"text\",\"name\": \"Meta keywords\",\"codename\": \"meta_keywords\"}" },
+						{ "language": "json", "code": "{\"type\": \"rich_text\",\"name\": \"Description\",\"codename\": \"description\"}" },
+						{ "language": "json", "code": "{\"type\": \"url_slug\",\"name\": \"URL\",\"codename\": \"url\"}" },
 						{
 							"language": "json",
 							"code": "{\n  \"message\": \"The requested content element 'authors' was not found in content type 'article'.\",\n  \"request_id\": \"|b8ec7d395e95c04e9511dbabd65bf4d1.a44b7400_\",\n  \"error_code\": 102,\n  \"specific_code\": 0\n}"
@@ -2873,22 +2852,13 @@
 						}
 					],
 					"samples": [
-						{
-							"language": "json",
-							"code": "{\"type\": \"asset\",\"name\": \"Teaser image\",\"codename\": \"teaser_image\"}"
-						},
+						{ "language": "json", "code": "{\"type\": \"asset\",\"name\": \"Teaser image\",\"codename\": \"teaser_image\"}" },
 						{
 							"language": "json",
 							"code": "{\"type\": \"custom\",\"name\": \"Markdown editor\",\"codename\": \"markdown_editor\"}"
 						},
-						{
-							"language": "json",
-							"code": "{\"type\": \"date_time\",\"name\": \"Post date\",\"codename\": \"post_date\"}"
-						},
-						{
-							"language": "json",
-							"code": "{\"type\": \"modular_content\",\"name\": \"Author\",\"codename\": \"author\"}"
-						},
+						{ "language": "json", "code": "{\"type\": \"date_time\",\"name\": \"Post date\",\"codename\": \"post_date\"}" },
+						{ "language": "json", "code": "{\"type\": \"modular_content\",\"name\": \"Author\",\"codename\": \"author\"}" },
 						{
 							"language": "json",
 							"code": "{\"type\": \"multiple_choice\",\"name\": \"Show image border\",\"options\": [\n   {\n      \"name\": \"True\",\n      \"codename\": \"true\"\n  },\n  {\n      \"name\": \"False\",\n      \"codename\": \"false\"\n  }\n],\"codename\": \"show_image_border\"}"
@@ -2897,26 +2867,14 @@
 							"language": "json",
 							"code": "{\"type\": \"number\",\"name\": \"Days since last accident\",\"codename\": \"days_since_last_accident\"}"
 						},
-						{
-							"language": "json",
-							"code": "{\"type\": \"modular_content\",\"name\": \"Subpages\",\"codename\": \"subpages\"}"
-						},
+						{ "language": "json", "code": "{\"type\": \"modular_content\",\"name\": \"Subpages\",\"codename\": \"subpages\"}" },
 						{
 							"language": "json",
 							"code": "{\"type\": \"taxonomy\",\"name\": \"Category\",\"taxonomy_group\": \"category\",\"codename\": \"category\"}"
 						},
-						{
-							"language": "json",
-							"code": "{\"type\": \"text\",\"name\": \"Meta keywords\",\"codename\": \"meta_keywords\"}"
-						},
-						{
-							"language": "json",
-							"code": "{\"type\": \"rich_text\",\"name\": \"Description\",\"codename\": \"description\"}"
-						},
-						{
-							"language": "json",
-							"code": "{\"type\": \"url_slug\",\"name\": \"URL\",\"codename\": \"url\"}"
-						},
+						{ "language": "json", "code": "{\"type\": \"text\",\"name\": \"Meta keywords\",\"codename\": \"meta_keywords\"}" },
+						{ "language": "json", "code": "{\"type\": \"rich_text\",\"name\": \"Description\",\"codename\": \"description\"}" },
+						{ "language": "json", "code": "{\"type\": \"url_slug\",\"name\": \"URL\",\"codename\": \"url\"}" },
 						{
 							"language": "json",
 							"code": "{\n  \"message\": \"The requested content element 'authors' was not found in content type 'article'.\",\n  \"request_id\": \"|b8ec7d395e95c04e9511dbabd65bf4d1.a44b7400_\",\n  \"error_code\": 102,\n  \"specific_code\": 0\n}"
@@ -3307,6 +3265,633 @@
 					]
 				}
 			]
+		}
+	],
+	"apiReferenceObjects": [
+		{
+			"title": "Error object",
+			"codename": "error_object",
+			"url": "http://localhost:3000/learn/docs/apis/sync-api-v2/errors#error-object",
+			"id": "api_reference_object_error_object",
+			"markdownContent": "Error object \n\nError object in Delivery API.",
+			"properties": [
+				{
+					"name": "message",
+					"type": "string",
+					"description": "<p>The error message explaining what caused the error.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": []
+				},
+				{
+					"name": "request_id",
+					"type": "string",
+					"description": "<p>The performed request's unique ID.</p>",
+					"modifiers": ["nullable", "optional"],
+					"nestedProperties": []
+				},
+				{
+					"name": "error_code",
+					"type": "number",
+					"description": "<p>The internal error code for the type of error. Used for finding patterns among error requests.</p>",
+					"modifiers": ["non-nullable", "optional"],
+					"nestedProperties": []
+				},
+				{
+					"name": "specific_code",
+					"type": "number",
+					"description": "<p>Only useful for finding reasons behind failed requests in specific cases.</p>",
+					"modifiers": ["non-nullable", "optional"],
+					"nestedProperties": []
+				}
+			],
+			"apiReference": "Sync API v2"
+		},
+		{
+			"title": "Content item object",
+			"codename": "content_item",
+			"url": "http://localhost:3000/learn/docs/apis/delivery-api/content-items#content-item-object",
+			"id": "api_reference_object_content_item",
+			"markdownContent": "Content item object \n\nThe content item with metadata and individual elements.",
+			"properties": [
+				{
+					"name": "system",
+					"type": "object",
+					"description": "<p>The content item's system properties.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": [
+						{
+							"name": "id",
+							"type": "string",
+							"description": "<p>The content item's internal ID.</p>",
+							"modifiers": ["non-nullable", "required"],
+							"nestedProperties": []
+						},
+						{
+							"name": "collection",
+							"type": "string",
+							"description": "<p>The content item's <a data-item-id=\"f48c2c0b-755f-4d23-bd5d-7201fe5fff01\" href=\"\">collection</a> codename. For projects without collections enabled, the value is <code>default</code>.</p>",
+							"modifiers": ["non-nullable", "required"],
+							"nestedProperties": []
+						},
+						{
+							"name": "name",
+							"type": "string",
+							"description": "<p>The content item's display name.</p>",
+							"modifiers": ["non-nullable", "required"],
+							"nestedProperties": []
+						},
+						{
+							"name": "codename",
+							"type": "string",
+							"description": "<p>The content item's codename. By default, generated from the item's display name.</p>",
+							"modifiers": ["non-nullable", "required"],
+							"nestedProperties": []
+						},
+						{
+							"name": "language",
+							"type": "string",
+							"description": "<p>The codename of the language that the content is in.</p>\n<p>For details on retrieving content in different languages, see <a data-item-id=\"bf83b286-9972-4e65-8db9-412ca17df944\" href=\"\">Getting localized content</a>.</p>",
+							"modifiers": ["non-nullable", "required"],
+							"nestedProperties": []
+						},
+						{
+							"name": "type",
+							"type": "string",
+							"description": "<p>The codename of the item's type.</p>",
+							"modifiers": ["non-nullable", "required"],
+							"nestedProperties": []
+						},
+						{
+							"name": "sitemap_locations",
+							"type": "array",
+							"description": "<p>A list of sitemap locations that the content item is in.</p>",
+							"modifiers": ["deprecated", "non-nullable", "required"],
+							"nestedProperties": []
+						},
+						{
+							"name": "last_modified",
+							"type": "string",
+							"description": "<p><a href=\"https://en.wikipedia.org/wiki/ISO_8601\" data-new-window=\"true\" target=\"_blank\" rel=\"noopener noreferrer\">ISO-8601</a> formatted date and time of the last change to user-content of the content item.</p>\n<object type=\"application/kenticocloud\" data-type=\"item\" data-rel=\"component\" data-codename=\"n152bdc7f_1548_016c_22c4_c750d3041524\"></object>",
+							"modifiers": ["non-nullable", "required"],
+							"nestedProperties": []
+						},
+						{
+							"name": "workflow",
+							"type": "string",
+							"description": "<p>The codename of the content item's current <a data-item-id=\"d9aef4af-94c2-4376-a173-13b1c3f041ba\" href=\"\">workflow</a>. By default, generated from the workflow's display name.</p>\n<p>This property is not present for <a data-item-id=\"286dbb0e-f673-494f-abfd-3f39c7ec3446\" href=\"\">components</a>.</p>",
+							"modifiers": ["non-nullable", "optional"],
+							"nestedProperties": []
+						},
+						{
+							"name": "workflow_step",
+							"type": "string",
+							"description": "<p>The codename of the content item's current workflow step. By default, generated from the workflow step's display name.</p>\n<p>This property is not present for <a data-item-id=\"286dbb0e-f673-494f-abfd-3f39c7ec3446\" href=\"\">components</a>.</p>",
+							"modifiers": ["non-nullable", "optional"],
+							"nestedProperties": []
+						}
+					]
+				},
+				{
+					"name": "<element_codename>",
+					"type": "object",
+					"description": "<p>The item's <a data-item-id=\"ea9768d1-bd2f-4027-bb5e-5cd9c85ea360\" href=\"\">elements</a> with values for the specific language. The order of the element objects might not match the content element order in the UI.</p>",
+					"modifiers": ["non-nullable", "optional"],
+					"nestedProperties": [
+						{
+							"name": "",
+							"type": "nestedSchema",
+							"description": "<p><br></p>",
+							"modifiers": ["non-nullable", "required"],
+							"nestedProperties": []
+						}
+					]
+				}
+			],
+			"apiReference": "Delivery REST API"
+		},
+		{
+			"title": "Content type object",
+			"codename": "content_type",
+			"url": "http://localhost:3000/learn/docs/apis/delivery-api/content-types#content-type-object",
+			"id": "api_reference_object_content_type",
+			"markdownContent": "Content type object",
+			"properties": [
+				{
+					"name": "system",
+					"type": "object",
+					"description": "<p>The content type's system properties.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": [
+						{
+							"name": "id",
+							"type": "string",
+							"description": "<p>The content type's internal ID.</p>",
+							"modifiers": ["non-nullable", "required"],
+							"nestedProperties": []
+						},
+						{
+							"name": "name",
+							"type": "string",
+							"description": "<p>The content type's display name.</p>",
+							"modifiers": ["non-nullable", "required"],
+							"nestedProperties": []
+						},
+						{
+							"name": "codename",
+							"type": "string",
+							"description": "<p>The content type's codename. By default, generated from the content types's <code>name</code>.</p>",
+							"modifiers": ["non-nullable", "required"],
+							"nestedProperties": []
+						},
+						{
+							"name": "last_modified",
+							"type": "string",
+							"description": "<p><a href=\"https://en.wikipedia.org/wiki/ISO_8601\" data-new-window=\"true\" title=\"International standard covering the exchange of date- and time-related data\" target=\"_blank\" rel=\"noopener noreferrer\">ISO-8601</a> formatted date-time of the last content type change.</p>",
+							"modifiers": ["non-nullable", "required"],
+							"nestedProperties": []
+						}
+					]
+				},
+				{
+					"name": "<element_codename>",
+					"type": "object",
+					"description": "<p>A list of <a data-item-id=\"ea9768d1-bd2f-4027-bb5e-5cd9c85ea360\" href=\"\">elements</a> that define the content type.</p>\n<object type=\"application/kenticocloud\" data-type=\"item\" data-rel=\"component\" data-codename=\"n739dbf59_4480_0174_daed_9b59df48b355\"></object>",
+					"modifiers": ["non-nullable", "optional"],
+					"nestedProperties": [
+						{
+							"name": "",
+							"type": "nestedSchema",
+							"description": "<p><br></p>",
+							"modifiers": ["non-nullable", "required"],
+							"nestedProperties": []
+						}
+					]
+				}
+			],
+			"apiReference": "Delivery REST API"
+		},
+		{
+			"title": "Language object",
+			"codename": "dapi_language",
+			"url": "http://localhost:3000/learn/docs/apis/delivery-api/languages#language-object",
+			"id": "api_reference_object_dapi_language",
+			"markdownContent": "Language object \n\nProvides metadata of a language in your environment.",
+			"properties": [
+				{
+					"name": "system",
+					"type": "object",
+					"description": "<p><br></p>",
+					"modifiers": ["non-nullable", "optional"],
+					"nestedProperties": [
+						{
+							"name": "id",
+							"type": "string",
+							"description": "<p>The language's ID.</p>",
+							"modifiers": ["non-nullable", "optional"],
+							"nestedProperties": []
+						},
+						{
+							"name": "name",
+							"type": "string",
+							"description": "<p>The language's name.</p>",
+							"modifiers": ["non-nullable", "optional"],
+							"nestedProperties": []
+						},
+						{
+							"name": "codename",
+							"type": "string",
+							"description": "<p>The language's codename.</p>",
+							"modifiers": ["non-nullable", "optional"],
+							"nestedProperties": []
+						}
+					]
+				}
+			],
+			"apiReference": "Delivery REST API"
+		},
+		{
+			"title": "Asset element",
+			"codename": "asset_element_in_item",
+			"url": "http://localhost:3000/learn/docs/apis/delivery-api/content-elements#asset-element",
+			"id": "api_reference_object_asset_element_in_item",
+			"markdownContent": "Asset element",
+			"properties": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": "<p>The element's type.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": []
+				},
+				{
+					"name": "name",
+					"type": "string",
+					"description": "<p>The element's display name.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": []
+				},
+				{
+					"name": "value",
+					"type": "array",
+					"description": "<p>The assets inserted into the element. The asset objects are returned in the same order as shown in the UI.</p>\n<p>Some of the properties are specific to images only:&nbsp;<code>width</code> and <code>height</code> represent the image’s width and height dimensions, and the <code>renditions</code> object contains details about <a data-item-id=\"47d39ee3-8a38-46d9-8420-65200ce3a3a9\" href=\"\">customized images</a>.</p>\n<p>To display customized images on the website or an app, you first need to apply custom query parameters to the asset’s original URL.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": [
+						{
+							"name": "asset",
+							"type": "object",
+							"description": "<p><br></p>",
+							"modifiers": ["non-nullable", "optional"],
+							"nestedProperties": [
+								{
+									"name": "name",
+									"type": "string",
+									"description": "<p>The asset's name.</p>",
+									"modifiers": ["non-nullable", "required"],
+									"nestedProperties": []
+								},
+								{
+									"name": "type",
+									"type": "string",
+									"description": "<p>The file's <a href=\"https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types\" data-new-window=\"true\" target=\"_blank\" rel=\"noopener noreferrer\">MIME type</a>.</p>",
+									"modifiers": ["non-nullable", "required"],
+									"nestedProperties": []
+								},
+								{
+									"name": "size",
+									"type": "number",
+									"description": "<p>The file's size in bytes.</p>",
+									"modifiers": ["non-nullable", "required"],
+									"nestedProperties": []
+								},
+								{
+									"name": "description",
+									"type": "string",
+									"description": "<p>The asset's description for a specific language.</p>",
+									"modifiers": ["nullable", "required"],
+									"nestedProperties": []
+								},
+								{
+									"name": "url",
+									"type": "string",
+									"description": "<p>The asset’s absolute URL. By default, the URL is publicly available without authentication. Anyone can download the asset.</p>\n<p>You can <a data-item-id=\"961f2179-e62c-4927-a7ad-e270d55fb61f\" href=\"\">restrict access to your assets{#a-retrieve-assets-securely#}</a> by requiring an API key with each request to the asset’s URL.</p>\n<object type=\"application/kenticocloud\" data-type=\"item\" data-rel=\"link\" data-codename=\"feature_limited_to_flex_price_plans\"></object>",
+									"modifiers": ["non-nullable", "required"],
+									"nestedProperties": []
+								},
+								{
+									"name": "width",
+									"type": "number",
+									"description": "<p>The image's width in pixels. Is&nbsp;<code>null</code>&nbsp;if the file is not an image.</p>",
+									"modifiers": ["non-nullable", "required"],
+									"nestedProperties": []
+								},
+								{
+									"name": "height",
+									"type": "number",
+									"description": "<p>The image's height in pixels. Is&nbsp;<code>null</code>&nbsp;if the file is not an image.</p>",
+									"modifiers": ["non-nullable", "required"],
+									"nestedProperties": []
+								},
+								{
+									"name": "renditions",
+									"type": "object",
+									"description": "<p>The image's rendition. Contains query parameters that need to be concatenated with the original asset's URL to apply image customization.</p>",
+									"modifiers": ["non-nullable", "required"],
+									"nestedProperties": [
+										{
+											"name": "default",
+											"type": "object",
+											"description": "<p>The name of the object represents an image preset's codename. Currently, there's only one default preset that holds the <a href=\"/tutorials/write-and-collaborate/create-content/work-with-media#a-customize-assets-for-a-better-fit\">customized image</a>.</p>",
+											"modifiers": ["non-nullable", "optional"],
+											"nestedProperties": [
+												{
+													"name": "rendition_id",
+													"type": "string",
+													"description": "<p>The rendition's ID.</p>",
+													"modifiers": ["non-nullable", "required"],
+													"nestedProperties": []
+												},
+												{
+													"name": "preset_id",
+													"type": "string",
+													"description": "<p>The preset's ID.</p>",
+													"modifiers": ["non-nullable", "required"],
+													"nestedProperties": []
+												},
+												{
+													"name": "width",
+													"type": "number",
+													"description": "<p>The rendition's width.</p>",
+													"modifiers": ["non-nullable", "required"],
+													"nestedProperties": []
+												},
+												{
+													"name": "height",
+													"type": "number",
+													"description": "<p>The rendition's&nbsp;height.</p>",
+													"modifiers": ["non-nullable", "required"],
+													"nestedProperties": []
+												},
+												{
+													"name": "query",
+													"type": "string",
+													"description": "<p>Parameters set for the image rendition.</p>",
+													"modifiers": ["non-nullable", "required"],
+													"nestedProperties": []
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			],
+			"apiReference": "Delivery REST API"
+		},
+		{
+			"title": "Custom element",
+			"codename": "custom_element_in_item",
+			"url": "http://localhost:3000/learn/docs/apis/delivery-api/content-elements#custom-element",
+			"id": "api_reference_object_custom_element_in_item",
+			"markdownContent": "Custom element \n\nCreate your own custom elements or discover existing [custom elements built by the community](https://github.com/topics/kontent-ai-integration).",
+			"properties": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": "<p>The element's type.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": []
+				},
+				{
+					"name": "name",
+					"type": "string",
+					"description": "<p>The element's display name.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": []
+				},
+				{
+					"name": "value",
+					"type": "string",
+					"description": "<p>The element's value.</p>",
+					"modifiers": ["nullable", "required"],
+					"nestedProperties": []
+				}
+			],
+			"apiReference": "Delivery REST API"
+		},
+		{
+			"title": "Subpages element",
+			"codename": "subpages_element_in_item",
+			"url": "http://localhost:3000/learn/docs/apis/delivery-api/content-elements#subpages-element",
+			"id": "api_reference_object_subpages_element_in_item",
+			"markdownContent": "Subpages element \n\nThe _Subpages_ element that works with live preview. This element defines parent-child relationships between content items to build a navigation hierarchy. When a space has a root item with a _Subpages_ element, it enables the navigation tree.",
+			"properties": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": "<p>The element's type.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": []
+				},
+				{
+					"name": "name",
+					"type": "string",
+					"description": "<p>The element's display name.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": []
+				},
+				{
+					"name": "value",
+					"type": "array",
+					"description": "<p>The linked pages as an array of item codenames.</p>\n<object type=\"application/kenticocloud\" data-type=\"item\" data-rel=\"component\" data-codename=\"f2402a67_61d9_01a3_39ef_b10065ba97c1\"></object>\n<p><br></p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": []
+				}
+			],
+			"apiReference": "Delivery REST API"
+		},
+		{
+			"title": "Taxonomy group object",
+			"codename": "taxonomy_group",
+			"url": "http://localhost:3000/learn/docs/apis/delivery-api/taxonomy-groups#taxonomy-group-object",
+			"id": "api_reference_object_taxonomy_group",
+			"markdownContent": "Taxonomy group object",
+			"properties": [
+				{
+					"name": "system",
+					"type": "object",
+					"description": "<p>The taxonomy group's system properties.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": [
+						{
+							"name": "id",
+							"type": "string",
+							"description": "<p>The taxonomy group's internal ID.</p>",
+							"modifiers": ["non-nullable", "required"],
+							"nestedProperties": []
+						},
+						{
+							"name": "name",
+							"type": "string",
+							"description": "<p>The taxonomy group's display name.</p>",
+							"modifiers": ["non-nullable", "required"],
+							"nestedProperties": []
+						},
+						{
+							"name": "codename",
+							"type": "string",
+							"description": "<p>The taxonomy group's codename.</p>",
+							"modifiers": ["non-nullable", "required"],
+							"nestedProperties": []
+						},
+						{
+							"name": "last_modified",
+							"type": "string",
+							"description": "<p><a href=\"https://en.wikipedia.org/wiki/ISO_8601\" data-new-window=\"true\" title=\"International standard covering the exchange of date- and time-related data\" target=\"_blank\" rel=\"noopener noreferrer\">ISO-8601</a> formatted date-time of the last change to the taxonomy group.</p>",
+							"modifiers": ["non-nullable", "required"],
+							"nestedProperties": []
+						}
+					]
+				},
+				{
+					"name": "terms",
+					"type": "array",
+					"description": "<p>A list of taxonomy terms.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": [
+						{
+							"name": "taxonomyTerm",
+							"type": "object",
+							"description": "<p><br></p>",
+							"modifiers": ["non-nullable", "optional"],
+							"nestedProperties": [
+								{
+									"name": "name",
+									"type": "string",
+									"description": "<p>The taxonomy term's display name.</p>",
+									"modifiers": ["non-nullable", "required"],
+									"nestedProperties": []
+								},
+								{
+									"name": "codename",
+									"type": "string",
+									"description": "<p>The taxonomy term's codename.</p>",
+									"modifiers": ["non-nullable", "required"],
+									"nestedProperties": []
+								},
+								{
+									"name": "terms",
+									"type": "array",
+									"description": "<p>A list of descendant taxonomy terms.</p>",
+									"modifiers": ["non-nullable", "required"],
+									"nestedProperties": []
+								}
+							]
+						}
+					]
+				}
+			],
+			"apiReference": "Delivery REST API"
+		},
+		{
+			"title": "Taxonomy element",
+			"codename": "taxonomy_element_in_item",
+			"url": "http://localhost:3000/learn/docs/apis/delivery-api/content-elements#taxonomy-element",
+			"id": "api_reference_object_taxonomy_element_in_item",
+			"markdownContent": "Taxonomy element",
+			"properties": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": "<p>The element's type.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": []
+				},
+				{
+					"name": "name",
+					"type": "string",
+					"description": "<p>The element's display name.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": []
+				},
+				{
+					"name": "taxonomy_group",
+					"type": "string",
+					"description": "<p>The codename of a specific taxonomy group that the element is using.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": []
+				},
+				{
+					"name": "value",
+					"type": "array",
+					"description": "<p>The element's value as an array of selected taxonomy terms.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": [
+						{
+							"name": "",
+							"type": "object",
+							"description": "<p><br></p>",
+							"modifiers": ["non-nullable", "optional"],
+							"nestedProperties": [
+								{
+									"name": "name",
+									"type": "string",
+									"description": "<p>The taxonomy term's display name.</p>",
+									"modifiers": ["non-nullable", "required"],
+									"nestedProperties": []
+								},
+								{
+									"name": "codename",
+									"type": "string",
+									"description": "<p>The taxonomy term's codename.</p>",
+									"modifiers": ["non-nullable", "required"],
+									"nestedProperties": []
+								}
+							]
+						}
+					]
+				}
+			],
+			"apiReference": "Delivery REST API"
+		},
+		{
+			"title": "Date and time element",
+			"codename": "date___time_element_in_item",
+			"url": "http://localhost:3000/learn/docs/apis/delivery-api/content-elements#date-and-time-element",
+			"id": "api_reference_object_date___time_element_in_item",
+			"markdownContent": "Date and time element",
+			"properties": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": "<p>The element's type.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": []
+				},
+				{
+					"name": "name",
+					"type": "string",
+					"description": "<p>The element's display name.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": []
+				},
+				{
+					"name": "value",
+					"type": "string",
+					"description": "<p>The element's value as a <a href=\"https://en.wikipedia.org/wiki/ISO_8601\" data-new-window=\"true\" target=\"_blank\" rel=\"noopener noreferrer\">ISO-8601</a> formatted string. Time in this element is displayed and interpreted as&nbsp;<a href=\"https://en.wikipedia.org/wiki/Coordinated_Universal_Time\" data-new-window=\"true\" title=\"Coordinated Universal Time\" target=\"_blank\" rel=\"noopener noreferrer\">UTC</a>.</p>",
+					"modifiers": ["nullable", "required"],
+					"nestedProperties": []
+				},
+				{
+					"name": "display_timezone",
+					"type": "string",
+					"description": "<p><a href=\"https://timezonedb.com/time-zones\" data-new-window=\"true\" target=\"_blank\" rel=\"noopener noreferrer\">IANA time zone name</a> used to display time offset of the date &amp; time element in the UI.</p>\n<p>The time zone doesn't modify the date specified in the <code>value</code> property.</p>\n<p>Obsolete values: \"America/Ojinaga\", \"America/Scoresbysund\", \"Antarctica/Vostok\", \"Asia/Aqtobe\", \"Asia/Qyzylorda\", \"Europe/Kiev\".</p>",
+					"modifiers": ["nullable", "optional"],
+					"nestedProperties": []
+				}
+			],
+			"apiReference": "Delivery REST API"
 		}
 	]
 }

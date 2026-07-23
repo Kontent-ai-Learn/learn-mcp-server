@@ -5,7 +5,7 @@ import type { ZodMiniType } from "zod/mini";
 import { getDataDir } from "../config.js";
 import { getEnvConfig } from "../utils/environment.utils.js";
 
-export type FileCacheKey = `api-reference-records` | `search-records`;
+export type FileCacheKey = `api-reference-records` | `api-reference-objects` | `search-records`;
 
 export async function getOrSetFromFileCache<T extends JsonValue>({
 	cacheKey,

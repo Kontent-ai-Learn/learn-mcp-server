@@ -1,6 +1,6 @@
 import { z } from "zod/mini";
 
-export const searchRecordTypeSchema = z.literal(["endpoint", "section"]);
+export const searchRecordTypeSchema = z.literal(["endpoint", "section", "object"]);
 
 export type SearchRecordType = z.infer<typeof searchRecordTypeSchema>;
 

@@ -1,6 +1,7 @@
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
 import { z } from "zod/mini";
+import { searchRecordTypeSchema } from "../content/models/search-records.models.js";
 import type { SearchResult } from "../indexing/indexer.models.js";
 import { CHUNKS_TABLE, DOCUMENTS_TABLE, toVectorParam } from "./tables.js";
 
@@ -9,7 +10,7 @@ const documentDistanceRow = z.readonly(
 		title: z.string(),
 		url: z.url(),
 		body: z.string(),
-		type: z.literal(["endpoint", "section"]),
+		type: searchRecordTypeSchema,
 		codename: z.string(),
 		distance: z.number(),
 	}),

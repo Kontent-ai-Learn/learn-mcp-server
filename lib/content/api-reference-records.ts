@@ -1,8 +1,6 @@
-import { z } from "zod/mini";
-import { type FileCacheKey, getFromFileCache } from "../cache/file-cache.js";
-import { getOrSetFromMemoryCache } from "../cache/memory-cache.js";
+import type { FileCacheKey } from "../cache/file-cache.js";
 import { getApiReferenceRecordsUrl } from "../config.js";
-import { initializeLearnEndpointData } from "./learn-api.js";
+import { initializeLearnEndpointData, readCachedRecords } from "./learn-api.js";
 import {
 	type ApiReferenceRecord,
 	apiReferenceRecordSchema,
@@ -21,16 +19,5 @@ export async function initializeApiReferenceRecords(): Promise<readonly ApiRefer
 }
 
 export async function getApiReferenceRecordsFromCache(): Promise<readonly ApiReferenceRecord[] | undefined> {
-	return await getOrSetFromMemoryCache<readonly ApiReferenceRecord[] | undefined>({
-		key: cacheKey,
-		schema: z.union([z.readonly(z.array(apiReferenceRecordSchema)), z.undefined()]),
-		value: async () => {
-			const dataFromCache = getFromFileCache<readonly ApiReferenceRecord[]>({
-				cacheKey,
-				schema: z.readonly(z.array(apiReferenceRecordSchema)),
-			});
-
-			return await Promise.resolve(dataFromCache);
-		},
-	});
+	return await readCachedRecords({ cacheKey, schema: apiReferenceRecordSchema });
 }
