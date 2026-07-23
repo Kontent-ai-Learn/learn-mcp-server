@@ -1,6 +1,8 @@
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname } from "node:path";
 import type { JsonValue } from "@kontent-ai/core-sdk";
 import type { ZodMiniType } from "zod/mini";
+import { getDataDir } from "../config.js";
 import { getEnvConfig } from "../utils/environment.utils.js";
 
 export type FileCacheKey = `api-reference-records` | `search-records`;
@@ -18,7 +20,7 @@ export async function getOrSetFromFileCache<T extends JsonValue>({
 	const resolveAndStoreValue = async () => {
 		const resolvedValue = await value();
 
-		writeFileSync(filepath, JSON.stringify(resolvedValue));
+		writeCacheFile(filepath, JSON.stringify(resolvedValue));
 		return resolvedValue;
 	};
 
@@ -45,7 +47,7 @@ export function setToFileCache<T extends JsonValue>({
 		throw new Error(`Could not set file cache value because it did not match the schema. Message: ${error.message}`);
 	}
 
-	writeFileSync(filepath, JSON.stringify(data));
+	writeCacheFile(filepath, JSON.stringify(data));
 }
 
 export function getFromFileCache<T extends JsonValue>({
@@ -64,7 +66,12 @@ export function getFromFileCache<T extends JsonValue>({
 }
 
 export function getFullPath(cacheKey: FileCacheKey): string {
-	const { dataPath, isTest } = getEnvConfig();
+	const { isTest } = getEnvConfig();
 	const suffix = isTest ? "-test" : "";
-	return `./${dataPath}/${cacheKey}${suffix}.json`;
+	return `./${getDataDir(isTest)}/${cacheKey}${suffix}.json`;
+}
+
+function writeCacheFile(filepath: string, content: string): void {
+	mkdirSync(dirname(filepath), { recursive: true });
+	writeFileSync(filepath, content);
 }
