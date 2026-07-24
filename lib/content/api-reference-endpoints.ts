@@ -1,5 +1,5 @@
 import type { FileCacheKey } from "../cache/file-cache.js";
-import { getApiReferenceEndpointsUrl } from "../config.js";
+import { learnUrls } from "../config.js";
 import { initializeLearnEndpointData, readCachedRecords } from "./learn-api.js";
 import {
 	type ApiReferenceEndpoint,
@@ -11,7 +11,7 @@ const cacheKey: FileCacheKey = "api-reference-endpoints";
 
 export async function initializeApiReferenceEndpoints(): Promise<readonly ApiReferenceEndpoint[]> {
 	return await initializeLearnEndpointData({
-		url: getApiReferenceEndpointsUrl(),
+		url: learnUrls.apiReferenceEndpointsUrl,
 		cacheKey,
 		schema: apiReferenceEndpointsResponseSchema,
 		select: (payload) => payload.data.apiReferenceEndpoints,

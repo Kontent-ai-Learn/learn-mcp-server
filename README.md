@@ -142,9 +142,6 @@ All variables are optional; copy `.env.template` to `.env` to override defaults.
 | `DataPath`               | `data`                                 | Directory for the vector database and cached JSON.            |
 | `CacheDir`               | `.cache/transformers`                  | transformers.js model cache directory.                        |
 | `LearnHost`              | `http://localhost:3000`                | Base URL of the Learn host exposing the AI content endpoints. |
-| `SearchRecordsUrl`       | `/learn/api/mcp/getSearchRecords`       | Path override for the search-records endpoint.                |
-| `ApiReferenceEndpointsUrl` | `/learn/api/mcp/getApiReferenceEndpoints` | Path override for the API-reference-endpoints endpoint.     |
-| `ApiReferenceObjectsUrl` | `/learn/api/mcp/getApiReferenceObjects` | Path override for the API-reference-objects endpoint.         |
 
 Endpoint URLs are composed as `LearnHost` + the corresponding path.
 

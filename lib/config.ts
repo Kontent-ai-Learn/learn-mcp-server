@@ -34,25 +34,17 @@ export const getDbPath = (): string => (getEnvConfig().isTest ? getTestDbPath() 
 /** transformers.js model cache directory. */
 export const getTransformersCacheDir = (): string => getEnvConfig().cacheDir;
 
-export const getSearchRecordsUrl = (): string => {
-	const {
-		learnUrls: { searchRecordsUrl },
-	} = getEnvConfig();
-	return searchRecordsUrl;
-};
+const composeLearnUrl = (path: string): string => new URL(path, getEnvConfig().learnHost).toString();
 
-/** Full URL of the API-reference-endpoints endpoint, composed from `LearnHost` + path */
-export const getApiReferenceEndpointsUrl = (): string => {
-	const {
-		learnUrls: { apiReferenceEndpointsUrl },
-	} = getEnvConfig();
-	return apiReferenceEndpointsUrl;
-};
-
-/** Full URL of the API-reference-objects endpoint, composed from `LearnHost` + path */
-export const getApiReferenceObjectsUrl = (): string => {
-	const {
-		learnUrls: { apiReferenceObjectsUrl },
-	} = getEnvConfig();
-	return apiReferenceObjectsUrl;
+/** Learn content endpoint URLs, composed from the configurable `LearnHost` base. */
+export const learnUrls = {
+	get searchRecordsUrl(): string {
+		return composeLearnUrl("/learn/api/mcp/getSearchRecords");
+	},
+	get apiReferenceEndpointsUrl(): string {
+		return composeLearnUrl("/learn/api/mcp/getApiReferenceEndpoints");
+	},
+	get apiReferenceObjectsUrl(): string {
+		return composeLearnUrl("/learn/api/mcp/getApiReferenceObjects");
+	},
 };

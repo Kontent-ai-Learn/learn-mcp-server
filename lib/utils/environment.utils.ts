@@ -9,11 +9,6 @@ type EnvConfig = {
 	readonly cacheDir: string;
 	readonly learnHost: string;
 	readonly isTest: boolean;
-	readonly learnUrls: {
-		readonly searchRecordsUrl: string;
-		readonly apiReferenceEndpointsUrl: string;
-		readonly apiReferenceObjectsUrl: string;
-	};
 };
 
 export function getEnvConfig(): EnvConfig {
@@ -23,9 +18,6 @@ export function getEnvConfig(): EnvConfig {
 	const dataPath = getOptionalValue("DataPath") ?? "data";
 	const cacheDir = getOptionalValue("CacheDir") ?? ".cache/transformers";
 	const learnHost = getOptionalValue("LearnHost") ?? "http://localhost:3000";
-	const searchRecordsPath = getOptionalValue("SearchRecordsUrl") ?? "/learn/api/mcp/getSearchRecords";
-	const apiReferenceEndpointsPath = getOptionalValue("ApiReferenceEndpointsUrl") ?? "/learn/api/mcp/getApiReferenceEndpoints";
-	const apiReferenceObjectsPath = getOptionalValue("ApiReferenceObjectsUrl") ?? "/learn/api/mcp/getApiReferenceObjects";
 	const isTest = getOptionalValue("IsTest") === "true";
 
 	return {
@@ -34,16 +26,7 @@ export function getEnvConfig(): EnvConfig {
 		cacheDir,
 		learnHost,
 		isTest,
-		learnUrls: {
-			apiReferenceEndpointsUrl: composeUrl(learnHost, apiReferenceEndpointsPath),
-			apiReferenceObjectsUrl: composeUrl(learnHost, apiReferenceObjectsPath),
-			searchRecordsUrl: composeUrl(learnHost, searchRecordsPath),
-		},
 	};
-}
-
-function composeUrl(host: string, path: string): string {
-	return new URL(path, host).toString();
 }
 
 function getOptionalValue(name: string): string | undefined {
