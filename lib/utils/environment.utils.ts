@@ -23,9 +23,9 @@ export function getEnvConfig(): EnvConfig {
 	const dataPath = getOptionalValue("DataPath") ?? "data";
 	const cacheDir = getOptionalValue("CacheDir") ?? ".cache/transformers";
 	const learnHost = getOptionalValue("LearnHost") ?? "http://localhost:3000";
-	const searchRecordsPath = getOptionalValue("SearchRecordsUrl") ?? "/learn/api/ai/getSearchRecords";
-	const apiReferenceEndpointsPath = getOptionalValue("ApiReferenceEndpointsUrl") ?? "/learn/api/ai/getApiReferenceEndpoints";
-	const apiReferenceObjectsPath = getOptionalValue("ApiReferenceObjectsUrl") ?? "/learn/api/ai/getApiReferenceObjects";
+	const searchRecordsPath = getOptionalValue("SearchRecordsUrl") ?? "/learn/api/mcp/getSearchRecords";
+	const apiReferenceEndpointsPath = getOptionalValue("ApiReferenceEndpointsUrl") ?? "/learn/api/mcp/getApiReferenceEndpoints";
+	const apiReferenceObjectsPath = getOptionalValue("ApiReferenceObjectsUrl") ?? "/learn/api/mcp/getApiReferenceObjects";
 	const isTest = getOptionalValue("IsTest") === "true";
 
 	return {
