@@ -1,0 +1,27 @@
+# Rebuilt inside the image
+node_modules
+dist
+
+# VCS / CI / editor / local
+.git
+.github
+.claude
+.vscode
+.zed
+.idea
+*.log
+.DS_Store
+coverage
+
+# Not needed in the image
+tests
+samples
+data/test
+
+# Baked in explicitly by the Dockerfile — keep these OUT of the ignore list:
+#   data/*.db, data/*.db-wal, data/*.json, .cache/transformers
+*.db-shm
+
+# Env is provided by the platform (ACA env vars), not a baked file
+.env
+.env.template
