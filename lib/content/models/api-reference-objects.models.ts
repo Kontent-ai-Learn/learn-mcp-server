@@ -1,5 +1,5 @@
 import { z } from "zod/mini";
-import { apiReferencePropertySchema } from "./api-reference-records.models.js";
+import { apiReferencePropertySchema } from "./api-reference-endpoints.models.js";
 
 export const apiReferenceObjectSchema = z.readonly(
 	z.object({

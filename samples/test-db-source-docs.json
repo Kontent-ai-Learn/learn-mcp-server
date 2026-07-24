@@ -881,7 +881,7 @@
 			"type": "endpoint"
 		}
 	],
-	"apiReferenceRecords": [
+	"apiReferenceEndpoints": [
 		{
 			"id": "api-ref-001",
 			"codename": "list_content_items",

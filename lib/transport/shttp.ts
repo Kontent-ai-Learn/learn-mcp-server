@@ -58,14 +58,14 @@ export function startStreamableHTTP(): void {
 
 	app.post("/init", async (_, res) => {
 		const { success, error } = await tryCatchAsync(async () => {
-			const { dbName, searchRecordsCount, apiReferenceRecordsCount, apiReferenceObjectsCount, index } = await initializeAll();
+			const { dbName, searchRecordsCount, apiReferenceEndpointsCount, apiReferenceObjectsCount, index } = await initializeAll();
 
 			setOkResponse(res, {
 				message: `Successfully indexed '${index.total}' documents into '${dbName}'.`,
 				result: {
 					dbName,
 					searchRecordsCount,
-					apiReferenceRecordsCount,
+					apiReferenceEndpointsCount,
 					apiReferenceObjectsCount,
 					index: {
 						added: index.added,

@@ -5,10 +5,10 @@ import type { Database } from "@tursodatabase/database";
 import { z } from "zod/mini";
 import { setToFileCache } from "../cache/file-cache.js";
 import { getProdDbPath, getTestDbPath } from "../config.js";
+import { initializeApiReferenceEndpoints } from "../content/api-reference-endpoints.js";
 import { initializeApiReferenceObjects } from "../content/api-reference-objects.js";
-import { initializeApiReferenceRecords } from "../content/api-reference-records.js";
+import { apiReferenceEndpointSchema } from "../content/models/api-reference-endpoints.models.js";
 import { type ApiReferenceObject, apiReferenceObjectSchema } from "../content/models/api-reference-objects.models.js";
-import { apiReferenceRecordSchema } from "../content/models/api-reference-records.models.js";
 import { type SearchRecord, searchRecordSchema } from "../content/models/search-records.models.js";
 import { initializeSearchRecords } from "../content/search-records.js";
 import { openDb } from "../database/db.js";
@@ -18,7 +18,7 @@ import { logger } from "../utils/logger.js";
 export type InitializeResult = {
 	readonly dbName: string;
 	readonly searchRecordsCount: number;
-	readonly apiReferenceRecordsCount: number;
+	readonly apiReferenceEndpointsCount: number;
 	readonly apiReferenceObjectsCount: number;
 	readonly index: {
 		readonly added: number;
@@ -34,7 +34,7 @@ const testSearchRecordsPath = fileURLToPath(new URL("../../samples/test-db-sourc
 const sourceSchema = z.readonly(
 	z.object({
 		searchRecords: z.array(searchRecordSchema),
-		apiReferenceRecords: z.array(apiReferenceRecordSchema),
+		apiReferenceEndpoints: z.array(apiReferenceEndpointSchema),
 		apiReferenceObjects: z.array(apiReferenceObjectSchema),
 	}),
 );
@@ -56,23 +56,23 @@ export async function cleanData(options?: Parameters<typeof initializeAll>[0]): 
 }
 
 async function initializeProdData(): Promise<InitializeResult> {
-	const apiReferenceRecords = await initializeApiReferenceRecords();
+	const apiReferenceEndpoints = await initializeApiReferenceEndpoints();
 	const apiReferenceObjects = await initializeApiReferenceObjects();
 	const searchRecords = await initializeSearchRecords();
 
 	const documents = [...searchRecords, ...apiReferenceObjects.map(toSearchRecord)];
 	const index = await indexSearchRecords(await getDb({ isTest: false }), documents);
 
-	return toInitializeResult({ isTest: false, searchRecords, apiReferenceRecords, apiReferenceObjects, index });
+	return toInitializeResult({ isTest: false, searchRecords, apiReferenceEndpoints, apiReferenceObjects, index });
 }
 
 async function initializeTestData(): Promise<InitializeResult> {
-	const { searchRecords, apiReferenceRecords, apiReferenceObjects } = await getTestData();
+	const { searchRecords, apiReferenceEndpoints, apiReferenceObjects } = await getTestData();
 
 	setToFileCache({
-		cacheKey: "api-reference-records",
-		value: apiReferenceRecords,
-		schema: z.readonly(z.array(apiReferenceRecordSchema)),
+		cacheKey: "api-reference-endpoints",
+		value: apiReferenceEndpoints,
+		schema: z.readonly(z.array(apiReferenceEndpointSchema)),
 	});
 
 	setToFileCache({
@@ -90,7 +90,7 @@ async function initializeTestData(): Promise<InitializeResult> {
 	const documents = [...searchRecords, ...apiReferenceObjects.map(toSearchRecord)];
 	const index = await indexSearchRecords(await getDb({ isTest: true }), documents);
 
-	return toInitializeResult({ isTest: true, searchRecords, apiReferenceRecords, apiReferenceObjects, index });
+	return toInitializeResult({ isTest: true, searchRecords, apiReferenceEndpoints, apiReferenceObjects, index });
 }
 
 /**
@@ -111,20 +111,20 @@ function toSearchRecord(object: ApiReferenceObject): SearchRecord {
 function toInitializeResult({
 	isTest,
 	searchRecords,
-	apiReferenceRecords,
+	apiReferenceEndpoints,
 	apiReferenceObjects,
 	index,
 }: {
 	readonly isTest: boolean;
 	readonly searchRecords: readonly unknown[];
-	readonly apiReferenceRecords: readonly unknown[];
+	readonly apiReferenceEndpoints: readonly unknown[];
 	readonly apiReferenceObjects: readonly unknown[];
 	readonly index: IndexDocumentsResult;
 }): InitializeResult {
 	return {
 		dbName: getDbPath({ isTest }),
 		searchRecordsCount: searchRecords.length,
-		apiReferenceRecordsCount: apiReferenceRecords.length,
+		apiReferenceEndpointsCount: apiReferenceEndpoints.length,
 		apiReferenceObjectsCount: apiReferenceObjects.length,
 		index: {
 			added: index.addedCount,

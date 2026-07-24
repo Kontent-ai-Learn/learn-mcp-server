@@ -28,7 +28,7 @@ All tools are **read-only** and operate on public Kontent.ai Learn content.
 
 On initialization the server pulls content from the Learn host and builds a local search index:
 
-1. **Fetch** search records, API-reference records, and API-reference objects from the Learn AI endpoints, caching each response as JSON on disk.
+1. **Fetch** search records, API-reference endpoints, and API-reference objects from the Learn AI endpoints, caching each response as JSON on disk.
 2. **Chunk & embed** the documents with the `Xenova/all-MiniLM-L6-v2` model (384-dim embeddings).
 3. **Store** documents and chunk embeddings in a local libSQL/Turso vector database.
 4. **Search** at query time by embedding the query and ranking documents by cosine similarity.
@@ -42,7 +42,7 @@ Indexing is incremental — unchanged documents keep their embeddings across res
 - **Node.js >= 22** and **pnpm**
 - Access to a **Learn host** that exposes the AI content endpoints (configured via `LearnHost`, default `http://localhost:3000`):
   - `/learn/api/ai/getSearchRecords`
-  - `/learn/api/ai/getApiReferenceRecords`
+  - `/learn/api/ai/getApiReferenceEndpoints`
   - `/learn/api/ai/getApiReferenceObjects`
 
 ### Build the index
@@ -130,7 +130,7 @@ The HTTP server exposes:
 
 - `POST /mcp` — the MCP endpoint
 - `GET /health` — health check (status, timestamp, version)
-- `POST /init` — (re)build the search index; returns counts of indexed search records, API-reference records, objects, and the diff (added/changed/removed/unchanged).
+- `POST /init` — (re)build the search index; returns counts of indexed search records, API-reference endpoints, objects, and the diff (added/changed/removed/unchanged).
 
 ## Environment Variables
 
@@ -143,7 +143,7 @@ All variables are optional; copy `.env.template` to `.env` to override defaults.
 | `CacheDir`               | `.cache/transformers`                  | transformers.js model cache directory.                        |
 | `LearnHost`              | `http://localhost:3000`                | Base URL of the Learn host exposing the AI content endpoints. |
 | `SearchRecordsUrl`       | `/learn/api/ai/getSearchRecords`       | Path override for the search-records endpoint.                |
-| `ApiReferenceRecordsUrl` | `/learn/api/ai/getApiReferenceRecords` | Path override for the API-reference-records endpoint.         |
+| `ApiReferenceEndpointsUrl` | `/learn/api/ai/getApiReferenceEndpoints` | Path override for the API-reference-endpoints endpoint.     |
 | `ApiReferenceObjectsUrl` | `/learn/api/ai/getApiReferenceObjects` | Path override for the API-reference-objects endpoint.         |
 
 Endpoint URLs are composed as `LearnHost` + the corresponding path.

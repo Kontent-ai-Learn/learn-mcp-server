@@ -42,7 +42,7 @@ export const apiReferenceResponseSchema = z.readonly(
 
 export type ApiReferenceResponse = z.infer<typeof apiReferenceResponseSchema>;
 
-export const apiReferenceRecordSchema = z.readonly(
+export const apiReferenceEndpointSchema = z.readonly(
 	z.object({
 		id: z.string(),
 		codename: z.string(),
@@ -61,10 +61,10 @@ export const apiReferenceRecordSchema = z.readonly(
 	}),
 );
 
-export type ApiReferenceRecord = z.infer<typeof apiReferenceRecordSchema>;
+export type ApiReferenceEndpoint = z.infer<typeof apiReferenceEndpointSchema>;
 
-export const apiReferenceRecordsResponseSchema = z.readonly(
+export const apiReferenceEndpointsResponseSchema = z.readonly(
 	z.object({
-		data: z.readonly(z.object({ apiReferenceRecords: z.readonly(z.array(apiReferenceRecordSchema)) })),
+		data: z.readonly(z.object({ apiReferenceEndpoints: z.readonly(z.array(apiReferenceEndpointSchema)) })),
 	}),
 );

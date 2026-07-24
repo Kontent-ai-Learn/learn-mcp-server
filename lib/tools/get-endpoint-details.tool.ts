@@ -1,5 +1,5 @@
 import z from "zod";
-import { getApiReferenceRecordsFromCache } from "../content/api-reference-records.js";
+import { getApiReferenceEndpointsFromCache } from "../content/api-reference-endpoints.js";
 import { findDetailsBySearch } from "./shared/find-details-by-search.js";
 import { defineReadOnlyTool } from "./shared/tool-definitions.js";
 import { withToolHandler } from "./shared/tool-handler.js";
@@ -25,7 +25,7 @@ export const getEndpointDetailsTools = defineReadOnlyTool(
 					text,
 					type: "endpoint",
 					label: "endpoint",
-					getRecordsFromCache: getApiReferenceRecordsFromCache,
+					getRecordsFromCache: getApiReferenceEndpointsFromCache,
 				}),
 		});
 	},

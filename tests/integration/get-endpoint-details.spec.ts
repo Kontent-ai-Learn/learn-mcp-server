@@ -1,6 +1,6 @@
 import { tryCatch } from "@kontent-ai/core-sdk";
 import { describe, expect, it } from "vitest";
-import { type ApiReferenceRecord, apiReferenceRecordSchema } from "../../lib/content/models/api-reference-records.models.js";
+import { type ApiReferenceEndpoint, apiReferenceEndpointSchema } from "../../lib/content/models/api-reference-endpoints.models.js";
 import type { ToolName } from "../../lib/tools/shared/tool-models.js";
 import { withTestClient } from "./test-client.js";
 
@@ -8,7 +8,7 @@ type TextContent = { readonly type: string; readonly text: string };
 
 type Result =
 	| {
-			readonly record: ApiReferenceRecord;
+			readonly record: ApiReferenceEndpoint;
 			readonly success: true;
 			readonly error?: never;
 	  }
@@ -34,7 +34,7 @@ const callGetEndpointDetails = async (text: string): Promise<Result> =>
 			};
 		}
 
-		const { data, error } = apiReferenceRecordSchema.safeParse(parsedItem);
+		const { data, error } = apiReferenceEndpointSchema.safeParse(parsedItem);
 		if (data) {
 			return {
 				record: data,

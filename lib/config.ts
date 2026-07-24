@@ -41,12 +41,12 @@ export const getSearchRecordsUrl = (): string => {
 	return searchRecordsUrl;
 };
 
-/** Full URL of the API-reference-records endpoint, composed from `LearnHost` + path */
-export const getApiReferenceRecordsUrl = (): string => {
+/** Full URL of the API-reference-endpoints endpoint, composed from `LearnHost` + path */
+export const getApiReferenceEndpointsUrl = (): string => {
 	const {
-		learnUrls: { apiReferenceRecordsUrl },
+		learnUrls: { apiReferenceEndpointsUrl },
 	} = getEnvConfig();
-	return apiReferenceRecordsUrl;
+	return apiReferenceEndpointsUrl;
 };
 
 /** Full URL of the API-reference-objects endpoint, composed from `LearnHost` + path */
