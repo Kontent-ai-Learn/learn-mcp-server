@@ -1,13 +1,11 @@
-import { type JsonValue, tryCatchAsync } from "@kontent-ai/core-sdk";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import express, { type Request, type RequestHandler, type Response } from "express";
+import express, { type RequestHandler, type Response } from "express";
 import { match } from "ts-pattern";
-import { initializeAll } from "../initialization/initialization.js";
-import { createServer } from "../server.js";
 import { getEnvConfig } from "../utils/environment.utils.js";
-import { getErrorMessage } from "../utils/error.utils.js";
-import { logger } from "../utils/logger.js";
 import { packageJsonName, packageJsonVersion } from "../utils/version.js";
+import { handleHealth } from "./routes/health.route.js";
+import { handleInit } from "./routes/init.route.js";
+import { handleMcpRequest } from "./routes/mcp.route.js";
+import { setMethodNotAllowedResponse } from "./routes/route.utils.js";
 
 type SupportedRoute = {
 	readonly method: "get" | "post";
@@ -55,86 +53,6 @@ ${formatSupportedRoutes()}`,
 	});
 }
 
-async function handleMcpRequest(req: Request, res: Response): Promise<void> {
-	const { success, error } = await tryCatchAsync(async () => {
-		const { server } = createServer();
-		const transport = new StreamableHTTPServerTransport({
-			sessionIdGenerator: undefined,
-		});
-		res.on("close", () => {
-			console.log("Request closed");
-			transport.close();
-			server.close();
-		});
-
-		await server.connect(transport);
-		await transport.handleRequest(Object.assign(req, {}), res, req.body);
-	});
-
-	if (!success) {
-		const errorMessage = getErrorMessage(error);
-		logger.log({
-			type: "error",
-			message: `${packageJsonName}@${packageJsonVersion} - Error handling MCP request: ${errorMessage}`,
-		});
-		if (!res.headersSent) {
-			setInternalServerErrorResponse(res, errorMessage);
-		}
-	}
-}
-
-function handleHealth(_req: Request, res: Response): void {
-	setOkResponse(res, {
-		status: "ok",
-		timestamp: new Date().toISOString(),
-		currentVersion: packageJsonVersion,
-	});
-}
-
-async function handleInit(_req: Request, res: Response): Promise<void> {
-	const { success, error } = await tryCatchAsync(async () => {
-		const { dbName, searchRecordsCount, apiReferenceEndpointsCount, apiReferenceObjectsCount, index } = await initializeAll();
-
-		setOkResponse(res, {
-			message: `Successfully indexed '${index.total}' documents into '${dbName}'.`,
-			result: {
-				dbName,
-				searchRecordsCount,
-				apiReferenceEndpointsCount,
-				apiReferenceObjectsCount,
-				index: {
-					added: index.added,
-					changed: index.changed,
-					removed: index.removed,
-					unchanged: index.unchanged,
-					total: index.total,
-				},
-			},
-			timestamp: new Date().toISOString(),
-			currentVersion: packageJsonVersion,
-		});
-	});
-
-	if (!success) {
-		const errorMessage = getErrorMessage(error);
-		logger.log({
-			type: "error",
-			message: `${packageJsonName}@${packageJsonVersion} - Error handling MCP request: ${errorMessage}`,
-		});
-		if (!res.headersSent) {
-			setInternalServerErrorResponse(res, errorMessage);
-		}
-	}
-}
-
-function setOkResponse(res: Response, json: JsonValue): void {
-	setResponse({ res, statusCode: 200, json });
-}
-
-function setInternalServerErrorResponse(res: Response, message: string = "Internal server error"): void {
-	setResponse({ res, statusCode: 500, json: { error: { code: -32603, message } } });
-}
-
 function setNotFoundResponse(res: Response, method: string, path: string): void {
 	res.status(404).json({
 		error: "Route not supported",
@@ -143,31 +61,7 @@ function setNotFoundResponse(res: Response, method: string, path: string): void 
 	});
 }
 
-function setMethodNotAllowedResponse(res: Response): void {
-	setResponse({
-		res,
-		statusCode: 405,
-		json: {
-			error: {
-				code: -32601,
-				message: "Method not allowed",
-			},
-		},
-	});
-}
-
-function setResponse({
-	res,
-	statusCode,
-	json,
-}: {
-	readonly res: Response;
-	readonly statusCode: 500 | 200 | 405;
-	readonly json: JsonValue;
-}): void {
-	res.status(statusCode).json({ jsonrpc: "2.0", json });
-}
-
+/** Public view of the routes for responses/logs — omits the internal `handler`. */
 function describeSupportedRoutes(): readonly { readonly method: string; readonly path: string; readonly description: string }[] {
 	return supportedRoutes.map(({ method, path, description }) => ({ method: method.toUpperCase(), path, description }));
 }
