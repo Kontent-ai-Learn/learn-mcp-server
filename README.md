@@ -139,8 +139,7 @@ All variables are optional; copy `.env.template` to `.env` to override defaults.
 | Variable                 | Default                                | Description                                                   |
 | ------------------------ | -------------------------------------- | ------------------------------------------------------------- |
 | `Port`                   | `3002`                                 | Port for the Streamable HTTP transport.                       |
-| `DataPath`               | `data`                                 | Directory for the vector database and cached JSON.            |
-| `CacheDir`               | `.cache/transformers`                  | transformers.js model cache directory.                        |
+| `DataPath`               | `data`                                 | Directory for the vector database, cached JSON, and the transformers model cache (`<DataPath>/transformers`). |
 | `LearnHost`              | `http://localhost:3000`                | Base URL of the Learn host exposing the AI content endpoints. |
 
 Endpoint URLs are composed as `LearnHost` + the corresponding path.

@@ -31,8 +31,8 @@ export const getTestDbPath = (): string => `${getDataDir(true)}/search-records-v
 /** DB path used at query time; the `isTest` env flag selects the test DB. */
 export const getDbPath = (): string => (getEnvConfig().isTest ? getTestDbPath() : getProdDbPath());
 
-/** transformers.js model cache directory. */
-export const getTransformersCacheDir = (): string => getEnvConfig().cacheDir;
+/** transformers.js model cache directory; always `<dataPath>/transformers`. */
+export const getTransformersCacheDir = (): string => `${getEnvConfig().dataPath}/transformers`;
 
 const composeLearnUrl = (path: string): string => new URL(path, getEnvConfig().learnHost).toString();
 

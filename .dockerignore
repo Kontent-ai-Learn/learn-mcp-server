@@ -19,7 +19,7 @@ samples
 data/test
 
 # Baked in explicitly by the Dockerfile — keep these OUT of the ignore list:
-#   data/*.db, data/*.db-wal, data/*.json, .cache/transformers
+#   data/*.db, data/*.db-wal, data/*.json, data/transformers
 *.db-shm
 
 # Env is provided by the platform (ACA env vars), not a baked file

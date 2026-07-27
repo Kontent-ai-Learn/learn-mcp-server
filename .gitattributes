@@ -1,1 +1,4 @@
 * text eol=lf
+
+# The embedding model is binary — never apply text/EOL normalization (would corrupt it).
+*.onnx binary

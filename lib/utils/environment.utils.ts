@@ -6,7 +6,6 @@ import { fileURLToPath } from "node:url";
 type EnvConfig = {
 	readonly port: number;
 	readonly dataPath: string;
-	readonly cacheDir: string;
 	readonly learnHost: string;
 	readonly isTest: boolean;
 };
@@ -16,14 +15,12 @@ export function getEnvConfig(): EnvConfig {
 
 	const port = getOptionalValue("Port");
 	const dataPath = getOptionalValue("DataPath") ?? "data";
-	const cacheDir = getOptionalValue("CacheDir") ?? ".cache/transformers";
 	const learnHost = getOptionalValue("LearnHost") ?? "http://localhost:3000";
 	const isTest = getOptionalValue("IsTest") === "true";
 
 	return {
 		port: port ? +port : 3002,
 		dataPath,
-		cacheDir,
 		learnHost,
 		isTest,
 	};
