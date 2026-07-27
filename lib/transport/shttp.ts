@@ -1,18 +1,10 @@
-import express, { type RequestHandler, type Response } from "express";
-import { match } from "ts-pattern";
+import express, { type Response } from "express";
 import { getEnvConfig } from "../utils/environment.utils.js";
 import { packageJsonName, packageJsonVersion } from "../utils/version.js";
 import { handleHealth } from "./routes/health.route.js";
 import { handleInit } from "./routes/init.route.js";
 import { handleMcpRequest } from "./routes/mcp.route.js";
-import { setMethodNotAllowedResponse } from "./routes/route.utils.js";
-
-type SupportedRoute = {
-	readonly method: "get" | "post";
-	readonly path: string;
-	readonly description: string;
-	readonly handler: RequestHandler;
-};
+import { registerRoutes, type SupportedRoute } from "./routes/route.utils.js";
 
 const supportedRoutes: readonly SupportedRoute[] = [
 	{ method: "post", path: "/mcp", description: "MCP endpoint (Streamable HTTP).", handler: handleMcpRequest },
@@ -24,19 +16,12 @@ export function startStreamableHTTP(): void {
 	const app = express();
 	app.use(express.json());
 
-	supportedRoutes.forEach(({ method, path, handler }) => {
-		match(method)
-			.with("get", () => app.get(path, handler))
-			.with("post", () => app.post(path, handler))
-			.exhaustive();
-	});
+	// Registers each handler plus an automatic friendly 405 for any other method on a
+	// supported path.
+	registerRoutes(app, supportedRoutes);
 
-	// Known path, unsupported method → 405 (the MCP transport is POST-only).
-	app.get("/mcp", (_, res) => setMethodNotAllowedResponse(res));
-	app.delete("/mcp", (_, res) => setMethodNotAllowedResponse(res));
-
-	// Catch-all for any unmatched route (any method, any path). Registered after all
-	// routes so it only handles the ones that fell through.
+	// Catch-all for any unmatched path (any method). Registered after all routes so it only
+	// handles the ones that fell through.
 	app.use((req, res) => setNotFoundResponse(res, req.method, req.originalUrl));
 
 	app.use((err: Error, _req: express.Request, _res: express.Response, next: express.NextFunction) => {
