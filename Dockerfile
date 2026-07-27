@@ -41,7 +41,8 @@ COPY --from=builder /app/dist ./dist
 COPY package.json ./
 
 # Baked search index + embedding model (data/transformers) → no network needed at runtime.
-# .dockerignore keeps data/test and *.db-shm out, so this copies the DB + WAL + JSONs + model.
+# Test artifacts live in the top-level data-test/ (outside data/); .dockerignore also drops
+# *.db-shm. So this copies the DB + WAL + JSONs + model.
 COPY data ./data/
 
 # Run non-root; the data dir must stay writable (libSQL opens the DB in WAL mode

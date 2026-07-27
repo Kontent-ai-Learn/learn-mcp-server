@@ -18,11 +18,8 @@ export const CHUNK_OVERLAP_CHARS = 200;
 /** Parent documents returned to the caller (bounds the response size). */
 export const SEARCH_LIMIT = 10;
 
-/** Data directory for the given mode; test artifacts live in a `test` subfolder. */
-export const getDataDir = (isTest: boolean): string => {
-	const { dataPath } = getEnvConfig();
-	return isTest ? `${dataPath}/test` : dataPath;
-};
+/** Data directory: prod uses DataPath; test artifacts live in the top-level `data-test` folder. */
+export const getDataDir = (isTest: boolean): string => (isTest ? "data-test" : getEnvConfig().dataPath);
 
 /** Persistent Turso DB path; overridable for deployment. */
 export const getProdDbPath = (): string => `${getDataDir(false)}/search-records-vector.db`;

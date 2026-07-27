@@ -16,7 +16,7 @@ coverage
 # Not needed in the image
 tests
 samples
-data/test
+data-test
 
 # Baked in explicitly by the Dockerfile — keep these OUT of the ignore list:
 #   data/*.db, data/*.db-wal, data/*.json, data/transformers

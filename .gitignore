@@ -10,8 +10,8 @@
 *.db-wal
 *.db-shm
 
-# Test data artifacts
-data/test/
+# Test data artifacts (created only by test runs)
+data-test/
 
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
