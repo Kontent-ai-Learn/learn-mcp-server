@@ -42,8 +42,8 @@ COPY --from=builder /app/dist ./dist
 COPY package.json ./
 
 # Baked search index + embedding-model cache → no network needed at runtime.
-COPY data/search-records-vector.db data/search-records-vector.db-wal ./data/
-COPY data/*.json ./data/
+# .dockerignore keeps data/test and *.db-shm out, so this copies only the DB + WAL + JSONs.
+COPY data ./data/
 COPY .cache/transformers ./.cache/transformers
 
 # Run non-root; the data dir must stay writable (libSQL opens the DB in WAL mode
