@@ -40,10 +40,12 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY package.json ./
 
-# Baked search index + embedding model (data/transformers) → no network needed at runtime.
+# Baked search index + embedding model (root-level transformers/) → no network needed at runtime.
 # Test artifacts live in the top-level data-test/ (outside data/); .dockerignore also drops
-# *.db-shm. So this copies the DB + WAL + JSONs + model.
+# *.db-shm. So this copies the DB + WAL + JSONs, plus the model cache.
+# The model cache path is cwd-relative, so WORKDIR /app is what puts it where the app looks.
 COPY data ./data/
+COPY transformers ./transformers/
 
 # Run non-root; the data dir must stay writable (libSQL opens the DB in WAL mode
 # and creates -wal/-shm on open).

@@ -139,10 +139,12 @@ All variables are optional; copy `.env.template` to `.env` to override defaults.
 | Variable                 | Default                                | Description                                                   |
 | ------------------------ | -------------------------------------- | ------------------------------------------------------------- |
 | `Port`                   | `3002`                                 | Port for the Streamable HTTP transport.                       |
-| `DataPath`               | `data`                                 | Directory for the vector database, cached JSON, and the transformers model cache (`<DataPath>/transformers`). |
+| `DataPath`               | `data`                                 | Directory for the vector database and the cached JSON.        |
 | `LearnHost`              | `http://localhost:3000`                | Base URL of the Learn host exposing the AI content endpoints. |
 
 Endpoint URLs are composed as `LearnHost` + the corresponding path.
+
+The embedding model cache is the committed root-level `transformers/` folder. It is resolved relative to the working directory the server is started from and is **not** configurable via `DataPath`.
 
 ## Security
 
@@ -189,9 +191,10 @@ lib/
 scripts/         # init / clean / search CLI helpers
 samples/         # sample data used to build the test index
 tests/           # unit & integration tests
+transformers/    # committed transformers.js model cache (Xenova/all-MiniLM-L6-v2)
 ```
 
-Tests use an isolated index under `data/test/` (gitignored), so running them never touches production data.
+Tests use an isolated index under `data-test/` (gitignored), so running them never touches production data.
 
 ## License
 

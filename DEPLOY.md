@@ -1,7 +1,7 @@
 # Deploying to Azure Container Instances (via Docker Hub)
 
 This server is packaged as a Docker image with the search index (`data/*.db`) and the
-embedding model (`data/transformers`) **baked in**, so the running container needs no
+embedding model (root-level `transformers/`) **baked in**, so the running container needs no
 secrets and no network. The MCP endpoint is served over Streamable HTTP at `POST /mcp`
 (health check at `GET /health`).
 
@@ -17,7 +17,7 @@ Two things to know about ACI:
   and create a new one (reuse the same resource group).
 
 > **Build the image locally**, not in CI: the vector DB is gitignored (the embedding model is
-> committed under `data/transformers`), so a CI runner without the DB can't build a working image.
+> committed under `transformers/`), so a CI runner without the DB can't build a working image.
 >
 > **Architecture:** ACI runs **linux/amd64**. On an Apple Silicon / ARM machine you must build
 > the pushed image with `--platform linux/amd64` (the `docker:build:linux` script does this).
@@ -27,7 +27,7 @@ Two things to know about ACI:
 
 - Docker (with Buildx) and a Docker Hub account.
 - The runtime data present locally: `data/search-records-vector.db` and
-  `data/transformers/Xenova/all-MiniLM-L6-v2/…`. If missing, run `pnpm install && pnpm run init`
+  `transformers/Xenova/all-MiniLM-L6-v2/…`. If missing, run `pnpm install && pnpm run init`
   (needs `LearnHost` reachable) to build them first.
 
 ## 1. Test locally (optional but recommended)

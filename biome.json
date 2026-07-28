@@ -31,7 +31,16 @@
 		}
 	},
 	"files": {
-		"includes": ["lib/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts", "sample/**/*.ts", "**/*.json", "!_legacy/**/*", "!data"]
+		"includes": [
+			"lib/**/*.ts",
+			"tests/**/*.ts",
+			"scripts/**/*.ts",
+			"sample/**/*.ts",
+			"**/*.json",
+			"!_legacy/**/*",
+			"!data",
+			"!transformers"
+		]
 	},
 	"overrides": [
 		{

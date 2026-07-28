@@ -3,9 +3,7 @@
 .env
 .claude/settings.local.json
 
-# RAG index + embedding model cache
-.index/
-.cache/
+# RAG index artifacts (the embedding model under transformers/ is committed, not ignored)
 *.db
 *.db-wal
 *.db-shm
