@@ -50,17 +50,19 @@ so pulls are authenticated (see the rate-limiting note in Troubleshooting).
 ```bash
 docker login                                # Docker Hub
 pnpm run docker:build:linux                 # docker build --platform linux/amd64 -t learn-mcp:linux .
-docker tag learn-mcp:linux <user>/learn-mcp:0.0.1
-docker push <user>/learn-mcp:0.0.1
+docker tag learn-mcp:linux <user>/learn-mcp:latest
+docker push <user>/learn-mcp:latest
 ```
+
+Re-pushing `:latest` re-points the tag at the new image, so a redeploy is always: push, then
+recreate the instance (ACI is immutable — see step 3).
 
 ## 3. Create the container in the Azure Portal
 
 1. Delete the existing sample container instance (keep the resource group).
 2. **Create → Container Instances**, in the same resource group / region. Configure:
-   - **Image source:** *Other registry* → **Image:** `docker.io/<user>/learn-mcp:0.0.1`.
-     - Always include the **`:0.0.1` tag**. A tagless reference resolves to `:latest`, which
-       isn't pushed → the deploy fails with `InaccessibleImage`.
+   - **Image source:** *Other registry* → **Image:** `docker.io/<user>/learn-mcp:latest`.
+     - Write the **`:latest` tag explicitly** so the reference is unambiguous.
      - **Provide registry credentials even for a public repo** (see the rate-limiting note
        below): login server `index.docker.io`, user name `<user>`, password = a Docker Hub
        **Personal Access Token**.
@@ -135,14 +137,19 @@ If Docker Hub throttling remains a recurring problem, use **Azure Container Regi
 
 ### `InaccessibleImage`
 
-The image reference is missing the tag (resolves to a non-existent `:latest`) — use the fully
-tagged `docker.io/<user>/learn-mcp:0.0.1`.
+The image reference doesn't resolve. Check, in order: a typo in `<user>` or the repo name, a push
+that never completed (`docker manifest inspect docker.io/<user>/learn-mcp:latest` should succeed),
+and — for a private repo — missing or invalid registry credentials.
 
 ## Notes
 
 - **HTTP only.** ACI provides no TLS. Some MCP clients require `https` for remote servers; if
   you need it, front the instance with Azure Front Door or Application Gateway to terminate TLS.
 - **Cost.** ACI has no scale-to-zero and bills while running — stop the instance when idle.
+- **`:latest` is a moving pointer**, so there's no tagged rollback target and two builds of the
+  same source can't be told apart by tag. Cross-check what's live with
+  `curl http://<fqdn>:8080/health`, which reports the `package.json` version. If rollback becomes
+  a real need, push an immutable tag (the version or a short git SHA) alongside `latest`.
 - **`POST /init` is unauthenticated.** With the index baked in it isn't needed at runtime, but
   it is exposed and would trigger a heavy reindex (and needs `LearnHost`) if called. Consider
   gating or removing it in `lib/transport/shttp.ts` before any non-test exposure.
