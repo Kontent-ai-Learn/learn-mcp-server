@@ -50,19 +50,21 @@ so pulls are authenticated (see the rate-limiting note in Troubleshooting).
 ```bash
 docker login                                # Docker Hub
 pnpm run docker:build:linux                 # amd64 build, tagged learn-mcp:linux
-docker tag learn-mcp:linux <user>/learn-mcp:latest
-docker push <user>/learn-mcp:latest
+docker tag learn-mcp:linux <user>/learn-mcp:0.0.1
+docker push <user>/learn-mcp:0.0.1
 ```
 
-Re-pushing `:latest` re-points the tag at the new image, so a redeploy is always: push, then
-recreate the instance (ACI is immutable — see step 3).
+Bump the tag to match `version` in `package.json` on every release. An immutable version tag means
+neither you nor an unattended ACI restart can ever change what's running without an explicit
+redeploy (see the Notes section for why that matters on ACI).
 
 ## 3. Create the container in the Azure Portal
 
 1. Delete the existing sample container instance (keep the resource group).
 2. **Create → Container Instances**, in the same resource group / region. Configure:
-   - **Image source:** *Other registry* → **Image:** `docker.io/<user>/learn-mcp:latest`.
-     - Write the **`:latest` tag explicitly** so the reference is unambiguous.
+   - **Image source:** *Other registry* → **Image:** `docker.io/<user>/learn-mcp:0.0.1`.
+     - Always include the **version tag**. A tagless reference resolves to `:latest`, which
+       isn't pushed → the deploy fails with `InaccessibleImage`.
      - **Provide registry credentials even for a public repo** (see the rate-limiting note
        below): login server `index.docker.io`, user name `<user>`, password = a Docker Hub
        **Personal Access Token**.
@@ -137,19 +139,28 @@ If Docker Hub throttling remains a recurring problem, use **Azure Container Regi
 
 ### `InaccessibleImage`
 
-The image reference doesn't resolve. Check, in order: a typo in `<user>` or the repo name, a push
-that never completed (`docker manifest inspect docker.io/<user>/learn-mcp:latest` should succeed),
-and — for a private repo — missing or invalid registry credentials.
+The image reference is missing the tag (resolves to a non-existent `:latest`, which is never
+pushed) — use the fully tagged `docker.io/<user>/learn-mcp:0.0.1`. If the tag is present and this
+still happens, check for a typo in `<user>` or the repo name, a push that never completed
+(`docker manifest inspect docker.io/<user>/learn-mcp:0.0.1` should succeed), and — for a private
+repo — missing or invalid registry credentials.
 
 ## Notes
 
 - **HTTP only.** ACI provides no TLS. Some MCP clients require `https` for remote servers; if
   you need it, front the instance with Azure Front Door or Application Gateway to terminate TLS.
 - **Cost.** ACI has no scale-to-zero and bills while running — stop the instance when idle.
-- **`:latest` is a moving pointer**, so there's no tagged rollback target and two builds of the same
-  source can't be told apart by tag. `curl http://<fqdn>:8080/health` reports the running
-  `package.json` version. If rollback becomes a real need, additionally push an immutable tag (the
-  version or a short git SHA) alongside `latest`.
+- **Versioned tag, not `:latest`.** Azure Container Instances documents that it can restart a
+  running container on its own ("restarts initiated by the ACI infrastructure due to maintenance
+  events," [Troubleshoot common issues](https://learn.microsoft.com/en-us/azure/container-instances/container-instances-troubleshooting) —
+  exit codes 7147/7148, called "expected in a cloud environment"; that same page also advises
+  against the `latest` tag on ACI). A [matching community report](https://learn.microsoft.com/en-us/answers/questions/268759/azure-container-instances-randomly-pulling-and-res)
+  describes exactly this — an unattended restart re-pulling an unchanged image. On `:latest`, that
+  risks an unattended swap to whatever's currently on Docker Hub; a version tag makes that
+  impossible, since the tag itself never changes what it points to. Rollback is just recreating the
+  instance with a previously-pushed version tag — no extra tagging scheme needed. Recreating keeps
+  the same URL as long as you reuse the same DNS name label and region (see step 3). Confirm the
+  running build with `curl http://<fqdn>:8080/health`.
 - **`POST /init` is unauthenticated.** With the index baked in it isn't needed at runtime, but
   it is exposed and would trigger a heavy reindex (and needs `LearnHost`) if called. Consider
   gating or removing it in `lib/transport/shttp.ts` before any non-test exposure.
