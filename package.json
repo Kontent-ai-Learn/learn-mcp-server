@@ -27,7 +27,7 @@
 		}
 	},
 	"bin": {
-		"@kontent-ai-learn/learn-mcp-server": "./build/bin.js"
+		"@kontent-ai-learn/learn-mcp-server": "./dist/bin.js"
 	},
 	"types": "./dist/public_api.d.ts",
 	"type": "module",
@@ -51,8 +51,8 @@
 		"biome:fix": "biome check --write",
 		"biome:fix:unsafe": "biome check --write --unsafe",
 		"clean": "tsx scripts/clean.ts",
-		"start:stdio": "node build/bin.js stdio",
-		"start:shttp": "node build/bin.js shttp",
+		"start:stdio": "node dist/bin.js stdio",
+		"start:shttp": "node dist/bin.js shttp",
 		"docker:build": "docker build -t learn-mcp:local .",
 		"docker:build:linux": "docker build --platform linux/amd64 -t learn-mcp:linux .",
 		"dev:stdio": "tsx watch lib/bin.ts stdio",
