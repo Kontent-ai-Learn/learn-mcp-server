@@ -35,9 +35,9 @@ Two things to know about ACI:
 Fast native-arch build:
 
 ```bash
-pnpm run docker:build                       # docker build -t learn-mcp:local .
+pnpm run docker:build                       # native-arch build, tagged learn-mcp:local
 docker run --rm -p 8080:8080 learn-mcp:local
-curl localhost:8080/health                  # → {"status":"ok",...}
+curl localhost:8080/health                  # → {"jsonrpc":"2.0","json":{"status":"ok","currentVersion":"0.0.1",...}}
 npx @modelcontextprotocol/inspector         # connect to http://localhost:8080/mcp, run a search
 ```
 
@@ -49,7 +49,7 @@ so pulls are authenticated (see the rate-limiting note in Troubleshooting).
 
 ```bash
 docker login                                # Docker Hub
-pnpm run docker:build:linux                 # docker build --platform linux/amd64 -t learn-mcp:linux .
+pnpm run docker:build:linux                 # amd64 build, tagged learn-mcp:linux
 docker tag learn-mcp:linux <user>/learn-mcp:latest
 docker push <user>/learn-mcp:latest
 ```
@@ -146,10 +146,10 @@ and — for a private repo — missing or invalid registry credentials.
 - **HTTP only.** ACI provides no TLS. Some MCP clients require `https` for remote servers; if
   you need it, front the instance with Azure Front Door or Application Gateway to terminate TLS.
 - **Cost.** ACI has no scale-to-zero and bills while running — stop the instance when idle.
-- **`:latest` is a moving pointer**, so there's no tagged rollback target and two builds of the
-  same source can't be told apart by tag. Cross-check what's live with
-  `curl http://<fqdn>:8080/health`, which reports the `package.json` version. If rollback becomes
-  a real need, push an immutable tag (the version or a short git SHA) alongside `latest`.
+- **`:latest` is a moving pointer**, so there's no tagged rollback target and two builds of the same
+  source can't be told apart by tag. `curl http://<fqdn>:8080/health` reports the running
+  `package.json` version. If rollback becomes a real need, additionally push an immutable tag (the
+  version or a short git SHA) alongside `latest`.
 - **`POST /init` is unauthenticated.** With the index baked in it isn't needed at runtime, but
   it is exposed and would trigger a heavy reindex (and needs `LearnHost`) if called. Consider
   gating or removing it in `lib/transport/shttp.ts` before any non-test exposure.

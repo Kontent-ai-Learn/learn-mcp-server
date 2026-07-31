@@ -6,8 +6,10 @@ WORKDIR /app
 ENV CI=true
 # Provision pnpm up front. corepack's on-demand fetch can hit transient registry
 # 522s under emulation, so activate it eagerly with a small retry loop.
+# Keep in sync with `packageManager` in package.json — a mismatch installs against
+# a lockfile written by a different pnpm.
 RUN corepack enable \
- && for i in 1 2 3; do corepack prepare pnpm@11.10.0 --activate && break || sleep 5; done
+ && for i in 1 2 3; do corepack prepare pnpm@11.17.0 --activate && break || sleep 5; done
 
 # Manifests first for layer caching. pnpm-workspace.yaml carries `allowBuilds`
 # (e.g. onnxruntime-node), which pnpm needs to run the native install scripts.
@@ -52,6 +54,11 @@ COPY transformers ./transformers/
 RUN useradd --system --create-home --uid 1001 app \
  && chown -R app:app /app
 USER app
+
+LABEL org.opencontainers.image.title="learn-mcp-server" \
+      org.opencontainers.image.description="MCP server for advanced search in kontent.ai learn materials, documentation & API reference" \
+      org.opencontainers.image.source="https://github.com/kontent-ai/mcp-server" \
+      org.opencontainers.image.licenses="MIT"
 
 EXPOSE 8080
 CMD ["node", "dist/bin.js", "shttp"]

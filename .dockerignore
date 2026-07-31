@@ -22,6 +22,6 @@ data-test
 #   data/*.db, data/*.db-wal, data/*.json, transformers/
 *.db-shm
 
-# Env is provided by the platform (ACA env vars), not a baked file
+# Env is provided by the platform (ACI env vars), not a baked file
 .env
 .env.template
