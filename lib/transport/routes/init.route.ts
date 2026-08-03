@@ -11,30 +11,30 @@ export async function handleInit(_req: Request, res: Response): Promise<void> {
 		const { dbName, searchRecordsCount, apiReferenceEndpointsCount, apiReferenceObjectsCount, index } = await initializeAll();
 
 		setOkResponse(res, {
+			currentVersion: packageJsonVersion,
 			message: `Successfully indexed '${index.total}' documents into '${dbName}'.`,
 			result: {
-				dbName,
-				searchRecordsCount,
 				apiReferenceEndpointsCount,
 				apiReferenceObjectsCount,
+				dbName,
 				index: {
 					added: index.added,
 					changed: index.changed,
 					removed: index.removed,
-					unchanged: index.unchanged,
 					total: index.total,
+					unchanged: index.unchanged,
 				},
+				searchRecordsCount,
 			},
 			timestamp: new Date().toISOString(),
-			currentVersion: packageJsonVersion,
 		});
 	});
 
 	if (!success) {
 		const errorMessage = getErrorMessage(error);
 		logger.log({
-			type: "error",
 			message: `${packageJsonName}@${packageJsonVersion} - Error handling MCP request: ${errorMessage}`,
+			type: "error",
 		});
 		if (!res.headersSent) {
 			setInternalServerErrorResponse(res, errorMessage);

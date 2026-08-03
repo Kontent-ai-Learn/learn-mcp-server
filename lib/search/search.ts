@@ -14,13 +14,13 @@ export async function search(query: string): Promise<readonly SearchResult[]> {
 	}
 	const db = await getCachedDb();
 	const vector = await embedQuery(trimmed);
-	return await getDocumentsFromDb({ db, queryVector: vector, limit: SEARCH_LIMIT });
+	return await getDocumentsFromDb({ db, limit: SEARCH_LIMIT, queryVector: vector });
 }
 
 async function getCachedDb(): Promise<Database> {
 	return await getOrSetFromMemoryCache({
 		key: "db",
-		value: async () => await openDb(getDbPath()),
 		schema: z.instanceof(Database),
+		value: async () => await openDb(getDbPath()),
 	});
 }

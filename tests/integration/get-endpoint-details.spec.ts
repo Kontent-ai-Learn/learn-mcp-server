@@ -1,10 +1,7 @@
-import { tryCatch } from "@kontent-ai/core-sdk";
 import { describe, expect, it } from "vitest";
 import { type ApiReferenceEndpoint, apiReferenceEndpointSchema } from "../../lib/content/models/api-reference-endpoints.models.js";
 import type { ToolName } from "../../lib/tools/shared/tool-models.js";
-import { withTestClient } from "./test-client.js";
-
-type TextContent = { readonly type: string; readonly text: string };
+import { parseFirstJsonContent, withTestClient } from "./test-client.js";
 
 type Result =
 	| {
@@ -19,13 +16,11 @@ type Result =
 	  };
 
 const callGetEndpointDetails = async (text: string): Promise<Result> =>
-	withTestClient(async (client) => {
-		const res = await client.callTool({ name: "get-endpoint-details" satisfies ToolName, arguments: { text } });
+	await withTestClient(async (client) => {
+		const res = await client.callTool({ arguments: { text }, name: "get-endpoint-details" satisfies ToolName });
 		expect(res.isError).toBeFalsy();
 
-		const content = res.content as readonly TextContent[];
-		const textOfFirstItem = content.at(0)?.text;
-		const { data: parsedItem, error: parseError } = tryCatch(() => JSON.parse(textOfFirstItem ?? "") as unknown);
+		const { data: parsedItem, error: parseError } = parseFirstJsonContent(res);
 
 		if (parseError) {
 			return {

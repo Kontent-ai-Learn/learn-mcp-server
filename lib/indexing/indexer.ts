@@ -9,12 +9,12 @@ import { chunkDoc } from "./chunking.js";
 import { embedTexts } from "./embeddings.js";
 import type { NormalizedDoc } from "./indexer.models.js";
 
-export type IndexDocumentsResult = {
+export interface IndexDocumentsResult {
 	readonly addedCount: number;
 	readonly changedCount: number;
 	readonly removedCount: number;
 	readonly unchangedCount: number;
-};
+}
 
 /**
  * Bring the index up to date with the source: diff by content hash, re-chunk
@@ -22,15 +22,15 @@ export type IndexDocumentsResult = {
  * incremental — unchanged docs keep their existing embeddings across restarts.
  */
 export async function indexSearchRecords(db: Database, searchRecords: readonly SearchRecord[]): Promise<IndexDocumentsResult> {
-	const normalized = searchRecords.map(normalize);
+	const normalized = searchRecords.map((doc) => normalize(doc));
 
 	const result = await logger.logWithSpinnerAsync<IndexDocumentsResult>(async (spinner) => {
 		logger.log({ message: `Indexing ${colorize("yellow", normalized.length.toString())} source documents` });
 		const { added, changed, removed, unchanged } = await applyDiff({ db, normalizedDocuments: normalized, spinner });
 		const embedded = await embedMissing(db, spinner);
 		spinner({
-			type: "completed",
 			message: `Index ready: ${colorize("yellow", normalized.length.toString())} docs (${colorize("green", added.toString())} added, ${colorize("green", changed.toString())} changed, ${colorize("gray", unchanged.toString())} unchanged, ${colorize("red", removed.toString())} removed), ${colorize("yellow", embedded.toString())} chunks embedded`,
+			type: "completed",
 		});
 
 		return { addedCount: added, changedCount: changed, removedCount: removed, unchangedCount: unchanged };
@@ -39,7 +39,7 @@ export async function indexSearchRecords(db: Database, searchRecords: readonly S
 }
 
 function normalizeBody(body: string): string {
-	return body.replace(/\r\n/g, "\n").trim();
+	return body.replaceAll("\r\n", "\n").trim();
 }
 
 function hashContent(parts: readonly string[]): string {
@@ -51,13 +51,13 @@ function normalize(doc: SearchRecord): NormalizedDoc {
 	const url = doc.url.trim();
 	const body = normalizeBody(doc.markdownContent);
 	return {
+		body,
+		codename: doc.codename,
+		contentHash: hashContent([title, url, body]),
 		id: doc.id,
 		title,
 		type: doc.type,
 		url,
-		body,
-		contentHash: hashContent([title, url, body]),
-		codename: doc.codename,
 	};
 }
 
@@ -84,6 +84,17 @@ async function applyDiff({
 	const addedDocuments: readonly NormalizedDoc[] = changedDocuments.filter((doc) => !currentDocHashes.has(doc.id));
 
 	await deleteDocuments(db, removedDocumentIds);
+	await replaceChangedDocuments(db, changedDocuments, spinner);
+
+	return {
+		added: addedDocuments.length,
+		changed: changedDocuments.length - addedDocuments.length,
+		removed: removedDocumentIds.length,
+		unchanged: normalizedDocuments.length - changedDocuments.length,
+	};
+}
+
+async function replaceChangedDocuments(db: Database, changedDocuments: readonly NormalizedDoc[], spinner: SpinnerLog): Promise<void> {
 	spinner({ message: `Indexing documents ${colorize("yellow", "0")}/${colorize("yellow", changedDocuments.length.toString())}` });
 	for (const [index, doc] of changedDocuments.entries()) {
 		spinner({
@@ -94,12 +105,6 @@ async function applyDiff({
 	logger.log({
 		message: `\nFinished indexing documents`,
 	});
-	return {
-		added: addedDocuments.length,
-		changed: changedDocuments.length - addedDocuments.length,
-		removed: removedDocumentIds.length,
-		unchanged: normalizedDocuments.length - changedDocuments.length,
-	};
 }
 
 /** Embed every chunk that is missing an embedding for the current model. */

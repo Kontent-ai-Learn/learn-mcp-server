@@ -7,12 +7,12 @@ import { CHUNKS_TABLE, DOCUMENTS_TABLE, toVectorParam } from "./tables.js";
 
 const documentDistanceRow = z.readonly(
 	z.object({
-		title: z.string(),
-		url: z.url(),
 		body: z.string(),
-		type: searchRecordTypeSchema,
 		codename: z.string(),
 		distance: z.number(),
+		title: z.string(),
+		type: searchRecordTypeSchema,
+		url: z.url(),
 	}),
 );
 
@@ -30,7 +30,7 @@ export async function getDocumentsFromDb({
 	const c = CHUNKS_TABLE.columns;
 	const d = DOCUMENTS_TABLE.columns;
 	// Rank documents by their best (smallest cosine distance) chunk; grouping in SQL
-	// keeps one row per document. vector_distance_cos returns 1 - cosineSimilarity.
+	// Keeps one row per document. vector_distance_cos returns 1 - cosineSimilarity.
 	const sql = `SELECT doc.${d.title.name}, doc.${d.url.name}, doc.${d.body.name}, doc.${d.type.name}, doc.${d.codename.name},
 			MIN(vector_distance_cos(chunk.${c.embedding.name}, vector32(?))) AS distance
 		FROM ${CHUNKS_TABLE.tableName} chunk
@@ -49,14 +49,16 @@ export async function getDocumentsFromDb({
 		);
 	}
 
-	return rows.filter(isDocumentDistanceRow).map((row) => ({
-		title: row.title,
-		url: row.url,
-		body: row.body,
-		type: row.type,
-		codename: row.codename,
-		score: round(1 - row.distance, 4),
-	}));
+	return rows
+		.filter((row) => isDocumentDistanceRow(row))
+		.map((row) => ({
+			body: row.body,
+			codename: row.codename,
+			score: round(1 - row.distance, 4),
+			title: row.title,
+			type: row.type,
+			url: row.url,
+		}));
 }
 
 function isDocumentDistanceRow(data: unknown): data is DocumentDistanceRow {

@@ -15,7 +15,7 @@ import { openDb } from "../database/db.js";
 import { type IndexDocumentsResult, indexSearchRecords } from "../indexing/indexer.js";
 import { logger } from "../utils/logger.js";
 
-export type InitializeResult = {
+export interface InitializeResult {
 	readonly dbName: string;
 	readonly searchRecordsCount: number;
 	readonly apiReferenceEndpointsCount: number;
@@ -27,22 +27,22 @@ export type InitializeResult = {
 		readonly unchanged: number;
 		readonly total: number;
 	};
-};
+}
 
 const testSearchRecordsPath = fileURLToPath(new URL("../../samples/test-db-source-docs.json", import.meta.url));
 
 const sourceSchema = z.readonly(
 	z.object({
-		searchRecords: z.array(searchRecordSchema),
 		apiReferenceEndpoints: z.array(apiReferenceEndpointSchema),
 		apiReferenceObjects: z.array(apiReferenceObjectSchema),
+		searchRecords: z.array(searchRecordSchema),
 	}),
 );
 
 export async function initializeAll(options?: { readonly isTest?: boolean }): Promise<InitializeResult> {
 	logger.log({ message: `Initializing ${colorize("yellow", options?.isTest ? "test" : "prod")} data...` });
 
-	return options?.isTest ? await initializeTestData() : await initializeProdData();
+	return options?.isTest === true ? await initializeTestData() : await initializeProdData();
 }
 
 export async function cleanData(options?: Parameters<typeof initializeAll>[0]): Promise<void> {
@@ -60,10 +60,10 @@ async function initializeProdData(): Promise<InitializeResult> {
 	const apiReferenceObjects = await initializeApiReferenceObjects();
 	const searchRecords = await initializeSearchRecords();
 
-	const documents = [...searchRecords, ...apiReferenceObjects.map(toSearchRecord)];
+	const documents = [...searchRecords, ...apiReferenceObjects.map((object) => toSearchRecord(object))];
 	const index = await indexSearchRecords(await getDb({ isTest: false }), documents);
 
-	return toInitializeResult({ isTest: false, searchRecords, apiReferenceEndpoints, apiReferenceObjects, index });
+	return toInitializeResult({ apiReferenceEndpoints, apiReferenceObjects, index, isTest: false, searchRecords });
 }
 
 async function initializeTestData(): Promise<InitializeResult> {
@@ -71,26 +71,26 @@ async function initializeTestData(): Promise<InitializeResult> {
 
 	setToFileCache({
 		cacheKey: "api-reference-endpoints",
-		value: apiReferenceEndpoints,
 		schema: z.readonly(z.array(apiReferenceEndpointSchema)),
+		value: apiReferenceEndpoints,
 	});
 
 	setToFileCache({
 		cacheKey: "api-reference-objects",
-		value: apiReferenceObjects,
 		schema: z.readonly(z.array(apiReferenceObjectSchema)),
+		value: apiReferenceObjects,
 	});
 
 	setToFileCache({
 		cacheKey: "search-records",
-		value: searchRecords,
 		schema: z.readonly(z.array(searchRecordSchema)),
+		value: searchRecords,
 	});
 
-	const documents = [...searchRecords, ...apiReferenceObjects.map(toSearchRecord)];
+	const documents = [...searchRecords, ...apiReferenceObjects.map((object) => toSearchRecord(object))];
 	const index = await indexSearchRecords(await getDb({ isTest: true }), documents);
 
-	return toInitializeResult({ isTest: true, searchRecords, apiReferenceEndpoints, apiReferenceObjects, index });
+	return toInitializeResult({ apiReferenceEndpoints, apiReferenceObjects, index, isTest: true, searchRecords });
 }
 
 /**
@@ -99,12 +99,12 @@ async function initializeTestData(): Promise<InitializeResult> {
  */
 function toSearchRecord(object: ApiReferenceObject): SearchRecord {
 	return {
-		id: object.id,
 		codename: object.codename,
-		title: object.title,
-		url: object.url,
-		type: "object",
+		id: object.id,
 		markdownContent: object.markdownContent,
+		title: object.title,
+		type: "object",
+		url: object.url,
 	};
 }
 
@@ -122,17 +122,17 @@ function toInitializeResult({
 	readonly index: IndexDocumentsResult;
 }): InitializeResult {
 	return {
-		dbName: getDbPath({ isTest }),
-		searchRecordsCount: searchRecords.length,
 		apiReferenceEndpointsCount: apiReferenceEndpoints.length,
 		apiReferenceObjectsCount: apiReferenceObjects.length,
+		dbName: getDbPath({ isTest }),
 		index: {
 			added: index.addedCount,
 			changed: index.changedCount,
 			removed: index.removedCount,
-			unchanged: index.unchangedCount,
 			total: searchRecords.length + apiReferenceObjects.length,
+			unchanged: index.unchangedCount,
 		},
+		searchRecordsCount: searchRecords.length,
 	};
 }
 

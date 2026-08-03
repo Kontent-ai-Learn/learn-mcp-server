@@ -1,22 +1,25 @@
-import type { Database } from "@tursodatabase/database";
+import type { Database, Transaction } from "@tursodatabase/database";
 import { match, P } from "ts-pattern";
 
 export type SqlValue = string | number | bigint | null | Uint8Array;
 
-export type SqlRunResult = { readonly changes: number; readonly lastInsertRowid: number };
+export interface SqlRunResult {
+	readonly changes: number;
+	readonly lastInsertRowid: number;
+}
 
-export type ColumnDefinition = {
+export interface ColumnDefinition {
 	readonly name: string;
 	readonly type: string;
 	readonly primaryKey?: boolean;
 	readonly notNull?: boolean;
 	readonly unique?: boolean;
-};
+}
 
-export type TableDefinition<TName extends string, TRow> = {
+export interface TableDefinition<TName extends string, TRow> {
 	readonly tableName: TName;
 	readonly columns: Record<keyof TRow & string, ColumnDefinition>;
-};
+}
 
 export type SqlWhere<TColumn extends string> =
 	| { readonly column: TColumn; readonly operator: "="; readonly value: SqlValue }
@@ -44,7 +47,7 @@ export function buildCreateTableQuery<TName extends string, TRow>(definition: Ta
 }
 
 export async function insertInto<TName extends string, TRow>(
-	db: Database,
+	db: Database | Transaction,
 	{
 		definition,
 		values,
@@ -58,7 +61,7 @@ export async function insertInto<TName extends string, TRow>(
 }
 
 export async function deleteFrom<TName extends string, TRow>(
-	db: Database,
+	db: Database | Transaction,
 	{ definition, where }: { readonly definition: TableDefinition<TName, TRow>; readonly where: SqlWhere<keyof TRow & string> },
 ): Promise<SqlRunResult> {
 	const { clause, params } = buildWhere(definition, where);
@@ -66,7 +69,7 @@ export async function deleteFrom<TName extends string, TRow>(
 }
 
 export async function updateTable<TName extends string, TRow>(
-	db: Database,
+	db: Database | Transaction,
 	{
 		definition,
 		set,
@@ -80,8 +83,8 @@ export async function updateTable<TName extends string, TRow>(
 	const assignments = (Object.entries(set) as readonly [string, UpdateValue][]).map(([key, value]) => {
 		const name = columnName(definition, key as keyof TRow & string);
 		return match(value)
-			.with({ expression: P.string }, (expr) => ({ sql: `${name} = ${expr.expression}`, params: expr.params }))
-			.otherwise((bound) => ({ sql: `${name} = ?`, params: [bound] as readonly SqlValue[] }));
+			.with({ expression: P.string }, (expr) => ({ params: expr.params, sql: `${name} = ${expr.expression}` }))
+			.otherwise((bound) => ({ params: [bound] as readonly SqlValue[], sql: `${name} = ?` }));
 	});
 	const setClause = assignments.map((assignment) => assignment.sql).join(", ");
 	const params = [...assignments.flatMap((assignment) => assignment.params), where.value];
@@ -112,18 +115,14 @@ export async function selectFrom<TName extends string, TRow, TColumn extends key
 }
 
 function columnName<TName extends string, TRow>(definition: TableDefinition<TName, TRow>, key: keyof TRow & string): string {
-	const column = definition.columns[key];
-	if (!column) {
-		throw new Error(`Unknown column "${key}" on table "${definition.tableName}"`);
-	}
-	return column.name;
+	return definition.columns[key].name;
 }
 
 function buildWhere<TName extends string, TRow>(
 	definition: TableDefinition<TName, TRow>,
 	where: SqlWhere<keyof TRow & string> | undefined,
 ): { readonly clause: string; readonly params: readonly SqlValue[] } {
-	if (where === undefined) {
+	if (!where) {
 		return { clause: "", params: [] };
 	}
 	const name = columnName(definition, where.column);

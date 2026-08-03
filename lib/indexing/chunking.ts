@@ -2,19 +2,19 @@ import { match } from "ts-pattern";
 import { CHUNK_OVERLAP_CHARS, CHUNK_TARGET_CHARS } from "../config.js";
 import type { DocChunk, NormalizedDoc } from "./indexer.models.js";
 
-type PackState = {
+interface PackState {
 	readonly done: readonly string[];
 	readonly current: string;
-};
+}
 
-type ChunkOptions = {
+interface ChunkOptions {
 	readonly targetChars: number;
 	readonly overlapChars: number;
-};
+}
 
 const defaultOptions: ChunkOptions = {
-	targetChars: CHUNK_TARGET_CHARS,
 	overlapChars: CHUNK_OVERLAP_CHARS,
+	targetChars: CHUNK_TARGET_CHARS,
 };
 
 export function chunkPlainText(text: string, options: ChunkOptions = defaultOptions): readonly string[] {
@@ -25,14 +25,14 @@ export function chunkPlainText(text: string, options: ChunkOptions = defaultOpti
 
 	const packed = units.reduce<PackState>(
 		({ done, current }, unit) =>
-			match({ hasCurrent: current.length > 0, fits: current.length + 2 + unit.length <= targetChars })
-				.with({ hasCurrent: false }, () => ({ done, current: unit }))
-				.with({ fits: true }, () => ({ done, current: `${current}\n\n${unit}` }))
+			match({ fits: current.length + 2 + unit.length <= targetChars, hasCurrent: current.length > 0 })
+				.with({ hasCurrent: false }, () => ({ current: unit, done }))
+				.with({ fits: true }, () => ({ current: `${current}\n\n${unit}`, done }))
 				.otherwise(() => ({
-					done: [...done, current],
 					current: seedNext(current, unit, overlapChars),
+					done: [...done, current],
 				})),
-		{ done: [], current: "" },
+		{ current: "", done: [] },
 	);
 
 	return packed.current.length > 0 ? [...packed.done, packed.current] : packed.done;
@@ -40,16 +40,16 @@ export function chunkPlainText(text: string, options: ChunkOptions = defaultOpti
 
 export function chunkDoc(doc: NormalizedDoc, options: ChunkOptions = defaultOptions): readonly DocChunk[] {
 	return chunkPlainText(doc.body, options).map((text, chunkIndex) => ({
+		chunkIndex,
 		chunkKey: `${doc.id}:${chunkIndex}`,
 		docId: doc.id,
-		chunkIndex,
 		text,
 	}));
 }
 
 function splitParagraphs(text: string): readonly string[] {
 	return text
-		.replace(/\r\n/g, "\n")
+		.replaceAll("\r\n", "\n")
 		.split(/\n\s*\n/)
 		.map((paragraph) => paragraph.trim())
 		.filter((paragraph) => paragraph.length > 0);
@@ -62,9 +62,9 @@ function splitOversized(paragraph: string, targetChars: number): readonly string
 		.reduce<{ readonly done: readonly string[]; readonly current: string }>(
 			({ done, current }, word) =>
 				current.length > 0 && current.length + 1 + word.length > targetChars
-					? { done: [...done, current], current: word }
-					: { done, current: current.length > 0 ? `${current} ${word}` : word },
-			{ done: [], current: "" },
+					? { current: word, done: [...done, current] }
+					: { current: current.length > 0 ? `${current} ${word}` : word, done },
+			{ current: "", done: [] },
 		);
 	return pieces.current.length > 0 ? [...pieces.done, pieces.current] : pieces.done;
 }

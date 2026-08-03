@@ -9,7 +9,7 @@ async function main(): Promise<void> {
 	const transportType = getTransportTypeFromArg(args[0]);
 
 	if (!transportType) {
-		logger.log({ type: "error", message: `Please specify a valid transport type: ${transportTypes.join(", ")}` });
+		logger.log({ message: `Please specify a valid transport type: ${transportTypes.join(", ")}`, type: "error" });
 		process.exit(1);
 	}
 
@@ -20,11 +20,12 @@ async function main(): Promise<void> {
 
 	if (transportType === "shttp") {
 		startStreamableHTTP();
-		return;
 	}
 }
 
-main().catch((error) => {
-	logger.log({ type: "error", message: `Fatal error: ${error instanceof Error ? error.message : String(error)}` });
+try {
+	await main();
+} catch (error) {
+	logger.log({ message: `Fatal error: ${error instanceof Error ? error.message : String(error)}`, type: "error" });
 	process.exit(1);
-});
+}

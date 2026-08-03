@@ -26,8 +26,8 @@ export async function initializeLearnEndpointData<TResponse extends JsonValue, T
 
 	setToFileCache({
 		cacheKey,
+		schema,
 		value: fetchedData,
-		schema: schema,
 	});
 
 	logger.log({ message: `Data stored in ${colorize("yellow", filename)}` });
@@ -47,22 +47,22 @@ export async function readCachedRecords<TRecord extends JsonValue>({
 	return await getOrSetFromMemoryCache<readonly TRecord[] | undefined>({
 		key: cacheKey,
 		schema: z.union([recordsSchema, z.undefined()]),
-		value: async () => getFromFileCache<readonly TRecord[]>({ cacheKey, schema: recordsSchema }),
+		value: async () => await Promise.resolve(getFromFileCache<readonly TRecord[]>({ cacheKey, schema: recordsSchema })),
 	});
 }
 
 async function fetchFromEndpoint<TResponse extends JsonValue>(url: string, schema: z.ZodMiniType<TResponse>): Promise<TResponse> {
 	const query = createFetchQuery({
-		url,
 		config: {
 			httpService: getDefaultHttpService(),
 			runtimeValidation: { validateResponses: true },
 		},
-		schema,
-		sdkInfo: { name: packageJsonName, version: packageJsonVersion, host: "npmjs.com" },
-		mapMetadata: () => ({}),
 		mapError: (error) => error,
 		mapExtraResponseProps: () => ({}),
+		mapMetadata: () => ({}),
+		schema,
+		sdkInfo: { host: "npmjs.com", name: packageJsonName, version: packageJsonVersion },
+		url,
 	});
 	const { payload } = await query.fetch();
 

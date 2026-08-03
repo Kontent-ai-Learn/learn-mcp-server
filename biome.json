@@ -52,6 +52,16 @@
 					}
 				}
 			}
+		},
+		{
+			"includes": ["lib/public-api.ts"],
+			"linter": {
+				"rules": {
+					"performance": {
+						"noBarrelFile": "off"
+					}
+				}
+			}
 		}
 	]
 }

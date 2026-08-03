@@ -11,7 +11,8 @@ export type NormalizedDoc = {
 };
 
 export type DocChunk = {
-	readonly chunkKey: string; // `${docId}:${chunkIndex}`
+	// `${docId}:${chunkIndex}`
+	readonly chunkKey: string;
 	readonly docId: string;
 	readonly chunkIndex: number;
 	readonly text: string;

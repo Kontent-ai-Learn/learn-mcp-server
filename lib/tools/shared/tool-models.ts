@@ -1,20 +1,20 @@
-export type McpToolErrorResponse = {
+export interface McpToolErrorResponse {
 	[x: string]: unknown;
-	content: Array<{
+	content: {
 		type: "text";
 		text: string;
-	}>;
+	}[];
 	isError: true;
-};
+}
 
-export type McpToolSuccessResponse = {
+export interface McpToolSuccessResponse {
 	[x: string]: unknown;
-	content: Array<{
+	content: {
 		type: "text";
 		text: string;
-	}>;
+	}[];
 	isError?: false;
-};
+}
 
 export type ToolName = "search-content" | "get-endpoint-details" | "get-object-details";
 

@@ -11,10 +11,10 @@ const cacheKey: FileCacheKey = "api-reference-endpoints";
 
 export async function initializeApiReferenceEndpoints(): Promise<readonly ApiReferenceEndpoint[]> {
 	return await initializeLearnEndpointData({
-		url: learnUrls.apiReferenceEndpointsUrl,
 		cacheKey,
 		schema: apiReferenceEndpointsResponseSchema,
 		select: (payload) => payload.data.apiReferenceEndpoints,
+		url: learnUrls.apiReferenceEndpointsUrl,
 	});
 }
 

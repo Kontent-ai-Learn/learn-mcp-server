@@ -8,7 +8,7 @@ env.cacheDir = getTransformersCacheDir();
  * resource (loads model weights once) — genuinely unavoidable shared mutable
  * state, held on a const object to avoid a top-level `let`.
  */
-const state: { pipeline: Promise<FeatureExtractionPipeline> | null } = { pipeline: null };
+const state: { pipeline?: Promise<FeatureExtractionPipeline> } = {};
 
 /** Mean-pooled, L2-normalised 384-dim embeddings — one per input text. */
 export async function embedTexts(texts: readonly string[]): Promise<readonly Float32Array[]> {
@@ -16,7 +16,7 @@ export async function embedTexts(texts: readonly string[]): Promise<readonly Flo
 		return [];
 	}
 	const extractor = await getPipeline();
-	const output = await extractor([...texts], { pooling: "mean", normalize: true });
+	const output = await extractor([...texts], { normalize: true, pooling: "mean" });
 	return (output.tolist() as readonly number[][]).map((row) => Float32Array.from(row));
 }
 

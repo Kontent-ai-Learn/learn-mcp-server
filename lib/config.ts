@@ -28,20 +28,20 @@ export const getTestDbPath = (): string => `${getDataDir(true)}/search-records-v
 /** DB path used at query time; the `isTest` env flag selects the test DB. */
 export const getDbPath = (): string => (getEnvConfig().isTest ? getTestDbPath() : getProdDbPath());
 
-/** transformers.js model cache: the committed root-level folder, resolved against the process cwd (not `DataPath`). */
+/** Transformers.js model cache: the committed root-level folder, resolved against the process cwd (not `DataPath`). */
 export const getTransformersCacheDir = (): string => "transformers";
 
 const composeLearnUrl = (path: string): string => new URL(path, getEnvConfig().learnHost).toString();
 
 /** Learn content endpoint URLs, composed from the configurable `LearnHost` base. */
 export const learnUrls = {
-	get searchRecordsUrl(): string {
-		return composeLearnUrl("/learn/api/mcp/getSearchRecords");
-	},
 	get apiReferenceEndpointsUrl(): string {
 		return composeLearnUrl("/learn/api/mcp/getApiReferenceEndpoints");
 	},
 	get apiReferenceObjectsUrl(): string {
 		return composeLearnUrl("/learn/api/mcp/getApiReferenceObjects");
+	},
+	get searchRecordsUrl(): string {
+		return composeLearnUrl("/learn/api/mcp/getSearchRecords");
 	},
 };

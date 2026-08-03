@@ -17,7 +17,7 @@ export async function getOrSetFromFileCache<T extends JsonValue>({
 	readonly schema: ZodMiniType<T>;
 }): Promise<T> {
 	const filepath = getFullPath(cacheKey);
-	const resolveAndStoreValue = async () => {
+	const resolveAndStoreValue = async (): Promise<T> => {
 		const resolvedValue = await value();
 
 		writeCacheFile(filepath, JSON.stringify(resolvedValue));

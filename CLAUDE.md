@@ -37,7 +37,7 @@
 
 ## Exports
 
-- All API queries and API-related models must be exported from `lib/public_api.ts` — nothing is part of the public API unless it appears there
+- All API queries and API-related models must be exported from `lib/public-api.ts` — nothing is part of the public API unless it appears there
 
 # Tooling
 

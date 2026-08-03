@@ -2,7 +2,7 @@ import { EMBEDDING_DIM } from "../config.js";
 import type { SearchRecordType } from "../content/models/search-records.models.js";
 import type { TableDefinition } from "./db.utils.js";
 
-export type DocumentRow = {
+export interface DocumentRow {
 	readonly id: string;
 	readonly codename: string;
 	readonly title: string;
@@ -11,9 +11,9 @@ export type DocumentRow = {
 	readonly contentHash: string;
 	readonly lastModified: string | null;
 	readonly type: SearchRecordType;
-};
+}
 
-export type ChunkRow = {
+export interface ChunkRow {
 	readonly id: number;
 	readonly chunkKey: string;
 	readonly docId: string;
@@ -21,34 +21,34 @@ export type ChunkRow = {
 	readonly text: string;
 	readonly embedding: Uint8Array | null;
 	readonly embeddingModel: string | null;
-};
+}
 
 export const DOCUMENTS_TABLE: TableDefinition<"documents", DocumentRow> = {
-	tableName: "documents",
 	columns: {
-		id: { name: "id", type: "TEXT", primaryKey: true },
-		codename: { name: "codename", type: "TEXT", notNull: true },
-		title: { name: "title", type: "TEXT", notNull: true },
-		url: { name: "url", type: "TEXT", notNull: true },
-		body: { name: "body", type: "TEXT", notNull: true },
-		type: { name: "type", type: "TEXT", notNull: true },
-		contentHash: { name: "contentHash", type: "TEXT", notNull: true },
+		body: { name: "body", notNull: true, type: "TEXT" },
+		codename: { name: "codename", notNull: true, type: "TEXT" },
+		contentHash: { name: "contentHash", notNull: true, type: "TEXT" },
+		id: { name: "id", primaryKey: true, type: "TEXT" },
 		lastModified: { name: "lastModified", type: "TEXT" },
+		title: { name: "title", notNull: true, type: "TEXT" },
+		type: { name: "type", notNull: true, type: "TEXT" },
+		url: { name: "url", notNull: true, type: "TEXT" },
 	},
+	tableName: "documents",
 };
 
 export const CHUNKS_TABLE: TableDefinition<"chunks", ChunkRow> = {
-	tableName: "chunks",
 	columns: {
-		id: { name: "id", type: "INTEGER", primaryKey: true },
-		chunkKey: { name: "chunkKey", type: "TEXT", notNull: true, unique: true },
-		docId: { name: "docId", type: "TEXT", notNull: true },
-		chunkIndex: { name: "chunkIndex", type: "INTEGER", notNull: true },
-		text: { name: "text", type: "TEXT", notNull: true },
+		chunkIndex: { name: "chunkIndex", notNull: true, type: "INTEGER" },
+		chunkKey: { name: "chunkKey", notNull: true, type: "TEXT", unique: true },
+		docId: { name: "docId", notNull: true, type: "TEXT" },
 		embedding: { name: "embedding", type: `F32_BLOB(${EMBEDDING_DIM})` },
 		embeddingModel: { name: "embeddingModel", type: "TEXT" },
+		id: { name: "id", primaryKey: true, type: "INTEGER" },
+		text: { name: "text", notNull: true, type: "TEXT" },
 	},
+	tableName: "chunks",
 };
 
 /** Serialise a vector for Turso's `vector32(?)` SQL function. */
-export const toVectorParam = (vector: Float32Array): string => JSON.stringify(Array.from(vector));
+export const toVectorParam = (vector: Float32Array): string => JSON.stringify([...vector]);

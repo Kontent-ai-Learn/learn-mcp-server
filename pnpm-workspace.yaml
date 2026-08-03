@@ -3,31 +3,25 @@ allowBuilds:
   onnxruntime-node: true
   protobufjs: true
   sharp: true
-ignoredBuiltDependencies:
-  - esbuild
 minimumReleaseAgeExclude:
-  - '@biomejs/biome@2.5.1 || 2.5.3 || 2.5.6'
-  - '@biomejs/cli-darwin-arm64@2.5.1 || 2.5.3 || 2.5.6'
-  - '@biomejs/cli-darwin-x64@2.5.1 || 2.5.3 || 2.5.6'
-  - '@biomejs/cli-linux-arm64-musl@2.5.1 || 2.5.3 || 2.5.6'
-  - '@biomejs/cli-linux-arm64@2.5.1 || 2.5.3 || 2.5.6'
-  - '@biomejs/cli-linux-x64-musl@2.5.1 || 2.5.3 || 2.5.6'
-  - '@biomejs/cli-linux-x64@2.5.1 || 2.5.3 || 2.5.6'
-  - '@biomejs/cli-win32-arm64@2.5.1 || 2.5.3 || 2.5.6'
-  - '@biomejs/cli-win32-x64@2.5.1 || 2.5.3 || 2.5.6'
-  - '@typescript/native-preview-darwin-arm64@7.0.0-dev.20260628.1'
-  - '@typescript/native-preview-darwin-x64@7.0.0-dev.20260628.1'
-  - '@typescript/native-preview-linux-arm64@7.0.0-dev.20260628.1'
-  - '@typescript/native-preview-linux-arm@7.0.0-dev.20260628.1'
-  - '@typescript/native-preview-linux-x64@7.0.0-dev.20260628.1'
-  - '@typescript/native-preview-win32-arm64@7.0.0-dev.20260628.1'
-  - '@typescript/native-preview-win32-x64@7.0.0-dev.20260628.1'
-  - '@typescript/native-preview@7.0.0-dev.20260628.1'
-  - '@types/node@26.1.0 || 26.1.1'
-  - tsx@4.23.1 || 4.23.5
-  - '@tursodatabase/database-common@0.7.1'
-  - '@tursodatabase/database-darwin-arm64@0.7.1'
-  - '@tursodatabase/database-linux-arm64-gnu@0.7.1'
-  - '@tursodatabase/database-linux-x64-gnu@0.7.1'
-  - '@tursodatabase/database-win32-x64-msvc@0.7.1'
-  - '@tursodatabase/database@0.7.1'
+  - '@oxlint/binding-android-arm-eabi@1.77.0'
+  - '@oxlint/binding-android-arm64@1.77.0'
+  - '@oxlint/binding-darwin-arm64@1.77.0'
+  - '@oxlint/binding-darwin-x64@1.77.0'
+  - '@oxlint/binding-freebsd-x64@1.77.0'
+  - '@oxlint/binding-linux-arm-gnueabihf@1.77.0'
+  - '@oxlint/binding-linux-arm-musleabihf@1.77.0'
+  - '@oxlint/binding-linux-arm64-gnu@1.77.0'
+  - '@oxlint/binding-linux-arm64-musl@1.77.0'
+  - '@oxlint/binding-linux-ppc64-gnu@1.77.0'
+  - '@oxlint/binding-linux-riscv64-gnu@1.77.0'
+  - '@oxlint/binding-linux-riscv64-musl@1.77.0'
+  - '@oxlint/binding-linux-s390x-gnu@1.77.0'
+  - '@oxlint/binding-linux-x64-gnu@1.77.0'
+  - '@oxlint/binding-linux-x64-musl@1.77.0'
+  - '@oxlint/binding-openharmony-arm64@1.77.0'
+  - '@oxlint/binding-win32-arm64-msvc@1.77.0'
+  - '@oxlint/binding-win32-ia32-msvc@1.77.0'
+  - '@oxlint/binding-win32-x64-msvc@1.77.0'
+  - oxlint@1.77.0
+  - tsx@4.23.5

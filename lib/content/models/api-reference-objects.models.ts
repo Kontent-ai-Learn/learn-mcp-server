@@ -3,13 +3,13 @@ import { apiReferencePropertySchema } from "./api-reference-endpoints.models.js"
 
 export const apiReferenceObjectSchema = z.readonly(
 	z.object({
-		id: z.string(),
-		codename: z.string(),
-		title: z.string(),
-		markdownContent: z.string(),
-		url: z.url(),
-		properties: z.readonly(z.array(apiReferencePropertySchema)),
 		apiReference: z.string(),
+		codename: z.string(),
+		id: z.string(),
+		markdownContent: z.string(),
+		properties: z.readonly(z.array(apiReferencePropertySchema)),
+		title: z.string(),
+		url: z.url(),
 	}),
 );
 

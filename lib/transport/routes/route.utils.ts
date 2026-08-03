@@ -2,12 +2,12 @@ import type { JsonValue } from "@kontent-ai/core-sdk";
 import type { Application, RequestHandler, Response } from "express";
 import { match } from "ts-pattern";
 
-export type SupportedRoute = {
+export interface SupportedRoute {
 	readonly method: "get" | "post";
 	readonly path: string;
 	readonly description: string;
 	readonly handler: RequestHandler;
-};
+}
 
 /**
  * Registers each route's handler, then — for every supported path — a catch-all that answers
@@ -23,24 +23,36 @@ export function registerRoutes(app: Application, routes: readonly SupportedRoute
 	});
 
 	methodsByPath(routes).forEach((methods, path) => {
-		app.all(path, (req, res) => setMethodNotAllowedResponse(res, req.method, path, methods));
+		app.all(path, (req, res) => {
+			setMethodNotAllowedResponse({ attemptedMethod: req.method, path, res, supportedMethods: methods });
+		});
 	});
 }
 
 export function setOkResponse(res: Response, json: JsonValue): void {
-	setResponse({ res, statusCode: 200, json });
+	setResponse({ json, res, statusCode: 200 });
 }
 
-export function setInternalServerErrorResponse(res: Response, message: string = "Internal server error"): void {
-	setResponse({ res, statusCode: 500, json: { error: { code: -32603, message } } });
+export function setInternalServerErrorResponse(res: Response, message = "Internal server error"): void {
+	setResponse({ json: { error: { code: -32_603, message } }, res, statusCode: 500 });
 }
 
-function setMethodNotAllowedResponse(res: Response, attemptedMethod: string, path: string, supportedMethods: readonly string[]): void {
+function setMethodNotAllowedResponse({
+	res,
+	attemptedMethod,
+	path,
+	supportedMethods,
+}: {
+	readonly res: Response;
+	readonly attemptedMethod: string;
+	readonly path: string;
+	readonly supportedMethods: readonly string[];
+}): void {
 	res.status(405).json({
+		attemptedMethod,
 		error: "Method not allowed",
 		message: `The path '${path}' does not support ${attemptedMethod}. Use ${supportedMethods.join(" or ")} instead.`,
 		path,
-		attemptedMethod,
 		supportedMethods,
 	});
 }
@@ -61,5 +73,5 @@ function setResponse({
 	readonly statusCode: 200 | 500;
 	readonly json: JsonValue;
 }): void {
-	res.status(statusCode).json({ jsonrpc: "2.0", json });
+	res.status(statusCode).json({ json, jsonrpc: "2.0" });
 }

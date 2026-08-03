@@ -10,13 +10,15 @@ import { setInternalServerErrorResponse } from "./route.utils.js";
 export async function handleMcpRequest(req: Request, res: Response): Promise<void> {
 	const { success, error } = await tryCatchAsync(async () => {
 		const { server } = createServer();
-		const transport = new StreamableHTTPServerTransport({
-			sessionIdGenerator: undefined,
-		});
+		const transport = new StreamableHTTPServerTransport({});
 		res.on("close", () => {
 			console.log("Request closed");
-			transport.close();
-			server.close();
+			transport.close().catch((closeError: unknown) => {
+				logger.log({ message: `Failed to close transport: ${getErrorMessage(closeError)}`, type: "error" });
+			});
+			server.close().catch((closeError: unknown) => {
+				logger.log({ message: `Failed to close server: ${getErrorMessage(closeError)}`, type: "error" });
+			});
 		});
 
 		await server.connect(transport);
@@ -26,8 +28,8 @@ export async function handleMcpRequest(req: Request, res: Response): Promise<voi
 	if (!success) {
 		const errorMessage = getErrorMessage(error);
 		logger.log({
-			type: "error",
 			message: `${packageJsonName}@${packageJsonVersion} - Error handling MCP request: ${errorMessage}`,
+			type: "error",
 		});
 		if (!res.headersSent) {
 			setInternalServerErrorResponse(res, errorMessage);

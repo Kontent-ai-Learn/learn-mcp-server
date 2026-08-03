@@ -1,14 +1,13 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { loadEnvFile } from "node:process";
-import { fileURLToPath } from "node:url";
 
-type EnvConfig = {
+interface EnvConfig {
 	readonly port: number;
 	readonly dataPath: string;
 	readonly learnHost: string;
 	readonly isTest: boolean;
-};
+}
 
 export function getEnvConfig(): EnvConfig {
 	loadEnvironmentVariables();
@@ -19,10 +18,10 @@ export function getEnvConfig(): EnvConfig {
 	const isTest = getOptionalValue("IsTest") === "true";
 
 	return {
-		port: port ? +port : 3002,
 		dataPath,
-		learnHost,
 		isTest,
+		learnHost,
+		port: port ? Number(port) : 3002,
 	};
 }
 
@@ -31,9 +30,9 @@ function getOptionalValue(name: string): string | undefined {
 }
 
 function loadEnvironmentVariables(): void {
-	const moduleDir = path.dirname(fileURLToPath(import.meta.url));
+	const moduleDir = import.meta.dirname;
 	const packageJsonPath = findFile("package.json", moduleDir);
-	if (packageJsonPath === undefined) {
+	if (!packageJsonPath) {
 		return;
 	}
 	const envFilePath = path.join(path.dirname(packageJsonPath), ".env");

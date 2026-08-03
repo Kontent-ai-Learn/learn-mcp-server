@@ -7,10 +7,10 @@ const cacheKey: FileCacheKey = "search-records";
 
 export async function initializeSearchRecords(): Promise<readonly SearchRecord[]> {
 	return await initializeLearnEndpointData({
-		url: learnUrls.searchRecordsUrl,
 		cacheKey,
 		schema: searchRecordsResponseSchema,
 		select: (payload) => payload.data.searchRecords,
+		url: learnUrls.searchRecordsUrl,
 	});
 }
 

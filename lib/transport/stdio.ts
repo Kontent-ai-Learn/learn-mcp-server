@@ -6,6 +6,6 @@ import { packageJsonName, packageJsonVersion } from "../utils/version.js";
 export async function startStdio(): Promise<void> {
 	const { server } = createServer();
 	const transport = new StdioServerTransport();
-	logger.log({ type: "info", message: `${packageJsonName}@${packageJsonVersion} (stdio) starting` });
+	logger.log({ message: `${packageJsonName}@${packageJsonVersion} (stdio) starting`, type: "info" });
 	await server.connect(transport);
 }

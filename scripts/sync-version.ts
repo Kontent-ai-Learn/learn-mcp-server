@@ -4,22 +4,22 @@ import { tryCatch } from "@kontent-ai/core-sdk";
 import { getErrorMessage } from "../lib/utils/error.utils.js";
 import { logger } from "../lib/utils/logger.js";
 
-type PackageJson = {
+interface PackageJson {
 	readonly version: string;
 	readonly [key: string]: unknown;
-};
+}
 
-type ServerJson = {
+interface ServerJson {
 	readonly version: string;
-	readonly packages: ReadonlyArray<{
+	readonly packages: readonly {
 		readonly version: string;
 		readonly [key: string]: unknown;
-	}>;
+	}[];
 	readonly [key: string]: unknown;
-};
+}
 
 const readJsonFile = <T>(filePath: string): T => {
-	const content = readFileSync(filePath, "utf-8");
+	const content = readFileSync(filePath, "utf8");
 	return JSON.parse(content) as T;
 };
 
@@ -36,8 +36,8 @@ const getFiles = (): {
 	return {
 		packageJsonVersion: packageJson.version,
 		serverJson,
-		updateServerJson: (serverJson: ServerJson) => {
-			writeFileSync(join(root, "server.json"), JSON.stringify(serverJson, null, 2));
+		updateServerJson: (updatedServerJson: ServerJson) => {
+			writeFileSync(join(root, "server.json"), JSON.stringify(updatedServerJson, undefined, 2));
 		},
 	};
 };
@@ -45,8 +45,8 @@ const getFiles = (): {
 const areAllVersionsEqual = (
 	targetVersion: string,
 	versions: {
-		serverJson: string;
-		serverJsonPackages: ReadonlyArray<string>;
+		readonly serverJson: string;
+		readonly serverJsonPackages: readonly string[];
 	},
 ): boolean => {
 	const serverVersionMatches = versions.serverJson === targetVersion;
@@ -70,11 +70,11 @@ const syncVersions = (): void => {
 
 	const updatedServerJson = {
 		...serverJson,
-		version: packageJsonVersion,
 		packages: serverJson.packages.map((pkg) => ({
 			...pkg,
 			version: packageJsonVersion,
 		})),
+		version: packageJsonVersion,
 	};
 
 	updateServerJson(updatedServerJson);
@@ -85,10 +85,10 @@ const syncVersions = (): void => {
 
 const { success, error } = tryCatch(() => {
 	syncVersions();
-	logger.log({ type: "info", message: "Version synced successfully" });
+	logger.log({ message: "Version synced successfully", type: "info" });
 });
 
 if (!success) {
-	logger.log({ type: "error", message: `Error syncing version: ${getErrorMessage(error)}` });
+	logger.log({ message: `Error syncing version: ${getErrorMessage(error)}`, type: "error" });
 	process.exit(1);
 }

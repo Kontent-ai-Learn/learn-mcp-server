@@ -9,9 +9,7 @@ export async function withToolHandler({
 	readonly handler: () => Promise<JsonValue>;
 	readonly toolName: ToolName;
 }): Promise<McpToolResponse> {
-	const { success, data, error } = await tryCatchAsync(async () => {
-		return createMcpToolSuccessResponse(await handler());
-	});
+	const { success, data, error } = await tryCatchAsync(async () => createMcpToolSuccessResponse(await handler()));
 
 	if (success) {
 		return data;
@@ -36,8 +34,8 @@ const createMcpToolSuccessResponse = (data: JsonValue): McpToolSuccessResponse =
 	return {
 		content: [
 			{
-				type: "text",
 				text,
+				type: "text",
 			},
 		],
 	};
@@ -49,15 +47,13 @@ const createMcpToolSuccessResponse = (data: JsonValue): McpToolSuccessResponse =
  * @param toolName Optional context string to include in error message
  * @returns Standardized MCP tool error response
  */
-const handleMcpToolError = (error: unknown, toolName: ToolName): McpToolErrorResponse => {
-	return {
-		content: [
-			{
-				type: "text",
-				text: `${toolName}: Unexpected error: ${error instanceof Error ? error.message : "Unknown error occurred"}
+const handleMcpToolError = (error: unknown, toolName: ToolName): McpToolErrorResponse => ({
+	content: [
+		{
+			text: `${toolName}: Unexpected error: ${error instanceof Error ? error.message : "Unknown error occurred"}
 Full error: ${JSON.stringify(error)}`,
-			},
-		],
-		isError: true,
-	};
-};
+			type: "text",
+		},
+	],
+	isError: true,
+});

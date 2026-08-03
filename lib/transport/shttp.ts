@@ -7,9 +7,9 @@ import { handleMcpRequest } from "./routes/mcp.route.js";
 import { registerRoutes, type SupportedRoute } from "./routes/route.utils.js";
 
 const supportedRoutes: readonly SupportedRoute[] = [
-	{ method: "post", path: "/mcp", description: "MCP endpoint (Streamable HTTP).", handler: handleMcpRequest },
-	{ method: "get", path: "/health", description: "Health check — status, timestamp, and version.", handler: handleHealth },
-	{ method: "post", path: "/init", description: "(Re)build the search index from the configured Learn host.", handler: handleInit },
+	{ description: "MCP endpoint (Streamable HTTP).", handler: handleMcpRequest, method: "post", path: "/mcp" },
+	{ description: "Health check — status, timestamp, and version.", handler: handleHealth, method: "get", path: "/health" },
+	{ description: "(Re)build the search index from the configured Learn host.", handler: handleInit, method: "post", path: "/init" },
 ];
 
 export function startStreamableHTTP(): void {
@@ -17,18 +17,24 @@ export function startStreamableHTTP(): void {
 	app.use(express.json());
 
 	// Registers each handler plus an automatic friendly 405 for any other method on a
-	// supported path.
+	// Supported path.
 	registerRoutes(app, supportedRoutes);
 
 	// Catch-all for any unmatched path (any method). Registered after all routes so it only
-	// handles the ones that fell through.
-	app.use((req, res) => setNotFoundResponse(res, req.method, req.originalUrl));
+	// Handles the ones that fell through.
+	app.use((req, res) => {
+		setNotFoundResponse(res, req.method, req.originalUrl);
+	});
 
+	// Express detects error-handling middleware by arity (exactly 4 declared params) — an
+	// Object param would collapse this to arity 1 and Express would treat it as regular
+	// Middleware instead, so this signature can't be refactored like the others.
+	// oxlint-disable-next-line max-params
 	app.use((err: Error, _req: express.Request, _res: express.Response, next: express.NextFunction) => {
 		next(err);
 	});
 
-	const port = getEnvConfig().port;
+	const { port } = getEnvConfig();
 	app.listen(port, () => {
 		console.log(
 			`${packageJsonName}@${packageJsonVersion} (Streamable HTTP) running on port ${port}.
@@ -48,7 +54,7 @@ function setNotFoundResponse(res: Response, method: string, path: string): void 
 
 /** Public view of the routes for responses/logs — omits the internal `handler`. */
 function describeSupportedRoutes(): readonly { readonly method: string; readonly path: string; readonly description: string }[] {
-	return supportedRoutes.map(({ method, path, description }) => ({ method: method.toUpperCase(), path, description }));
+	return supportedRoutes.map(({ method, path, description }) => ({ description, method: method.toUpperCase(), path }));
 }
 
 function formatSupportedRoutes(): string {

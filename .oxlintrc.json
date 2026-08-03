@@ -1,0 +1,54 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"options": {
+		"typeAware": true
+	},
+	"ignorePatterns": ["dist/**"],
+	"env": {
+		"node": true,
+		"vitest": true
+	},
+	"categories": {
+		"correctness": "error",
+		"suspicious": "error",
+		"pedantic": "error",
+		"perf": "error",
+		"restriction": "error",
+		"style": "error",
+		"nursery": "error"
+	},
+	"rules": {
+		"no-duplicate-imports": "error",
+		"no-promise-executor-return": "error",
+		"no-unexpected-multiline": "error",
+		"no-unreachable-loop": "error",
+		"no-useless-backreference": "error",
+		"no-unused-vars": "off",
+		"typescript/prefer-nullish-coalescing": "off",
+		"typescript/consistent-type-definitions": "off",
+		"typescript/prefer-readonly-parameter-types": "off",
+		"eslint/no-ternary": "off",
+		"no-use-before-define": "off",
+		"strict-boolean-expressions": "off",
+		"no-unsafe-type-assertion": "off",
+		"func-style": ["error", "declaration", { "allowArrowFunctions": true }],
+		"no-unnecessary-type-parameters": "off",
+		"no-unnecessary-condition": "off",
+		"return-await": ["error", "always"],
+		"oxc/no-async-await": "off",
+		"oxc/no-optional-chaining": "off",
+		"sort-imports": "off",
+		"no-console": "off",
+		"unicorn/no-process-exit": "off",
+		"no-magic-numbers": "off",
+		"unicorn/max-nested-calls": "off",
+		"require-unicode-regexp": "off",
+		"id-length": "off",
+		"no-await-in-loop": "off",
+		"unicorn/no-array-for-each": "off",
+		"unicorn/no-array-reduce": "off",
+		"unicorn/import-style": "off",
+		"oxc/no-rest-spread-properties": "off",
+		"no-undefined": "off"
+	}
+}
