@@ -18,9 +18,9 @@ RUN pnpm install --frozen-lockfile
 
 COPY tsconfig.json tsconfig.build.json ./
 COPY lib ./lib
-# Compile directly with tsgo — NOT `pnpm run build`, which also runs lint and a
+# Compile directly with tsc — NOT `pnpm run build`, which also runs lint and a
 # `version` step that does `git add` and fails without a git repo.
-RUN pnpm exec tsgo -p tsconfig.build.json
+RUN pnpm exec tsc -p tsconfig.build.json
 
 # Drop devDependencies but keep the downloaded native binaries (onnxruntime-node,
 # @tursodatabase/*-gnu) so the runtime stage needs neither pnpm nor network.
