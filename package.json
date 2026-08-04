@@ -1,6 +1,6 @@
 {
 	"name": "@kontent-ai/learn-mcp-server",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/kontent-ai/mcp-server"
@@ -19,7 +19,7 @@
 	"engines": {
 		"node": ">= 22"
 	},
-	"packageManager": "pnpm@11.18.0",
+	"packageManager": "pnpm@11.19.0",
 	"exports": {
 		".": {
 			"types": "./dist/public-api.d.ts",
