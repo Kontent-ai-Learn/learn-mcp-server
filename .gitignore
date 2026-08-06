@@ -7,6 +7,7 @@
 *.db
 *.db-wal
 *.db-shm
+data/sync.json
 
 # Test data artifacts (created only by test runs)
 data-test/

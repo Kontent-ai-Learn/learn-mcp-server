@@ -27,7 +27,7 @@ Two things to know about ACI:
 
 - Docker (with Buildx) and a Docker Hub account.
 - The runtime data present locally: `data/search-records-vector.db` and
-  `transformers/Xenova/all-MiniLM-L6-v2/…`. If missing, run `pnpm install && pnpm run init`
+  `transformers/Xenova/all-MiniLM-L6-v2/…`. If missing, run `pnpm install && pnpm run sync`
   (needs `LearnHost` reachable) to build them first.
 
 ## 1. Test locally (optional but recommended)

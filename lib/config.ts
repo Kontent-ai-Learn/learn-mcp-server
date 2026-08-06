@@ -1,3 +1,5 @@
+import { Duration } from "luxon";
+import { match } from "ts-pattern";
 import { getEnvConfig } from "./utils/environment.utils.js";
 
 /**
@@ -24,6 +26,19 @@ export const getDataDir = (isTest: boolean): string => (isTest ? "data-test" : g
 /** Persistent Turso DB path; overridable for deployment. */
 export const getProdDbPath = (): string => `${getDataDir(false)}/search-records-vector.db`;
 export const getTestDbPath = (): string => `${getDataDir(true)}/search-records-vector-test.db`;
+
+/** Path to the persisted auto-sync state file (see lib/sync). */
+export const getSyncStatePath = (): string => `${getDataDir(getEnvConfig().isTest)}/sync.json`;
+
+/** How often the auto-sync loop runs, from `SyncIntervalValue`/`SyncIntervalUnit`. */
+export const getSyncInterval = (): Duration => {
+	const { syncIntervalValue, syncIntervalUnit } = getEnvConfig();
+	return match(syncIntervalUnit)
+		.with("minutes", () => Duration.fromObject({ minutes: syncIntervalValue }))
+		.with("hours", () => Duration.fromObject({ hours: syncIntervalValue }))
+		.with("days", () => Duration.fromObject({ days: syncIntervalValue }))
+		.exhaustive();
+};
 
 /** DB path used at query time; the `isTest` env flag selects the test DB. */
 export const getDbPath = (): string => (getEnvConfig().isTest ? getTestDbPath() : getProdDbPath());

@@ -15,7 +15,7 @@ import { openDb } from "../database/db.js";
 import { type IndexDocumentsResult, indexSearchRecords } from "../indexing/indexer.js";
 import { logger } from "../utils/logger.js";
 
-export interface InitializeResult {
+export interface SyncResult {
 	readonly dbName: string;
 	readonly searchRecordsCount: number;
 	readonly apiReferenceEndpointsCount: number;
@@ -39,13 +39,13 @@ const sourceSchema = z.readonly(
 	}),
 );
 
-export async function initializeAll(options?: { readonly isTest?: boolean }): Promise<InitializeResult> {
+export async function syncAll(options?: { readonly isTest?: boolean }): Promise<SyncResult> {
 	logger.log({ message: `Initializing ${colorize("yellow", options?.isTest ? "test" : "prod")} data...` });
 
 	return options?.isTest === true ? await initializeTestData() : await initializeProdData();
 }
 
-export async function cleanData(options?: Parameters<typeof initializeAll>[0]): Promise<void> {
+export async function cleanData(options?: Parameters<typeof syncAll>[0]): Promise<void> {
 	const dbPath = getDbPath(options);
 
 	await Promise.all(
@@ -55,18 +55,18 @@ export async function cleanData(options?: Parameters<typeof initializeAll>[0]): 
 	);
 }
 
-async function initializeProdData(): Promise<InitializeResult> {
+async function initializeProdData(): Promise<SyncResult> {
 	const apiReferenceEndpoints = await initializeApiReferenceEndpoints();
 	const apiReferenceObjects = await initializeApiReferenceObjects();
 	const searchRecords = await initializeSearchRecords();
 
 	const documents = [...searchRecords, ...apiReferenceObjects.map((object) => toSearchRecord(object))];
-	const index = await indexSearchRecords(await getDb({ isTest: false }), documents);
+	const index = await indexWithDb({ documents, isTest: false });
 
-	return toInitializeResult({ apiReferenceEndpoints, apiReferenceObjects, index, isTest: false, searchRecords });
+	return toSyncResult({ apiReferenceEndpoints, apiReferenceObjects, index, isTest: false, searchRecords });
 }
 
-async function initializeTestData(): Promise<InitializeResult> {
+async function initializeTestData(): Promise<SyncResult> {
 	const { searchRecords, apiReferenceEndpoints, apiReferenceObjects } = await getTestData();
 
 	setToFileCache({
@@ -88,9 +88,29 @@ async function initializeTestData(): Promise<InitializeResult> {
 	});
 
 	const documents = [...searchRecords, ...apiReferenceObjects.map((object) => toSearchRecord(object))];
-	const index = await indexSearchRecords(await getDb({ isTest: true }), documents);
+	const index = await indexWithDb({ documents, isTest: true });
 
-	return toInitializeResult({ apiReferenceEndpoints, apiReferenceObjects, index, isTest: true, searchRecords });
+	return toSyncResult({ apiReferenceEndpoints, apiReferenceObjects, index, isTest: true, searchRecords });
+}
+
+/**
+ * Opens the DB just for this indexing pass and closes it afterwards — `syncAll` can be
+ * called many times over a long-lived server process (e.g. the daily auto-sync loop), and
+ * leaving connections open would leak handles and eventually fail with a file-locking error.
+ */
+async function indexWithDb({
+	documents,
+	isTest,
+}: {
+	readonly documents: readonly SearchRecord[];
+	readonly isTest: boolean;
+}): Promise<IndexDocumentsResult> {
+	const db = await getDb({ isTest });
+	try {
+		return await indexSearchRecords(db, documents);
+	} finally {
+		await db.close();
+	}
 }
 
 /**
@@ -108,7 +128,7 @@ function toSearchRecord(object: ApiReferenceObject): SearchRecord {
 	};
 }
 
-function toInitializeResult({
+function toSyncResult({
 	isTest,
 	searchRecords,
 	apiReferenceEndpoints,
@@ -120,7 +140,7 @@ function toInitializeResult({
 	readonly apiReferenceEndpoints: readonly unknown[];
 	readonly apiReferenceObjects: readonly unknown[];
 	readonly index: IndexDocumentsResult;
-}): InitializeResult {
+}): SyncResult {
 	return {
 		apiReferenceEndpointsCount: apiReferenceEndpoints.length,
 		apiReferenceObjectsCount: apiReferenceObjects.length,
@@ -136,11 +156,11 @@ function toInitializeResult({
 	};
 }
 
-function getDbPath(options?: Parameters<typeof initializeAll>[0]): string {
+function getDbPath(options?: Parameters<typeof syncAll>[0]): string {
 	return options?.isTest ? getTestDbPath() : getProdDbPath();
 }
 
-async function getDb(options?: Parameters<typeof initializeAll>[0]): Promise<Database> {
+async function getDb(options?: Parameters<typeof syncAll>[0]): Promise<Database> {
 	return await openDb(getDbPath(options));
 }
 

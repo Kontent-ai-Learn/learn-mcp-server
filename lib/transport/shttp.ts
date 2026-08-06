@@ -1,15 +1,16 @@
 import express, { type Response } from "express";
+import { startAutoSyncIfEnabled } from "../sync/auto-sync.js";
 import { getEnvConfig } from "../utils/environment.utils.js";
 import { packageJsonName, packageJsonVersion } from "../utils/version.js";
 import { handleHealth } from "./routes/health.route.js";
-import { handleInit } from "./routes/init.route.js";
+import { handleSync } from "./routes/sync.route.js";
 import { handleMcpRequest } from "./routes/mcp.route.js";
 import { registerRoutes, type SupportedRoute } from "./routes/route.utils.js";
 
 const supportedRoutes: readonly SupportedRoute[] = [
 	{ description: "MCP endpoint (Streamable HTTP).", handler: handleMcpRequest, method: "post", path: "/mcp" },
 	{ description: "Health check — status, timestamp, and version.", handler: handleHealth, method: "get", path: "/health" },
-	{ description: "(Re)build the search index from the configured Learn host.", handler: handleInit, method: "post", path: "/init" },
+	{ description: "(Re)build the search index from the configured Learn host.", handler: handleSync, method: "post", path: "/init" },
 ];
 
 export function startStreamableHTTP(): void {
@@ -41,6 +42,7 @@ export function startStreamableHTTP(): void {
 Supported routes:
 ${formatSupportedRoutes()}`,
 		);
+		startAutoSyncIfEnabled();
 	});
 }
 
@@ -52,7 +54,6 @@ function setNotFoundResponse(res: Response, method: string, path: string): void 
 	});
 }
 
-/** Public view of the routes for responses/logs — omits the internal `handler`. */
 function describeSupportedRoutes(): readonly { readonly method: string; readonly path: string; readonly description: string }[] {
 	return supportedRoutes.map(({ method, path, description }) => ({ description, method: method.toUpperCase(), path }));
 }

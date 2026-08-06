@@ -55,7 +55,7 @@ npx @kontent-ai/learn-mcp-server@latest shttp   # then POST http://localhost:300
 
 # Or from a local checkout
 pnpm install
-pnpm run init                                   # builds the index into ./data
+pnpm run sync                                   # builds the index into ./data
 ```
 
 ## Configuration
@@ -160,7 +160,7 @@ pnpm run dev:stdio      # stdio transport
 pnpm run dev:shttp      # Streamable HTTP transport
 
 # Build the index from the configured LearnHost
-pnpm run init
+pnpm run sync
 
 # Build & run the compiled server
 pnpm run build
