@@ -161,6 +161,6 @@ repo — missing or invalid registry credentials.
   instance with a previously-pushed version tag — no extra tagging scheme needed. Recreating keeps
   the same URL as long as you reuse the same DNS name label and region (see step 3). Confirm the
   running build with `curl http://<fqdn>:8080/health`.
-- **`POST /init` is unauthenticated.** With the index baked in it isn't needed at runtime, but
+- **`POST /sync` is unauthenticated.** With the index baked in it isn't needed at runtime, but
   it is exposed and would trigger a heavy reindex (and needs `LearnHost`) if called. Consider
   gating or removing it in `lib/transport/shttp.ts` before any non-test exposure.

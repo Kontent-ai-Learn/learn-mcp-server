@@ -51,7 +51,7 @@ The server serves queries from a local index, so it must be initialized once (an
 
 ```bash
 # From an installed package
-npx @kontent-ai/learn-mcp-server@latest shttp   # then POST http://localhost:3002/init
+npx @kontent-ai/learn-mcp-server@latest shttp   # then POST http://localhost:3002/sync
 
 # Or from a local checkout
 pnpm install
@@ -130,7 +130,7 @@ The HTTP server exposes:
 
 - `POST /mcp` — the MCP endpoint
 - `GET /health` — health check (status, timestamp, version)
-- `POST /init` — (re)build the search index; returns counts of indexed search records, API-reference endpoints, objects, and the diff (added/changed/removed/unchanged).
+- `POST /sync` — (re)build the search index; returns counts of indexed search records, API-reference endpoints, objects, and the diff (added/changed/removed/unchanged).
 
 ## Environment Variables
 

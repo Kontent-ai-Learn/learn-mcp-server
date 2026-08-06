@@ -27,6 +27,7 @@ export async function mkdir(path: string): Promise<void> {
 }
 
 export async function rm(path: string): Promise<void> {
+	logger.log({ message: `Deleting file: ${path}` });
 	await fsRm(path, { force: true });
 }
 

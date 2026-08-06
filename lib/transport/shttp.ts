@@ -10,7 +10,7 @@ import { handleSync } from "./routes/sync.route.js";
 const supportedRoutes: readonly SupportedRoute[] = [
 	{ description: "MCP endpoint (Streamable HTTP).", handler: handleMcpRequest, method: "post", path: "/mcp" },
 	{ description: "Health check — status, timestamp, and version.", handler: handleHealth, method: "get", path: "/health" },
-	{ description: "(Re)build the search index from the configured Learn host.", handler: handleSync, method: "post", path: "/init" },
+	{ description: "(Re)build the search index from the configured Learn host.", handler: handleSync, method: "post", path: "/sync" },
 ];
 
 export function startStreamableHTTP(): void {
