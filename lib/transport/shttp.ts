@@ -3,9 +3,9 @@ import { startAutoSyncIfEnabled } from "../sync/auto-sync.js";
 import { getEnvConfig } from "../utils/environment.utils.js";
 import { packageJsonName, packageJsonVersion } from "../utils/version.js";
 import { handleHealth } from "./routes/health.route.js";
-import { handleSync } from "./routes/sync.route.js";
 import { handleMcpRequest } from "./routes/mcp.route.js";
 import { registerRoutes, type SupportedRoute } from "./routes/route.utils.js";
+import { handleSync } from "./routes/sync.route.js";
 
 const supportedRoutes: readonly SupportedRoute[] = [
 	{ description: "MCP endpoint (Streamable HTTP).", handler: handleMcpRequest, method: "post", path: "/mcp" },

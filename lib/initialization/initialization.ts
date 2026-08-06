@@ -1,4 +1,3 @@
-import { readFile, rm } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
@@ -13,6 +12,7 @@ import { type SearchRecord, searchRecordSchema } from "../content/models/search-
 import { initializeSearchRecords } from "../content/search-records.js";
 import { openDb } from "../database/db.js";
 import { type IndexDocumentsResult, indexSearchRecords } from "../indexing/indexer.js";
+import { readFile, rm } from "../utils/file.utils.js";
 import { logger } from "../utils/logger.js";
 
 export interface SyncResult {
@@ -50,7 +50,7 @@ export async function cleanData(options?: Parameters<typeof syncAll>[0]): Promis
 
 	await Promise.all(
 		[dbPath, `${dbPath}-wal`, `${dbPath}-shm`].map(async (file) => {
-			await rm(file, { force: true });
+			await rm(file);
 		}),
 	);
 }
@@ -165,6 +165,6 @@ async function getDb(options?: Parameters<typeof syncAll>[0]): Promise<Database>
 }
 
 async function getTestData(): Promise<z.infer<typeof sourceSchema>> {
-	const raw: unknown = JSON.parse(await readFile(testSearchRecordsPath, "utf8"));
+	const raw: unknown = JSON.parse(await readFile(testSearchRecordsPath));
 	return z.parse(sourceSchema, raw);
 }

@@ -1,12 +1,12 @@
-import { mkdir } from "node:fs/promises";
 import { dirname } from "node:path";
 import { connect, type Database } from "@tursodatabase/database";
 import type { DocChunk, NormalizedDoc } from "../indexing/indexer.models.js";
+import { mkdir } from "../utils/file.utils.js";
 import { buildCreateTableQuery, deleteFrom, insertInto, selectFrom, updateTable } from "./db.utils.js";
 import { CHUNKS_TABLE, DOCUMENTS_TABLE, toVectorParam } from "./tables.js";
 
 export async function openDb(path: string): Promise<Database> {
-	await mkdir(dirname(path), { recursive: true });
+	await mkdir(dirname(path));
 	const db = await connect(path, { experimental: ["index_method"] });
 	await db.exec(buildCreateTablesQuery());
 	return db;

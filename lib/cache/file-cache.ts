@@ -1,9 +1,8 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname } from "node:path";
 import type { JsonValue } from "@kontent-ai/core-sdk";
 import type { ZodMiniType } from "zod/mini";
 import { getDataDir } from "../config.js";
 import { getEnvConfig } from "../utils/environment.utils.js";
+import { existsSync, readFileSync, writeFileSync } from "../utils/file.utils.js";
 
 export type FileCacheKey = `api-reference-endpoints` | `api-reference-objects` | `search-records`;
 
@@ -20,14 +19,14 @@ export async function getOrSetFromFileCache<T extends JsonValue>({
 	const resolveAndStoreValue = async (): Promise<T> => {
 		const resolvedValue = await value();
 
-		writeCacheFile(filepath, JSON.stringify(resolvedValue));
+		writeFileSync(filepath, JSON.stringify(resolvedValue));
 		return resolvedValue;
 	};
 
 	if (!existsSync(filepath)) {
 		return await resolveAndStoreValue();
 	}
-	const existingContent = readFileSync(filepath, "utf8");
+	const existingContent = readFileSync(filepath);
 	return schema.parse(JSON.parse(existingContent));
 }
 
@@ -47,7 +46,7 @@ export function setToFileCache<T extends JsonValue>({
 		throw new Error(`Could not set file cache value because it did not match the schema. Message: ${error.message}`);
 	}
 
-	writeCacheFile(filepath, JSON.stringify(data));
+	writeFileSync(filepath, JSON.stringify(data));
 }
 
 export function getFromFileCache<T extends JsonValue>({
@@ -61,7 +60,7 @@ export function getFromFileCache<T extends JsonValue>({
 	if (!existsSync(filepath)) {
 		return undefined;
 	}
-	const existingContent = readFileSync(filepath, "utf8");
+	const existingContent = readFileSync(filepath);
 	return schema.parse(JSON.parse(existingContent));
 }
 
@@ -69,9 +68,4 @@ export function getFullPath(cacheKey: FileCacheKey): string {
 	const { isTest } = getEnvConfig();
 	const suffix = isTest ? "-test" : "";
 	return `./${getDataDir(isTest)}/${cacheKey}${suffix}.json`;
-}
-
-function writeCacheFile(filepath: string, content: string): void {
-	mkdirSync(dirname(filepath), { recursive: true });
-	writeFileSync(filepath, content);
 }

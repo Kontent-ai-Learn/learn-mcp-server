@@ -1,7 +1,6 @@
-import { existsSync } from "node:fs";
 import path from "node:path";
-import { loadEnvFile } from "node:process";
 import { match } from "ts-pattern";
+import { existsSync, loadEnvFile } from "./file.utils.js";
 
 type SyncIntervalUnit = "minutes" | "hours" | "days";
 
