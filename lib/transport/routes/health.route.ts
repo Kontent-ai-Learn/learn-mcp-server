@@ -16,7 +16,6 @@ export function handleHealth(_req: Request, res: Response): void {
 			enabled: autoSyncEnabled,
 			interval: { unit: syncIntervalUnit, value: syncIntervalValue },
 			lastSync,
-			lastSyncAt: lastSync?.endedAt,
 			nextSyncAt: autoSyncEnabled ? toIsoString(computeNextSyncAt(lastSync)) : undefined,
 		},
 		timestamp: new Date().toISOString(),

@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import { type SyncResult, syncAll } from "../initialization/initialization.js";
 import { getErrorMessage } from "../utils/error.utils.js";
 import { logger } from "../utils/logger.js";
-import { toIsoString } from "./sync-schedule.js";
+import { formatDuration, toIsoString } from "./sync-schedule.js";
 import { writeSyncState } from "./sync-state.js";
 
 export interface SyncRunResult {
@@ -22,6 +22,7 @@ export async function runAndRecordSync(label: string, options?: { readonly isTes
 	const durationMs = endedAt.diff(startedAt).as("milliseconds");
 
 	writeSyncState({
+		duration: formatDuration(durationMs),
 		durationMs,
 		endedAt: toIsoString(endedAt),
 		startedAt: toIsoString(startedAt),

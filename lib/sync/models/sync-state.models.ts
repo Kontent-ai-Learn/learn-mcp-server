@@ -21,6 +21,7 @@ export type SyncOutcome = z.infer<typeof syncOutcomeSchema>;
 
 export const syncStateSchema = z.readonly(
 	z.object({
+		duration: z.string(),
 		durationMs: z.number(),
 		endedAt: z.string(),
 		error: z.optional(z.string()),
