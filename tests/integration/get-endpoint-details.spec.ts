@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
+import type { z } from "zod/mini";
 import { apiReferenceEndpointSchema } from "../../lib/content/models/api-reference-endpoints.models.js";
-import { callToolAndParse } from "./test-client.js";
+import { callToolAndParse, type ToolCallResult } from "./test-client.js";
 
-const callGetEndpointDetails = (text: string) =>
-	callToolAndParse({ schema: apiReferenceEndpointSchema, text, toolName: "get-endpoint-details" });
+const callGetEndpointDetails = async (text: string): Promise<ToolCallResult<z.infer<typeof apiReferenceEndpointSchema>>> =>
+	await callToolAndParse({ schema: apiReferenceEndpointSchema, text, toolName: "get-endpoint-details" });
 
 describe("get-endpoint-details tool (in-memory e2e)", () => {
 	it("returns the endpoint matching a specific URL", async () => {

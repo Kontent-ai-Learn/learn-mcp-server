@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
+import type { z } from "zod/mini";
 import { apiReferenceObjectSchema } from "../../lib/content/models/api-reference-objects.models.js";
-import { callToolAndParse } from "./test-client.js";
+import { callToolAndParse, type ToolCallResult } from "./test-client.js";
 
-const callGetObjectDetails = (text: string) => callToolAndParse({ schema: apiReferenceObjectSchema, text, toolName: "get-object-details" });
+const callGetObjectDetails = async (text: string): Promise<ToolCallResult<z.infer<typeof apiReferenceObjectSchema>>> =>
+	await callToolAndParse({ schema: apiReferenceObjectSchema, text, toolName: "get-object-details" });
 
 describe("get-object-details tool (in-memory e2e)", () => {
 	it("returns the object matching a description", async () => {
