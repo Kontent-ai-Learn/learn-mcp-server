@@ -19,7 +19,7 @@ RUN pnpm install --frozen-lockfile
 COPY tsconfig.json tsconfig.build.json ./
 COPY lib ./lib
 # Compile directly with tsc — NOT `pnpm run build`, which also runs lint and a
-# `version` step that does `git add` and fails without a git repo.
+# `sync-server-json` step that does `git add` and fails without a git repo.
 RUN pnpm exec tsc -p tsconfig.build.json
 
 # Drop devDependencies but keep the downloaded native binaries (onnxruntime-node,
