@@ -24,4 +24,4 @@ minimumReleaseAgeExclude:
   - '@oxlint/binding-win32-ia32-msvc@1.77.0'
   - '@oxlint/binding-win32-x64-msvc@1.77.0'
   - oxlint@1.77.0
-  - tsx@4.23.5
+  - tsx@4.23.5 || 4.23.12
