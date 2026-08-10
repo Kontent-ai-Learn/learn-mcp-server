@@ -7,6 +7,7 @@ export default defineConfig({
 	root: ".",
 	test: {
 		dir: "tests/unit",
+		env: { IsTest: "true" },
 		environment: "node",
 		globals: true,
 	},
