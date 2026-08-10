@@ -1,46 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { type ApiReferenceEndpoint, apiReferenceEndpointSchema } from "../../lib/content/models/api-reference-endpoints.models.js";
-import type { ToolName } from "../../lib/tools/shared/tool-models.js";
-import { parseFirstJsonContent, withTestClient } from "./test-client.js";
+import { apiReferenceEndpointSchema } from "../../lib/content/models/api-reference-endpoints.models.js";
+import { callToolAndParse } from "./test-client.js";
 
-type Result =
-	| {
-			readonly record: ApiReferenceEndpoint;
-			readonly success: true;
-			readonly error?: never;
-	  }
-	| {
-			readonly error: unknown;
-			readonly record?: never;
-			readonly success: false;
-	  };
-
-const callGetEndpointDetails = async (text: string): Promise<Result> =>
-	await withTestClient(async (client) => {
-		const res = await client.callTool({ arguments: { text }, name: "get-endpoint-details" satisfies ToolName });
-		expect(res.isError).toBeFalsy();
-
-		const { data: parsedItem, error: parseError } = parseFirstJsonContent(res);
-
-		if (parseError) {
-			return {
-				error: parseError,
-				success: false,
-			};
-		}
-
-		const { data, error } = apiReferenceEndpointSchema.safeParse(parsedItem);
-		if (data) {
-			return {
-				record: data,
-				success: true,
-			};
-		}
-		return {
-			error,
-			success: false,
-		};
-	});
+const callGetEndpointDetails = (text: string) =>
+	callToolAndParse({ schema: apiReferenceEndpointSchema, text, toolName: "get-endpoint-details" });
 
 describe("get-endpoint-details tool (in-memory e2e)", () => {
 	it("returns the endpoint matching a specific URL", async () => {

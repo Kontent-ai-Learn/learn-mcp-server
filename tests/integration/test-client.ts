@@ -1,8 +1,14 @@
 import { type TryCatchResult, tryCatch, tryCatchAsync } from "@kontent-ai/core-sdk";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
+import { expect } from "vitest";
 import { z } from "zod";
 import { createServer } from "../../lib/server.js";
+import type { ToolName } from "../../lib/tools/shared/tool-models.js";
+
+export type ToolCallResult<T> =
+	| { readonly record: T; readonly success: true; readonly error?: never }
+	| { readonly error: unknown; readonly record?: never; readonly success: false };
 
 const textContentBlockSchema = z.object({
 	text: z.string(),
@@ -32,6 +38,33 @@ export function parseFirstJsonContent(res: unknown): TryCatchResult<unknown> {
 		return { error: new Error("Expected res to be a tool-call result with a non-empty array of text content blocks"), success: false };
 	}
 	return tryCatch(() => JSON.parse(data.content.at(0)?.text ?? "") as unknown);
+}
+
+/** Calls a tool, parses its first JSON content block, and validates it against `schema`. */
+export async function callToolAndParse<T>({
+	toolName,
+	schema,
+	text,
+}: {
+	readonly toolName: ToolName;
+	readonly schema: { readonly safeParse: (data: unknown) => { readonly data?: T; readonly error?: unknown } };
+	readonly text: string;
+}): Promise<ToolCallResult<T>> {
+	return await withTestClient(async (client) => {
+		const res = await client.callTool({ arguments: { text }, name: toolName });
+		expect(res.isError).toBeFalsy();
+
+		const { data: parsedItem, error: parseError } = parseFirstJsonContent(res);
+		if (parseError) {
+			return { error: parseError, success: false };
+		}
+
+		const { data, error } = schema.safeParse(parsedItem);
+		if (data) {
+			return { record: data, success: true };
+		}
+		return { error, success: false };
+	});
 }
 
 const createTestClient = async (): Promise<{ readonly client: Client; readonly close: () => Promise<void> }> => {

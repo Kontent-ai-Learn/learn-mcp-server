@@ -1,46 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { type ApiReferenceObject, apiReferenceObjectSchema } from "../../lib/content/models/api-reference-objects.models.js";
-import type { ToolName } from "../../lib/tools/shared/tool-models.js";
-import { parseFirstJsonContent, withTestClient } from "./test-client.js";
+import { apiReferenceObjectSchema } from "../../lib/content/models/api-reference-objects.models.js";
+import { callToolAndParse } from "./test-client.js";
 
-type Result =
-	| {
-			readonly record: ApiReferenceObject;
-			readonly success: true;
-			readonly error?: never;
-	  }
-	| {
-			readonly error: unknown;
-			readonly record?: never;
-			readonly success: false;
-	  };
-
-const callGetObjectDetails = async (text: string): Promise<Result> =>
-	await withTestClient(async (client) => {
-		const res = await client.callTool({ arguments: { text }, name: "get-object-details" satisfies ToolName });
-		expect(res.isError).toBeFalsy();
-
-		const { data: parsedItem, error: parseError } = parseFirstJsonContent(res);
-
-		if (parseError) {
-			return {
-				error: parseError,
-				success: false,
-			};
-		}
-
-		const { data, error } = apiReferenceObjectSchema.safeParse(parsedItem);
-		if (data) {
-			return {
-				record: data,
-				success: true,
-			};
-		}
-		return {
-			error,
-			success: false,
-		};
-	});
+const callGetObjectDetails = (text: string) => callToolAndParse({ schema: apiReferenceObjectSchema, text, toolName: "get-object-details" });
 
 describe("get-object-details tool (in-memory e2e)", () => {
 	it("returns the object matching a description", async () => {
