@@ -18,7 +18,7 @@ export const logger: Logger = {
 		console.log(format(data));
 	},
 	logWithSpinnerAsync: async (operation) => {
-		// No interactive terminal (MCP stdio host, pipes, CI, tests): emit plain stderr lines.
+		// No interactive terminal (MCP stdio host, pipes, CI, tests): emit plain stdout lines.
 		if (!process.stderr.isTTY) {
 			return await operation((data) => {
 				console.log(format(data));

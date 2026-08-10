@@ -23,11 +23,11 @@ export const SEARCH_LIMIT = 10;
 /** Data directory: prod uses DataPath; test artifacts live in the top-level `data-test` folder. */
 export const getDataDir = (isTest: boolean): string => (isTest ? "data-test" : getEnvConfig().dataPath);
 
-/** Persistent Turso DB path; overridable for deployment. */
+/** Persistent Turso DB path */
 export const getProdDbPath = (): string => `${getDataDir(false)}/search-records-vector.db`;
 export const getTestDbPath = (): string => `${getDataDir(true)}/search-records-vector-test.db`;
 
-/** Path to the persisted auto-sync state file (see lib/sync). */
+/** Path to the persisted sync-state file (last run of any sync trigger — auto, manual, or CLI). */
 export const getSyncStatePath = (): string => `${getDataDir(getEnvConfig().isTest)}/sync.json`;
 
 /** How often the auto-sync loop runs, from `SyncIntervalValue`/`SyncIntervalUnit`. */
@@ -43,7 +43,7 @@ export const getSyncInterval = (): Duration => {
 /** DB path used at query time; the `isTest` env flag selects the test DB. */
 export const getDbPath = (): string => (getEnvConfig().isTest ? getTestDbPath() : getProdDbPath());
 
-/** Transformers.js model cache: the committed root-level folder, resolved against the process cwd (not `DataPath`). */
+/** Transformers.js model cache folder name — committed at the repo root; the transformers.js runtime resolves it relative to cwd, not tied to `DataPath`. */
 export const getTransformersCacheDir = (): string => "transformers";
 
 const composeLearnUrl = (path: string): string => new URL(path, getEnvConfig().learnHost).toString();

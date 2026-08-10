@@ -45,7 +45,7 @@ const createMcpToolSuccessResponse = (data: JsonValue): McpToolSuccessResponse =
 /**
  * Handles various types of errors and returns a standardized MCP tool error response
  * @param error The error to handle
- * @param toolName Optional context string to include in error message
+ * @param toolName The name of the tool that failed (used to prefix the error message)
  * @returns Standardized MCP tool error response
  */
 const handleMcpToolError = (error: unknown, toolName: ToolName): McpToolErrorResponse => ({

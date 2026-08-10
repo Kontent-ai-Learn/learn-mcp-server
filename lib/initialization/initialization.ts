@@ -100,8 +100,9 @@ async function finishSync({
 
 /**
  * Opens the DB just for this indexing pass and closes it afterwards — `syncAll` can be
- * called many times over a long-lived server process (e.g. the daily auto-sync loop), and
- * leaving connections open would leak handles and eventually fail with a file-locking error.
+ * called many times over a long-lived server process (e.g. the auto-sync loop, which can run
+ * as often as every few minutes), and leaving connections open would leak handles and
+ * eventually fail with a file-locking error.
  */
 async function indexWithDb({
 	documents,

@@ -12,5 +12,5 @@ export function hasTestFlag(argv: readonly string[]): boolean {
 }
 
 export function setTestEnv(): void {
-  	process.env.IsTest = "true";
+	process.env.IsTest = "true";
 }
