@@ -1,7 +1,7 @@
-import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tryCatch } from "@kontent-ai/core-sdk";
 import { getErrorMessage } from "../lib/utils/error.utils.js";
+import { readFileSync, writeFileSync } from "../lib/utils/file.utils.js";
 import { logger } from "../lib/utils/logger.js";
 
 interface PackageJson {
@@ -19,7 +19,7 @@ interface ServerJson {
 }
 
 const readJsonFile = <T>(filePath: string): T => {
-	const content = readFileSync(filePath, "utf8");
+	const content = readFileSync(filePath);
 	return JSON.parse(content) as T;
 };
 

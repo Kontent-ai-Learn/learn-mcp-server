@@ -60,10 +60,7 @@ async function initializeProdData(): Promise<SyncResult> {
 	const apiReferenceObjects = await initializeApiReferenceObjects();
 	const searchRecords = await initializeSearchRecords();
 
-	const documents = [...searchRecords, ...apiReferenceObjects.map((object) => toSearchRecord(object))];
-	const index = await indexWithDb({ documents, isTest: false });
-
-	return toSyncResult({ apiReferenceEndpoints, apiReferenceObjects, index, isTest: false, searchRecords });
+	return await finishSync({ apiReferenceEndpoints, apiReferenceObjects, isTest: false, searchRecords });
 }
 
 async function initializeTestData(): Promise<SyncResult> {
@@ -74,23 +71,31 @@ async function initializeTestData(): Promise<SyncResult> {
 		schema: z.readonly(z.array(apiReferenceEndpointSchema)),
 		value: apiReferenceEndpoints,
 	});
-
 	setToFileCache({
 		cacheKey: "api-reference-objects",
 		schema: z.readonly(z.array(apiReferenceObjectSchema)),
 		value: apiReferenceObjects,
 	});
+	setToFileCache({ cacheKey: "search-records", schema: z.readonly(z.array(searchRecordSchema)), value: searchRecords });
 
-	setToFileCache({
-		cacheKey: "search-records",
-		schema: z.readonly(z.array(searchRecordSchema)),
-		value: searchRecords,
-	});
+	return await finishSync({ apiReferenceEndpoints, apiReferenceObjects, isTest: true, searchRecords });
+}
 
+async function finishSync({
+	isTest,
+	searchRecords,
+	apiReferenceEndpoints,
+	apiReferenceObjects,
+}: {
+	readonly isTest: boolean;
+	readonly searchRecords: readonly SearchRecord[];
+	readonly apiReferenceEndpoints: readonly unknown[];
+	readonly apiReferenceObjects: readonly ApiReferenceObject[];
+}): Promise<SyncResult> {
 	const documents = [...searchRecords, ...apiReferenceObjects.map((object) => toSearchRecord(object))];
-	const index = await indexWithDb({ documents, isTest: true });
+	const index = await indexWithDb({ documents, isTest });
 
-	return toSyncResult({ apiReferenceEndpoints, apiReferenceObjects, index, isTest: true, searchRecords });
+	return toSyncResult({ apiReferenceEndpoints, apiReferenceObjects, index, isTest, searchRecords });
 }
 
 /**

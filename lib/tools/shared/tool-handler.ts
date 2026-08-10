@@ -1,5 +1,6 @@
 import { type JsonValue, tryCatchAsync } from "@kontent-ai/core-sdk";
 import { match, P } from "ts-pattern";
+import { getErrorMessage } from "../../utils/error.utils.js";
 import type { McpToolErrorResponse, McpToolResponse, McpToolSuccessResponse, ToolName } from "./tool-models.js";
 
 export async function withToolHandler({
@@ -50,7 +51,7 @@ const createMcpToolSuccessResponse = (data: JsonValue): McpToolSuccessResponse =
 const handleMcpToolError = (error: unknown, toolName: ToolName): McpToolErrorResponse => ({
 	content: [
 		{
-			text: `${toolName}: Unexpected error: ${error instanceof Error ? error.message : "Unknown error occurred"}
+			text: `${toolName}: Unexpected error: ${getErrorMessage(error)}
 Full error: ${JSON.stringify(error)}`,
 			type: "text",
 		},

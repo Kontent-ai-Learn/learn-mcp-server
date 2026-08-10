@@ -22,7 +22,7 @@ export const apiReferencePropertySchema: z.ZodMiniType<ApiReferenceProperty> = z
 	}),
 );
 
-export const apiReferenceCodeSampleSchema = z.readonly(
+const apiReferenceCodeSampleSchema = z.readonly(
 	z.object({
 		code: z.string(),
 		language: z.string(),
@@ -31,7 +31,7 @@ export const apiReferenceCodeSampleSchema = z.readonly(
 
 export type ApiReferenceCodeSample = z.infer<typeof apiReferenceCodeSampleSchema>;
 
-export const apiReferenceResponseSchema = z.readonly(
+const apiReferenceResponseSchema = z.readonly(
 	z.object({
 		description: z.string(),
 		properties: z.readonly(z.array(apiReferencePropertySchema)),

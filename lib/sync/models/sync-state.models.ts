@@ -1,6 +1,6 @@
 import { z } from "zod/mini";
 
-export const syncOutcomeSchema = z.readonly(
+const syncOutcomeSchema = z.readonly(
 	z.object({
 		apiReferenceEndpointsCount: z.number(),
 		apiReferenceObjectsCount: z.number(),

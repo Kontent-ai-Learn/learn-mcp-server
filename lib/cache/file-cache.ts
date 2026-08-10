@@ -6,30 +6,6 @@ import { existsSync, readFileSync, writeFileSync } from "../utils/file.utils.js"
 
 export type FileCacheKey = `api-reference-endpoints` | `api-reference-objects` | `search-records`;
 
-export async function getOrSetFromFileCache<T extends JsonValue>({
-	cacheKey,
-	value,
-	schema,
-}: {
-	readonly cacheKey: FileCacheKey;
-	readonly value: () => Promise<T>;
-	readonly schema: ZodMiniType<T>;
-}): Promise<T> {
-	const filepath = getFullPath(cacheKey);
-	const resolveAndStoreValue = async (): Promise<T> => {
-		const resolvedValue = await value();
-
-		writeFileSync(filepath, JSON.stringify(resolvedValue));
-		return resolvedValue;
-	};
-
-	if (!existsSync(filepath)) {
-		return await resolveAndStoreValue();
-	}
-	const existingContent = readFileSync(filepath);
-	return schema.parse(JSON.parse(existingContent));
-}
-
 export function setToFileCache<T extends JsonValue>({
 	cacheKey,
 	value,
@@ -64,7 +40,7 @@ export function getFromFileCache<T extends JsonValue>({
 	return schema.parse(JSON.parse(existingContent));
 }
 
-export function getFullPath(cacheKey: FileCacheKey): string {
+function getFullPath(cacheKey: FileCacheKey): string {
 	const { isTest } = getEnvConfig();
 	const suffix = isTest ? "-test" : "";
 	return `./${getDataDir(isTest)}/${cacheKey}${suffix}.json`;

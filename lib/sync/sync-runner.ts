@@ -32,8 +32,8 @@ export async function runAndRecordSync(label: string, options?: { readonly isTes
 
 	logger.log({
 		message: outcome.success
-			? `${label} completed in ${(durationMs / 1000).toFixed(1)}s (+${outcome.data.index.added} ~${outcome.data.index.changed} -${outcome.data.index.removed}, ${outcome.data.index.unchanged} unchanged).`
-			: `${label} failed after ${(durationMs / 1000).toFixed(1)}s: ${getErrorMessage(outcome.error)}`,
+			? `${label} completed in ${formatDuration(durationMs)} (+${outcome.data.index.added} ~${outcome.data.index.changed} -${outcome.data.index.removed}, ${outcome.data.index.unchanged} unchanged).`
+			: `${label} failed after ${formatDuration(durationMs)}: ${getErrorMessage(outcome.error)}`,
 		type: outcome.success ? "completed" : "error",
 	});
 

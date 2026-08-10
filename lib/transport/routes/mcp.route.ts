@@ -4,8 +4,7 @@ import type { Request, Response } from "express";
 import { createServer } from "../../server.js";
 import { getErrorMessage } from "../../utils/error.utils.js";
 import { logger } from "../../utils/logger.js";
-import { packageJsonName, packageJsonVersion } from "../../utils/version.js";
-import { setInternalServerErrorResponse } from "./route.utils.js";
+import { logAndRespondError } from "./route.utils.js";
 
 export async function handleMcpRequest(req: Request, res: Response): Promise<void> {
 	const { success, error } = await tryCatchAsync(async () => {
@@ -26,13 +25,6 @@ export async function handleMcpRequest(req: Request, res: Response): Promise<voi
 	});
 
 	if (!success) {
-		const errorMessage = getErrorMessage(error);
-		logger.log({
-			message: `${packageJsonName}@${packageJsonVersion} - Error handling MCP request: ${errorMessage}`,
-			type: "error",
-		});
-		if (!res.headersSent) {
-			setInternalServerErrorResponse(res, errorMessage);
-		}
+		logAndRespondError({ error, requestLabel: "MCP", res });
 	}
 }

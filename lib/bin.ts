@@ -2,6 +2,7 @@
 import { startStreamableHTTP } from "./transport/shttp.js";
 import { startStdio } from "./transport/stdio.js";
 import { getTransportTypeFromArg, transportTypes } from "./utils/arg.utils.js";
+import { getErrorMessage } from "./utils/error.utils.js";
 import { logger } from "./utils/logger.js";
 
 async function main(): Promise<void> {
@@ -26,6 +27,6 @@ async function main(): Promise<void> {
 try {
 	await main();
 } catch (error) {
-	logger.log({ message: `Fatal error: ${error instanceof Error ? error.message : String(error)}`, type: "error" });
+	logger.log({ message: `Fatal error: ${getErrorMessage(error)}`, type: "error" });
 	process.exit(1);
 }

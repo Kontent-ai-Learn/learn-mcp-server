@@ -22,8 +22,3 @@ export async function getOrSetFromMemoryCache<T>({
 	cache.set(key, resolvedValue);
 	return resolvedValue;
 }
-
-export function getFromCache<T>({ key, schema }: { readonly key: string; readonly schema: ZodMiniType<T> }): T | undefined {
-	const dataFromCache = cache.get(key);
-	return dataFromCache ? schema.parse(dataFromCache) : undefined;
-}

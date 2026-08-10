@@ -1,6 +1,9 @@
 import type { JsonValue } from "@kontent-ai/core-sdk";
 import type { Application, RequestHandler, Response } from "express";
 import { match } from "ts-pattern";
+import { getErrorMessage } from "../../utils/error.utils.js";
+import { logger } from "../../utils/logger.js";
+import { packageJsonName, packageJsonVersion } from "../../utils/version.js";
 
 export interface SupportedRoute {
 	readonly method: "get" | "post";
@@ -35,6 +38,26 @@ export function setOkResponse(res: Response, json: JsonValue): void {
 
 export function setInternalServerErrorResponse(res: Response, message = "Internal server error"): void {
 	setResponse({ json: { error: { code: -32_603, message } }, res, statusCode: 500 });
+}
+
+/** Logs the error and, unless the response has already started streaming, sends a 500. */
+export function logAndRespondError({
+	res,
+	requestLabel,
+	error,
+}: {
+	readonly res: Response;
+	readonly requestLabel: string;
+	readonly error: unknown;
+}): void {
+	const errorMessage = getErrorMessage(error);
+	logger.log({
+		message: `${packageJsonName}@${packageJsonVersion} - Error handling ${requestLabel} request: ${errorMessage}`,
+		type: "error",
+	});
+	if (!res.headersSent) {
+		setInternalServerErrorResponse(res, errorMessage);
+	}
 }
 
 function setMethodNotAllowedResponse({
