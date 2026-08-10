@@ -47,7 +47,7 @@
 		"sync-version": "tsx scripts/sync-version.ts",
 		"sync": "tsx scripts/sync.ts",
 		"sync:test": "tsx scripts/sync.ts --test",
-		"bump": "pnpm version patch --no-git-tag-version && pnpm run sync-server-json && git add package.json server.json && git commit -m \"bumps version\" && git push",
+		"bump": "pnpm version patch --no-git-tag-version && pnpm run sync-server-json && git add package.json server.json && git commit -m \"bumps version\"",
 		"init": "tsx scripts/init.ts",
 		"init:test": "tsx scripts/init.ts --test",
 		"search": "tsx scripts/search.ts",
