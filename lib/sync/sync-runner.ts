@@ -3,6 +3,7 @@ import { DateTime } from "luxon";
 import { type SyncResult, syncAll } from "../initialization/initialization.js";
 import { getErrorMessage } from "../utils/error.utils.js";
 import { logger } from "../utils/logger.js";
+import { acquireSyncLock, releaseSyncLock } from "./sync-lock.js";
 import { formatDuration, toIsoString } from "./sync-schedule.js";
 import { writeSyncState } from "./sync-state.js";
 
@@ -14,28 +15,42 @@ export interface SyncRunResult {
 }
 
 export async function runAndRecordSync(label: string, options?: { readonly isTest?: boolean }): Promise<SyncRunResult> {
+	acquireSyncLock();
+	try {
+		const syncResult = await syncAsync(label, options);
+		logSyncResult(label, syncResult);
+
+		return syncResult;
+	} finally {
+		releaseSyncLock();
+	}
+}
+
+async function syncAsync(label: string, options?: { readonly isTest?: boolean }): Promise<SyncRunResult> {
 	const startedAt = DateTime.now();
 	logger.log({ message: `${label} starting...` });
 
-	const outcome = await tryCatchAsync(async () => await syncAll(options));
+	const syncResult = await tryCatchAsync(async () => await syncAll(options));
 	const endedAt = DateTime.now();
 	const durationMs = endedAt.diff(startedAt).as("milliseconds");
 
+	return { durationMs, endedAt, outcome: syncResult, startedAt };
+}
+
+function logSyncResult(label: string, syncResult: SyncRunResult): void {
 	writeSyncState({
-		duration: formatDuration(durationMs),
-		durationMs,
-		endedAt: toIsoString(endedAt),
-		startedAt: toIsoString(startedAt),
-		success: outcome.success,
-		...(outcome.success ? { result: outcome.data } : { error: getErrorMessage(outcome.error) }),
+		duration: formatDuration(syncResult.durationMs),
+		durationMs: syncResult.durationMs,
+		endedAt: toIsoString(syncResult.endedAt),
+		startedAt: toIsoString(syncResult.startedAt),
+		success: syncResult.outcome.success,
+		...(syncResult.outcome.success ? { result: syncResult.outcome.data } : { error: getErrorMessage(syncResult.outcome.error) }),
 	});
 
 	logger.log({
-		message: outcome.success
-			? `${label} completed in ${formatDuration(durationMs)} (+${outcome.data.index.added} ~${outcome.data.index.changed} -${outcome.data.index.removed}, ${outcome.data.index.unchanged} unchanged).`
-			: `${label} failed after ${formatDuration(durationMs)}: ${getErrorMessage(outcome.error)}`,
-		type: outcome.success ? "completed" : "error",
+		message: syncResult.outcome.success
+			? `${label} completed in ${formatDuration(syncResult.durationMs)} (+${syncResult.outcome.data.index.added} ~${syncResult.outcome.data.index.changed} -${syncResult.outcome.data.index.removed}, ${syncResult.outcome.data.index.unchanged} unchanged).`
+			: `${label} failed after ${formatDuration(syncResult.durationMs)}: ${getErrorMessage(syncResult.outcome.error)}`,
+		type: syncResult.outcome.success ? "completed" : "error",
 	});
-
-	return { durationMs, endedAt, outcome, startedAt };
 }

@@ -36,6 +36,10 @@ export function setOkResponse(res: Response, json: JsonValue): void {
 	setResponse({ json, res, statusCode: 200 });
 }
 
+export function setConflictResponse(res: Response, error: { readonly type: string; readonly message: string }): void {
+	setResponse({ json: { error }, res, statusCode: 409 });
+}
+
 export function setInternalServerErrorResponse(res: Response, message = "Internal server error"): void {
 	setResponse({ json: { error: { code: -32_603, message } }, res, statusCode: 500 });
 }
@@ -93,7 +97,7 @@ function setResponse({
 	json,
 }: {
 	readonly res: Response;
-	readonly statusCode: 200 | 500;
+	readonly statusCode: 200 | 409 | 500;
 	readonly json: JsonValue;
 }): void {
 	res.status(statusCode).json({ json, jsonrpc: "2.0" });

@@ -1,3 +1,4 @@
+import { tryCatchAsync } from "@kontent-ai/core-sdk";
 import { DateTime } from "luxon";
 import { getSyncInterval } from "../config.js";
 import { getEnvConfig } from "../utils/environment.utils.js";
@@ -31,6 +32,13 @@ function scheduleSyncAt(at: DateTime): void {
 }
 
 async function runSyncAndReschedule(): Promise<void> {
-	const { endedAt } = await runAndRecordSync("Automatic sync");
-	scheduleSyncAt(endedAt.plus(getSyncInterval()));
+	const { success, data, error } = await tryCatchAsync(async () => await runAndRecordSync("Automatic sync"));
+
+	if (!success) {
+		logger.log({ message: `Automatic sync skipped this cycle: ${getErrorMessage(error)}`, type: "warning" });
+		scheduleSyncAt(DateTime.now().plus(getSyncInterval()));
+		return;
+	}
+
+	scheduleSyncAt(data.endedAt.plus(getSyncInterval()));
 }
