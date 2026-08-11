@@ -5,6 +5,7 @@ import { EMBED_BATCH_SIZE, EMBEDDING_MODEL } from "../config.js";
 import type { SearchRecord } from "../content/models/search-records.models.js";
 import { deleteDocuments, getDocHashes, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "../database/db.js";
 import { logger, type SpinnerLog } from "../utils/logger.js";
+import { yieldToEventLoop } from "../utils/timeout.utils.js";
 import { chunkDoc } from "./chunking.js";
 import { embedTexts } from "./embeddings.js";
 import type { NormalizedDoc } from "./indexer.models.js";
@@ -101,6 +102,7 @@ async function replaceChangedDocuments(db: Database, changedDocuments: readonly 
 			message: `Indexing documents ${colorize("yellow", (index + 1).toString())}/${colorize("yellow", changedDocuments.length.toString())}`,
 		});
 		await replaceDocument(db, doc, chunkDoc(doc));
+		await yieldToEventLoop();
 	}
 	logger.log({
 		message: `\nFinished indexing documents`,
@@ -118,24 +120,36 @@ async function embedMissing(db: Database, spinner: SpinnerLog): Promise<number> 
 		message: `Batch ${colorize("yellow", "0")}/${colorize("yellow", batches.length.toString())}`,
 	});
 	for (const [batchIndex, batch] of batches.entries()) {
-		spinner({
-			message: `Batch ${colorize("yellow", (batchIndex + 1).toString())}/${colorize("yellow", batches.length.toString())}`,
-		});
-
-		const vectors = await embedTexts(batch.map((chunk) => chunk.text));
-
-		await updateEmbeddings(
-			db,
-			EMBEDDING_MODEL,
-			batch.flatMap((chunk, index) => {
-				const vector = vectors[index];
-				return vector ? [{ chunkKey: chunk.chunkKey, vector }] : [];
-			}),
-		);
+		await embedBatch({ batch, batchIndex, db, spinner, totalBatches: batches.length });
 	}
 
 	logger.log({
 		message: `\nFinished embedding chunks`,
 	});
 	return chunks.length;
+}
+
+async function embedBatch(params: {
+	readonly db: Database;
+	readonly batch: readonly { readonly chunkKey: string; readonly text: string }[];
+	readonly batchIndex: number;
+	readonly totalBatches: number;
+	readonly spinner: SpinnerLog;
+}): Promise<void> {
+	const { db, batch, batchIndex, totalBatches, spinner } = params;
+	spinner({
+		message: `Batch ${colorize("yellow", (batchIndex + 1).toString())}/${colorize("yellow", totalBatches.toString())}`,
+	});
+
+	const vectors = await embedTexts(batch.map((chunk) => chunk.text));
+
+	await updateEmbeddings(
+		db,
+		EMBEDDING_MODEL,
+		batch.flatMap((chunk, index) => {
+			const vector = vectors[index];
+			return vector ? [{ chunkKey: chunk.chunkKey, vector }] : [];
+		}),
+	);
+	await yieldToEventLoop();
 }

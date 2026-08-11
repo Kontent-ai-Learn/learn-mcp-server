@@ -2,6 +2,7 @@ import { dirname } from "node:path";
 import { connect, type Database } from "@tursodatabase/database";
 import type { DocChunk, NormalizedDoc } from "../indexing/indexer.models.js";
 import { mkdir } from "../utils/file.utils.js";
+import { yieldToEventLoop } from "../utils/timeout.utils.js";
 import { buildCreateTableQuery, deleteFrom, insertInto, selectFrom, updateTable } from "./db.utils.js";
 import { CHUNKS_TABLE, DOCUMENTS_TABLE, toVectorParam } from "./tables.js";
 
@@ -27,6 +28,7 @@ export async function deleteDocuments(db: Database, ids: readonly string[]): Pro
 		for (const id of toDelete) {
 			await deleteFrom(txn, { definition: CHUNKS_TABLE, where: { column: "docId", operator: "=", value: id } });
 			await deleteFrom(txn, { definition: DOCUMENTS_TABLE, where: { column: "id", operator: "=", value: id } });
+			await yieldToEventLoop();
 		}
 	});
 	await transaction(ids);
