@@ -6,33 +6,36 @@ import { getOrSetFromMemoryCache } from "../cache/memory-cache.js";
 import { logger } from "../utils/logger.js";
 import { packageJsonName, packageJsonVersion } from "../utils/version.js";
 
-export async function initializeLearnEndpointData<TResponse extends JsonValue, TResult>({
+export async function initializeLearnEndpointData<TResponse extends JsonValue, TRecord extends JsonValue>({
 	url,
 	cacheKey,
 	schema,
+	recordSchema,
 	select,
 }: {
 	readonly url: string;
 	readonly cacheKey: FileCacheKey;
 	readonly schema: z.ZodMiniType<TResponse>;
-	readonly select: (payload: TResponse) => TResult;
-}): Promise<TResult> {
+	readonly recordSchema: z.ZodMiniType<TRecord>;
+	readonly select: (payload: TResponse) => readonly TRecord[];
+}): Promise<readonly TRecord[]> {
 	logger.log({ message: `Requesting data from ${url}` });
 	const fetchedData = await fetchFromEndpoint(url, schema);
 
 	logger.log({ message: `Successfully fetched data from ${colorize("yellow", url)}` });
 
 	const filename = `${cacheKey}.json`;
+	const result = select(fetchedData);
 
 	setToFileCache({
 		cacheKey,
-		schema,
-		value: fetchedData,
+		schema: z.readonly(z.array(recordSchema)),
+		value: result,
 	});
 
 	logger.log({ message: `Data stored in ${colorize("yellow", filename)}` });
 
-	return select(fetchedData);
+	return result;
 }
 
 /** Read a cached array of records: memory cache first, falling back to the file cache. */

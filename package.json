@@ -60,6 +60,7 @@
 		"start:shttp": "node dist/bin.js shttp",
 		"docker:build": "docker build -t learn-mcp:local .",
 		"docker:build:linux": "docker build --platform linux/amd64 -t learn-mcp:linux .",
+		"docker:build:linux:latest": "docker build --platform linux/amd64 -t enngage/learn-mcp:latest . && docker push enngage/learn-mcp:latest",
 		"dev:stdio": "tsx watch lib/bin.ts stdio",
 		"dev:shttp": "tsx watch lib/bin.ts shttp"
 	},

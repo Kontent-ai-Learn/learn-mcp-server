@@ -12,6 +12,7 @@ const cacheKey: FileCacheKey = "api-reference-objects";
 export async function initializeApiReferenceObjects(): Promise<readonly ApiReferenceObject[]> {
 	return await initializeLearnEndpointData({
 		cacheKey,
+		recordSchema: apiReferenceObjectSchema,
 		schema: apiReferenceObjectsResponseSchema,
 		select: (payload) => payload.data.apiReferenceObjects,
 		url: learnUrls.apiReferenceObjectsUrl,
