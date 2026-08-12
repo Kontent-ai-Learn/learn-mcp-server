@@ -18,8 +18,8 @@ export async function findDetailsBySearch<TRecord extends JsonValue & { readonly
 	readonly label: string;
 	readonly getRecordsFromCache: () => Promise<readonly TRecord[] | undefined>;
 }): Promise<JsonValue> {
-	const searchResults = await search(text);
-	const topResult = searchResults.find((match) => match.type === type);
+	const searchResults = await search(text, type);
+	const topResult = searchResults?.[0];
 
 	if (!topResult) {
 		return `Could not find ${label} details for the given input.`;

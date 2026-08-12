@@ -1,7 +1,7 @@
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
 import { z } from "zod/mini";
-import { searchRecordTypeSchema } from "../content/models/search-records.models.js";
+import { type SearchRecordType, searchRecordTypeSchema } from "../content/models/search-records.models.js";
 import type { SearchResult } from "../indexing/indexer.models.js";
 import { CHUNKS_TABLE, DOCUMENTS_TABLE, toVectorParam } from "./tables.js";
 
@@ -22,24 +22,29 @@ export async function getDocumentsFromDb({
 	db,
 	queryVector,
 	limit,
+	type,
 }: {
 	readonly db: Database;
 	readonly queryVector: Float32Array;
 	readonly limit: number;
+	readonly type?: SearchRecordType;
 }): Promise<readonly SearchResult[]> {
 	const c = CHUNKS_TABLE.columns;
 	const d = DOCUMENTS_TABLE.columns;
 	// Rank documents by their best (smallest cosine distance) chunk; grouping in SQL
 	// Keeps one row per document. vector_distance_cos returns 1 - cosineSimilarity.
+	// Filtering by type here (rather than after LIMIT) keeps a type-specific lookup from
+	// Losing to unrelated types that rank higher in the global top-N.
 	const sql = `SELECT doc.${d.title.name}, doc.${d.url.name}, doc.${d.body.name}, doc.${d.type.name}, doc.${d.codename.name},
 			MIN(vector_distance_cos(chunk.${c.embedding.name}, vector32(?))) AS distance
 		FROM ${CHUNKS_TABLE.tableName} chunk
 		JOIN ${DOCUMENTS_TABLE.tableName} doc ON doc.${d.id.name} = chunk.${c.docId.name}
-		WHERE chunk.${c.embedding.name} IS NOT NULL
+		WHERE chunk.${c.embedding.name} IS NOT NULL ${type ? `AND doc.${d.type.name} = ?` : ""}
 		GROUP BY doc.${d.id.name}
 		ORDER BY distance ASC
 		LIMIT ?`;
-	const rows = await db.all(sql, toVectorParam(queryVector), limit);
+	const params = type ? [toVectorParam(queryVector), type, limit] : [toVectorParam(queryVector), limit];
+	const rows = await db.all(sql, ...params);
 
 	const invalidRows = rows.filter((row) => !isDocumentDistanceRow(row));
 
