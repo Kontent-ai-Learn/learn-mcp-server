@@ -51,6 +51,7 @@
 		"init": "tsx scripts/init.ts",
 		"init:test": "tsx scripts/init.ts --test",
 		"search": "tsx scripts/search.ts",
+		"get-endpoint-details": "tsx scripts/get-endpoint-details.ts",
 		"sync-server-json": "pnpm run sync-version sync && pnpm run biome:fix -- server.json",
 		"biome:check": "biome check",
 		"biome:fix": "biome check --write",
