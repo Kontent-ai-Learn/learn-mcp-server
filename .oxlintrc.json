@@ -49,6 +49,7 @@
 		"unicorn/no-array-reduce": "off",
 		"unicorn/import-style": "off",
 		"oxc/no-rest-spread-properties": "off",
-		"no-undefined": "off"
+		"no-undefined": "off",
+		"one-var": "off"
 	}
 }

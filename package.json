@@ -77,13 +77,13 @@
 		"zod": "^4"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.5.7",
+		"@biomejs/biome": "2.5.8",
 		"@kontent-ai/biome-config": "0.7.3",
 		"@types/express": "5.0.6",
 		"@types/luxon": "3.7.4",
 		"@types/node": "26.2.0",
 		"esbuild": "0.28.2",
-		"oxlint": "1.77.0",
+		"oxlint": "1.78.0",
 		"oxlint-tsgolint": "7.0.2001",
 		"tsx": "4.23.12",
 		"typescript": "7.0.2",
