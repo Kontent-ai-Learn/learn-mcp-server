@@ -44,8 +44,9 @@ npx @modelcontextprotocol/inspector         # connect to http://localhost:8080/m
 ## 2. Build the amd64 image and push to Docker Hub
 
 Replace `<user>` with your Docker Hub username. A private repo is fine (the image bundles data
-+ model), and a public repo works too — but either way, supply Docker Hub credentials to ACI
-so pulls are authenticated (see the rate-limiting note in Troubleshooting).
+
+- model), and a public repo works too — but either way, supply Docker Hub credentials to ACI
+  so pulls are authenticated (see the rate-limiting note in Troubleshooting).
 
 ```bash
 docker login                                # Docker Hub
@@ -62,7 +63,7 @@ redeploy (see the Notes section for why that matters on ACI).
 
 1. Delete the existing sample container instance (keep the resource group).
 2. **Create → Container Instances**, in the same resource group / region. Configure:
-   - **Image source:** *Other registry* → **Image:** `docker.io/<user>/learn-mcp:0.0.1`.
+   - **Image source:** _Other registry_ → **Image:** `docker.io/<user>/learn-mcp:0.0.1`.
      - Always include the **version tag**. A tagless reference resolves to `:latest`, which
        isn't pushed → the deploy fails with `InaccessibleImage`.
      - **Provide registry credentials even for a public repo** (see the rate-limiting note
@@ -92,7 +93,11 @@ curl http://<fqdn>:8080/health
 Point an MCP client at the endpoint (note **http**, and the `:8080` port):
 
 ```json
-{ "mcpServers": { "kontent-learn": { "type": "http", "url": "http://<fqdn>:8080/mcp" } } }
+{
+  "mcpServers": {
+    "kontent-learn": { "type": "http", "url": "http://<fqdn>:8080/mcp" }
+  }
+}
 ```
 
 The first request loads the embedding model into memory (a few seconds); later requests are
