@@ -3,7 +3,7 @@
 	"options": {
 		"typeAware": true
 	},
-	"ignorePatterns": ["dist/**"],
+	"ignorePatterns": ["dist/**", "ecosystem.config.js"],
 	"env": {
 		"node": true,
 		"vitest": true
