@@ -129,18 +129,21 @@ npx @kontent-ai/learn-mcp-server@latest shttp   # listens on http://localhost:30
 The HTTP server exposes:
 
 - `POST /mcp` — the MCP endpoint
-- `GET /health` — health check (status, timestamp, version)
+- `GET /health` — health check (status, timestamp, version, and automatic sync state)
 - `POST /sync` — (re)build the search index; returns counts of indexed search records, API-reference endpoints, objects, and the diff (added/changed/removed/unchanged).
 
 ## Environment Variables
 
 All variables are optional; copy `.env.template` to `.env` to override defaults.
 
-| Variable    | Default                 | Description                                                   |
-| ----------- | ----------------------- | ------------------------------------------------------------- |
-| `Port`      | `3002`                  | Port for the Streamable HTTP transport.                       |
-| `DataPath`  | `data`                  | Directory for the vector database and the cached JSON.        |
-| `LearnHost` | `http://localhost:3000` | Base URL of the Learn host exposing the AI content endpoints. |
+| Variable             | Default                 | Description                                                              |
+| -------------------- | ----------------------- | ------------------------------------------------------------------------- |
+| `Port`               | `3002`                  | Port for the Streamable HTTP transport.                                  |
+| `DataPath`           | `data`                  | Directory for the vector database and the cached JSON.                  |
+| `LearnHost`          | `http://localhost:3000` | Base URL of the Learn host exposing the AI content endpoints.           |
+| `AutoSyncEnabled`    | `true`                  | Automatically re-sync the search index from `LearnHost` on a schedule (Streamable HTTP transport only). |
+| `SyncIntervalValue`  | `1`                     | How often automatic sync runs, paired with `SyncIntervalUnit`.           |
+| `SyncIntervalUnit`   | `days`                  | Unit for `SyncIntervalValue`: `minutes`, `hours`, or `days`.             |
 
 Endpoint URLs are composed as `LearnHost` + the corresponding path.
 
@@ -149,6 +152,10 @@ The embedding model cache is the committed root-level `transformers/` folder. It
 ## Security
 
 The server is read-only and exposes only public Kontent.ai Learn documentation — it requires no API keys or credentials and performs no write operations. As with any MCP server, be mindful that document content is passed to the connected AI client.
+
+## Deployment
+
+See [`DEPLOY.md`](./DEPLOY.md) for how this server is released.
 
 ## Development
 
@@ -167,7 +174,7 @@ pnpm run build
 pnpm run start:stdio    # or start:shttp
 
 # Quality
-pnpm run lint           # biome + eslint
+pnpm run lint           # biome + oxlint
 pnpm run biome:fix      # auto-format & fix
 
 # Tests (builds a local test index from ./samples first)
@@ -188,6 +195,7 @@ lib/
   transport/     # stdio & Streamable HTTP entry points
   cache/         # in-memory & file caches
   initialization/# index build/init orchestration
+  sync/          # (re)sync runs, automatic sync scheduling & state
 scripts/         # init / clean / search CLI helpers
 samples/         # sample data used to build the test index
 tests/           # unit & integration tests
