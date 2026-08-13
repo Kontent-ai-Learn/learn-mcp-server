@@ -21,13 +21,13 @@ jobs:
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
-          node-version: '24.x'
+          node-version: "24.x"
 
-      - name: npm install, build, and test
+      - name: pnpm install, build, and test
         run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
+          pnpm install
+          pnpm run build --if-present
+          pnpm run test --if-present
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -47,7 +47,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: node-app
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -55,11 +55,10 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_8DCBB04E6BCD4919B5DC6A09BDF44380 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DAA901508CC4437DB26E2BFC66FBC4BB }}
 
-      - name: 'Deploy to Azure Web App'
+      - name: "Deploy to Azure Web App"
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'learn-mcp'
-          slot-name: 'Production'
+          app-name: "learn-mcp"
+          slot-name: "Production"
           package: .
-          
