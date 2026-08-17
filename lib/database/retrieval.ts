@@ -45,18 +45,18 @@ export async function getDocumentsFromDb({
 		LIMIT ?`;
 	const params = type ? [toVectorParam(queryVector), type, limit] : [toVectorParam(queryVector), limit];
 	const rows = await db.all(sql, ...params);
+	const parsedRows = rows.map((row) => documentDistanceRow.safeParse(row));
+	const invalidCount = parsedRows.filter((parsed) => !parsed.success).length;
 
-	const invalidRows = rows.filter((row) => !isDocumentDistanceRow(row));
-
-	if (invalidRows.length > 0) {
+	if (invalidCount > 0) {
 		throw new Error(
-			`Unexpected result from database. Out of ${colorize("yellow", rows.length.toString())} rows, ${colorize("red", invalidRows.length.toString())} do not match the expected schema.`,
+			`Unexpected result from database. Out of ${colorize("yellow", rows.length.toString())} rows, ${colorize("red", invalidCount.toString())} do not match the expected schema.`,
 		);
 	}
 
-	return rows
-		.filter((row) => isDocumentDistanceRow(row))
-		.map((row) => ({
+	return parsedRows
+		.filter((parsed): parsed is { readonly success: true; readonly data: DocumentDistanceRow } => parsed.success)
+		.map(({ data: row }) => ({
 			body: row.body,
 			codename: row.codename,
 			score: round(1 - row.distance, 4),
@@ -64,10 +64,6 @@ export async function getDocumentsFromDb({
 			type: row.type,
 			url: row.url,
 		}));
-}
-
-function isDocumentDistanceRow(data: unknown): data is DocumentDistanceRow {
-	return documentDistanceRow.safeParse(data).success;
 }
 
 function round(value: number, places: number): number {

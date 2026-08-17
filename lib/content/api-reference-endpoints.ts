@@ -19,6 +19,6 @@ export async function initializeApiReferenceEndpoints(): Promise<readonly ApiRef
 	});
 }
 
-export async function getApiReferenceEndpointsFromCache(): Promise<readonly ApiReferenceEndpoint[] | undefined> {
-	return await readCachedRecords({ cacheKey, schema: apiReferenceEndpointSchema });
+export function getApiReferenceEndpointsFromCache(): readonly ApiReferenceEndpoint[] | undefined {
+	return readCachedRecords({ cacheKey, schema: apiReferenceEndpointSchema });
 }

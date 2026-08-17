@@ -48,6 +48,10 @@ export function setInternalServerErrorResponse(res: Response, message = "Interna
 	setResponse({ json: { error: { code: -32_603, message } }, res, statusCode: 500 });
 }
 
+export function setRequestTimeoutResponse(res: Response, message = "Request timed out"): void {
+	setResponse({ json: { error: { code: -32_603, message } }, res, statusCode: 504 });
+}
+
 /** Logs the error and, unless the response has already started streaming, sends a 500. */
 export function logAndRespondError({
 	res,
@@ -101,7 +105,7 @@ function setResponse({
 	json,
 }: {
 	readonly res: Response;
-	readonly statusCode: 200 | 202 | 409 | 500;
+	readonly statusCode: 200 | 202 | 409 | 500 | 504;
 	readonly json: JsonValue;
 }): void {
 	res.status(statusCode).json({ json, jsonrpc: "2.0" });

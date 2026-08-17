@@ -39,18 +39,18 @@ export async function initializeLearnEndpointData<TResponse extends JsonValue, T
 }
 
 /** Read a cached array of records: memory cache first, falling back to the file cache. */
-export async function readCachedRecords<TRecord extends JsonValue>({
+export function readCachedRecords<TRecord extends JsonValue>({
 	cacheKey,
 	schema,
 }: {
 	readonly cacheKey: FileCacheKey;
 	readonly schema: z.ZodMiniType<TRecord>;
-}): Promise<readonly TRecord[] | undefined> {
+}): readonly TRecord[] | undefined {
 	const recordsSchema = z.readonly(z.array(schema));
-	return await getOrSetFromMemoryCache<readonly TRecord[] | undefined>({
+	return getOrSetFromMemoryCache<readonly TRecord[] | undefined>({
 		key: cacheKey,
 		schema: z.union([recordsSchema, z.undefined()]),
-		value: async () => await Promise.resolve(getFromFileCache<readonly TRecord[]>({ cacheKey, schema: recordsSchema })),
+		value: () => getFromFileCache<readonly TRecord[]>({ cacheKey, schema: recordsSchema }),
 	});
 }
 

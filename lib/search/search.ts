@@ -1,6 +1,6 @@
 import { Database } from "@tursodatabase/database";
 import { z } from "zod/mini";
-import { getOrSetFromMemoryCache } from "../cache/memory-cache.js";
+import { getOrSetFromMemoryCacheAsync } from "../cache/memory-cache.js";
 import { getDbPath, SEARCH_LIMIT } from "../config.js";
 import type { SearchRecordType } from "../content/models/search-records.models.js";
 import { openDb } from "../database/db.js";
@@ -13,13 +13,12 @@ export async function search(query: string, type?: SearchRecordType): Promise<re
 	if (trimmed.length === 0) {
 		return [];
 	}
-	const db = await getCachedDb();
-	const vector = await embedQuery(trimmed);
+	const [db, vector] = await Promise.all([getCachedDb(), embedQuery(trimmed)]);
 	return await getDocumentsFromDb({ db, limit: SEARCH_LIMIT, queryVector: vector, type });
 }
 
 async function getCachedDb(): Promise<Database> {
-	return await getOrSetFromMemoryCache({
+	return await getOrSetFromMemoryCacheAsync({
 		key: "db",
 		schema: z.instanceof(Database),
 		value: async () => await openDb(getDbPath()),

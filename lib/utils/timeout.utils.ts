@@ -3,14 +3,19 @@ import type { Duration } from "luxon";
 export type WithTimeoutResult<T> = { readonly kind: "resolved"; readonly value: T } | { readonly kind: "timedOut" };
 
 export async function withTimeout<T>(promise: Promise<T>, timeout: Duration): Promise<WithTimeoutResult<T>> {
+	const timerHandle: { current?: NodeJS.Timeout } = {};
 	const timedOut = new Promise<WithTimeoutResult<T>>((resolve) => {
-		setTimeout(() => {
+		timerHandle.current = setTimeout(() => {
 			resolve({ kind: "timedOut" });
 		}, timeout.as("milliseconds"));
 	});
 	const resolved = promise.then((value): WithTimeoutResult<T> => ({ kind: "resolved", value }));
 
-	return await Promise.race([resolved, timedOut]);
+	try {
+		return await Promise.race([resolved, timedOut]);
+	} finally {
+		clearTimeout(timerHandle.current);
+	}
 }
 
 /**

@@ -16,7 +16,7 @@ export async function findDetailsBySearch<TRecord extends JsonValue & { readonly
 	readonly text: string;
 	readonly type: SearchRecordType;
 	readonly label: string;
-	readonly getRecordsFromCache: () => Promise<readonly TRecord[] | undefined>;
+	readonly getRecordsFromCache: () => readonly TRecord[] | undefined;
 }): Promise<JsonValue> {
 	const searchResults = await search(text, type);
 	const topResult = searchResults?.[0];
@@ -25,7 +25,7 @@ export async function findDetailsBySearch<TRecord extends JsonValue & { readonly
 		return `Could not find ${label} details for the given input.`;
 	}
 
-	const records = await getRecordsFromCache();
+	const records = getRecordsFromCache();
 
 	if (!records) {
 		return "Could not fetch learn records. Run indexer to initialize the cache.";

@@ -1,20 +1,39 @@
 import path from "node:path";
 import { match } from "ts-pattern";
+import { z } from "zod/mini";
+import { getOrSetFromMemoryCache } from "../cache/memory-cache.js";
 import { existsSync, loadEnvFile } from "./file.utils.js";
 
-type SyncIntervalUnit = "minutes" | "hours" | "days";
+const syncIntervalUnitSchema = z.literal(["minutes", "hours", "days"]);
+type SyncIntervalUnit = z.infer<typeof syncIntervalUnitSchema>;
 
-interface EnvConfig {
-	readonly port: number;
-	readonly dataPath: string;
-	readonly learnHost: string;
-	readonly isTest: boolean;
-	readonly autoSyncEnabled: boolean;
-	readonly syncIntervalValue: number;
-	readonly syncIntervalUnit: SyncIntervalUnit;
+const envConfigSchema = z.readonly(
+	z.object({
+		autoSyncEnabled: z.boolean(),
+		dataPath: z.string(),
+		isTest: z.boolean(),
+		learnHost: z.string(),
+		port: z.number(),
+		syncIntervalUnit: syncIntervalUnitSchema,
+		syncIntervalValue: z.number(),
+	}),
+);
+type EnvConfig = z.infer<typeof envConfigSchema>;
+
+/**
+ * Env vars never change at runtime, so the parsed config is cached after the first call —
+ * without this, every caller (health checks, sync scheduling, etc.) re-walks the filesystem for
+ * `.env` and reloads it from disk on every call.
+ */
+export function getEnvConfig(): EnvConfig {
+	return getOrSetFromMemoryCache({
+		key: "envConfig",
+		schema: envConfigSchema,
+		value: () => computeEnvConfig(),
+	});
 }
 
-export function getEnvConfig(): EnvConfig {
+function computeEnvConfig(): EnvConfig {
 	loadEnvironmentVariables();
 
 	const port = getOptionalValue("Port");

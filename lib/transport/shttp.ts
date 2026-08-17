@@ -1,6 +1,10 @@
+import compression from "compression";
 import express, { type Response } from "express";
+import { warmupEmbeddingPipeline } from "../indexing/embeddings.js";
 import { startAutoSyncIfEnabled } from "../sync/auto-sync.js";
 import { getEnvConfig } from "../utils/environment.utils.js";
+import { getErrorMessage } from "../utils/error.utils.js";
+import { logger } from "../utils/logger.js";
 import { packageJsonName, packageJsonVersion } from "../utils/version.js";
 import { handleHealth } from "./routes/health.route.js";
 import { handleMcpRequest } from "./routes/mcp.route.js";
@@ -15,6 +19,7 @@ const supportedRoutes: readonly SupportedRoute[] = [
 
 export function startStreamableHTTP(): void {
 	const app = express();
+	app.use(compression());
 	app.use(express.json());
 
 	// Registers each handler plus an automatic friendly 405 for any other method on a
@@ -43,6 +48,9 @@ Supported routes:
 ${formatSupportedRoutes()}`,
 		);
 		startAutoSyncIfEnabled();
+		warmupEmbeddingPipeline().catch((error: unknown) => {
+			logger.log({ message: `Failed to warm up the embedding pipeline: ${getErrorMessage(error)}`, type: "error" });
+		});
 	});
 }
 

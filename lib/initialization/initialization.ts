@@ -56,9 +56,11 @@ export async function cleanData(options?: Parameters<typeof syncAll>[0]): Promis
 }
 
 async function initializeProdData(): Promise<SyncResult> {
-	const apiReferenceEndpoints = await initializeApiReferenceEndpoints();
-	const apiReferenceObjects = await initializeApiReferenceObjects();
-	const searchRecords = await initializeSearchRecords();
+	const [apiReferenceEndpoints, apiReferenceObjects, searchRecords] = await Promise.all([
+		initializeApiReferenceEndpoints(),
+		initializeApiReferenceObjects(),
+		initializeSearchRecords(),
+	]);
 
 	return await finishSync({ apiReferenceEndpoints, apiReferenceObjects, isTest: false, searchRecords });
 }
