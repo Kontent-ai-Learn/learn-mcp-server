@@ -3,7 +3,7 @@ import { connect, type Database } from "@tursodatabase/database";
 import type { DocChunk, NormalizedDoc } from "../indexing/indexer.models.js";
 import { mkdir } from "../utils/file.utils.js";
 import { yieldToEventLoop } from "../utils/timeout.utils.js";
-import { buildCreateTableQuery, deleteFrom, insertInto, selectFrom, updateTable } from "./db.utils.js";
+import { buildCreateTableQuery, deleteFrom, insertInto, selectFrom } from "./db.utils.js";
 import { CHUNKS_TABLE, DOCUMENTS_TABLE, toVectorParam } from "./tables.js";
 
 export async function openDb(path: string): Promise<Database> {
@@ -74,15 +74,11 @@ export async function updateEmbeddings(
 		return;
 	}
 	const transaction = db.transactionAsync(async (txn) => {
+		const statement = await txn.prepare(
+			`UPDATE ${CHUNKS_TABLE.tableName} SET ${CHUNKS_TABLE.columns.embedding.name} = vector32(?), ${CHUNKS_TABLE.columns.embeddingModel.name} = ? WHERE ${CHUNKS_TABLE.columns.chunkKey.name} = ?`,
+		);
 		for (const item of items) {
-			await updateTable(txn, {
-				definition: CHUNKS_TABLE,
-				set: {
-					embedding: { expression: "vector32(?)", params: [toVectorParam(item.vector)] },
-					embeddingModel: model,
-				},
-				where: { column: "chunkKey", value: item.chunkKey },
-			});
+			await statement.run(toVectorParam(item.vector), model, item.chunkKey);
 		}
 	});
 	await transaction();
@@ -91,7 +87,8 @@ export async function updateEmbeddings(
 function buildCreateIndexesQuery(): string {
 	return `
 CREATE INDEX IF NOT EXISTS idx_chunks_doc_id ON ${CHUNKS_TABLE.tableName}(${CHUNKS_TABLE.columns.docId.name});
-CREATE INDEX IF NOT EXISTS idx_chunks_fts ON ${CHUNKS_TABLE.tableName} USING fts (${CHUNKS_TABLE.columns.text.name});`;
+CREATE INDEX IF NOT EXISTS idx_chunks_fts ON ${CHUNKS_TABLE.tableName} USING fts (${CHUNKS_TABLE.columns.text.name});
+CREATE INDEX IF NOT EXISTS idx_documents_type ON ${DOCUMENTS_TABLE.tableName}(${DOCUMENTS_TABLE.columns.type.name});`;
 }
 
 function buildCreateTablesQuery(): string {
