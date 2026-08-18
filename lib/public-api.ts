@@ -1,5 +1,6 @@
 /** Biome-ignore-all lint/performance/noBarrelFile: Fine for public API */
 
+export { getEndpointDetails, getObjectDetails } from "./content/api-reference-details.js";
 export type {
 	ApiReferenceCodeSample,
 	ApiReferenceEndpoint,

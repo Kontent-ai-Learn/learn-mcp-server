@@ -1,6 +1,5 @@
 import z from "zod";
-import { getApiReferenceEndpointsFromCache } from "../content/api-reference-endpoints.js";
-import { findDetailsBySearch } from "./shared/find-details-by-search.js";
+import { getEndpointDetails } from "../content/api-reference-details.js";
 import { defineReadOnlyTool } from "./shared/tool-definitions.js";
 import { withToolHandler } from "./shared/tool-handler.js";
 import type { ToolName } from "./shared/tool-models.js";
@@ -12,13 +11,7 @@ export const getEndpointDetailsTools = defineReadOnlyTool({
 		"Retrieves details for a requested endpoint. It includes the endpoint URL, title, description, code samples, request body schema, response body schema, query parameters and headers.",
 	handler: async ({ text }) =>
 		await withToolHandler({
-			handler: async () =>
-				await findDetailsBySearch({
-					getRecordsFromCache: getApiReferenceEndpointsFromCache,
-					label: "endpoint",
-					text,
-					type: "endpoint",
-				}),
+			handler: async () => await getEndpointDetails(text),
 			toolName,
 		}),
 	inputSchema: {

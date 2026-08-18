@@ -6,14 +6,30 @@ import { getEnvConfig } from "../utils/environment.utils.js";
 import { getErrorMessage } from "../utils/error.utils.js";
 import { logger } from "../utils/logger.js";
 import { packageJsonName, packageJsonVersion } from "../utils/version.js";
+import { handleEndpointDetails } from "./routes/endpoint-details.route.js";
 import { handleHealth } from "./routes/health.route.js";
 import { handleMcpRequest } from "./routes/mcp.route.js";
+import { handleObjectDetails } from "./routes/object-details.route.js";
 import { registerRoutes, type SupportedRoute } from "./routes/route.utils.js";
+import { handleSearch } from "./routes/search.route.js";
 import { handleSync } from "./routes/sync.route.js";
 
 const supportedRoutes: readonly SupportedRoute[] = [
 	{ description: "MCP endpoint (Streamable HTTP).", handler: handleMcpRequest, method: "post", path: "/mcp" },
 	{ description: "Health check — status, timestamp, and version.", handler: handleHealth, method: "get", path: "/health" },
+	{ description: "Searches Kontent.ai Learn documentation and developer guides.", handler: handleSearch, method: "get", path: "/search" },
+	{
+		description: "Retrieves details for a requested API endpoint.",
+		handler: handleEndpointDetails,
+		method: "get",
+		path: "/endpoint-details",
+	},
+	{
+		description: "Retrieves details for a requested API reference object.",
+		handler: handleObjectDetails,
+		method: "get",
+		path: "/object-details",
+	},
 	{ description: "(Re)build the search index from the configured Learn host.", handler: handleSync, method: "post", path: "/sync" },
 ];
 

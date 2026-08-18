@@ -40,6 +40,10 @@ export function setAcceptedResponse(res: Response, json: JsonValue): void {
 	setResponse({ json, res, statusCode: 202 });
 }
 
+export function setBadRequestResponse(res: Response, message: string): void {
+	setResponse({ json: { error: { code: -32_602, message } }, res, statusCode: 400 });
+}
+
 export function setConflictResponse(res: Response, error: { readonly type: string; readonly message: string }): void {
 	setResponse({ json: { error }, res, statusCode: 409 });
 }
@@ -105,7 +109,7 @@ function setResponse({
 	json,
 }: {
 	readonly res: Response;
-	readonly statusCode: 200 | 202 | 409 | 500 | 504;
+	readonly statusCode: 200 | 202 | 400 | 409 | 500 | 504;
 	readonly json: JsonValue;
 }): void {
 	res.status(statusCode).json({ json, jsonrpc: "2.0" });
