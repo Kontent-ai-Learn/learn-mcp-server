@@ -12,12 +12,13 @@ driven by pushing to the `prod` branch.
 2. **Push to `prod`.** This triggers the GitHub Actions workflow
    [`prod_learn-mcp(staging).yml`](.github/workflows/prod_learn-mcp(staging).yml), which
    builds the app and deploys it to the **staging slot** of the `learn-mcp` Azure Web
-   App (Azure subscription: **Kontent Learn**).
+   App.
 3. **Verify on staging:**
 
    ```
-   https://learn-mcp-staging-a3bxawf3dhazacf0.westeurope-01.azurewebsites.net
+   https://<staging-app-url>.azurewebsites.net
    ```
+   (see the Azure Portal for the actual URL)
 
 4. **Promote to production.** Once staging looks good, swap the staging slot with the
    production slot in the [Azure Portal](https://portal.azure.com) (App Service →
@@ -26,8 +27,9 @@ driven by pushing to the `prod` branch.
 5. **Live at production:**
 
    ```
-   https://learn-mcp-hzc6csg7b4cxb0hf.westeurope-01.azurewebsites.net
+   https://<production-app-url>.azurewebsites.net
    ```
+   (see the Azure Portal for the actual URL)
 
 ## Alternative: Docker / Azure Container Instances
 
