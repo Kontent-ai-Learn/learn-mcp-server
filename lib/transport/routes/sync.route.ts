@@ -1,16 +1,21 @@
 import { tryCatchAsync } from "@kontent-ai/core-sdk";
 import type { Request, Response } from "express";
 import { Duration } from "luxon";
+import { match } from "ts-pattern";
 import { LearnMcpExceptionError } from "../../exceptions/learn-mcp-exception.js";
 import { runAndRecordSync, type SyncRunResult } from "../../sync/sync-runner.js";
 import { withTimeout } from "../../utils/timeout.utils.js";
+import { validateSyncToken } from "../../utils/token.utils.js";
 import { packageJsonVersion } from "../../utils/version.js";
-import { logAndRespondError, setAcceptedResponse, setConflictResponse, setOkResponse } from "./route.utils.js";
+import { logAndRespondError, setAcceptedResponse, setConflictResponse, setOkResponse, setUnauthorizedResponse } from "./route.utils.js";
 
-const SYNC_WAIT_TIMEOUT = Duration.fromObject({ seconds: 15 });
+const SYNC_WAIT_TIMEOUT = Duration.fromObject({ seconds: 5 });
 
-export async function handleSync(_req: Request, res: Response): Promise<void> {
-	const syncOutcome = tryCatchAsync(async () => await runAndRecordSync("Manual sync"));
+export async function handleSync(req: Request, res: Response): Promise<void> {
+	const syncOutcome = tryCatchAsync(async () => {
+		validateSyncToken(req);
+		return await runAndRecordSync("Manual sync");
+	});
 	const raceResult = await withTimeout(syncOutcome, SYNC_WAIT_TIMEOUT);
 
 	if (raceResult.kind === "timedOut") {
@@ -38,7 +43,14 @@ function respondWithSyncStillRunning(res: Response): void {
 
 function respondWithSyncError(res: Response, error: unknown): void {
 	if (error instanceof LearnMcpExceptionError) {
-		setConflictResponse(res, { message: error.message, type: error.type });
+		match(error.type)
+			.with("syncAlreadyRunning", () => {
+				setConflictResponse(res, { message: error.message, type: error.type });
+			})
+			.with("unauthorized", () => {
+				setUnauthorizedResponse(res, { message: error.message, type: error.type });
+			})
+			.exhaustive();
 		return;
 	}
 	logAndRespondError({ error, requestLabel: "sync", res });

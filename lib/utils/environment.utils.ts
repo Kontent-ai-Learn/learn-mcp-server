@@ -9,6 +9,7 @@ type SyncIntervalUnit = z.infer<typeof syncIntervalUnitSchema>;
 
 const envConfigSchema = z.readonly(
 	z.object({
+		apiToken: z.string(),
 		autoSyncEnabled: z.boolean(),
 		dataPath: z.string(),
 		isTest: z.boolean(),
@@ -36,6 +37,7 @@ export function getEnvConfig(): EnvConfig {
 function computeEnvConfig(): EnvConfig {
 	loadEnvironmentVariables();
 
+	const apiToken = getOptionalValue("ApiToken") ?? "";
 	const port = getOptionalValue("Port");
 	const dataPath = getOptionalValue("DataPath") ?? "data";
 	const learnHost = getOptionalValue("LearnHost") ?? "http://localhost:3000";
@@ -45,6 +47,7 @@ function computeEnvConfig(): EnvConfig {
 	const syncIntervalUnit = parseSyncIntervalUnit(getOptionalValue("SyncIntervalUnit"));
 
 	return {
+		apiToken,
 		autoSyncEnabled,
 		dataPath,
 		isTest,

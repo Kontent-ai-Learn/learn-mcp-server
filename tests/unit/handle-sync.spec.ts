@@ -4,8 +4,12 @@ import { afterEach, beforeEach, expect, it, type Mock, vi } from "vitest";
 import { LearnMcpExceptionError } from "../../lib/exceptions/learn-mcp-exception.js";
 import { runAndRecordSync } from "../../lib/sync/sync-runner.js";
 import { handleSync } from "../../lib/transport/routes/sync.route.js";
+import { getEnvConfig } from "../../lib/utils/environment.utils.js";
+
+const VALID_TOKEN = "test-token";
 
 vi.mock("../../lib/sync/sync-runner.js", () => ({ runAndRecordSync: vi.fn() }));
+vi.mock("../../lib/utils/environment.utils.js", () => ({ getEnvConfig: vi.fn() }));
 
 type MockResponse = { readonly res: Response; readonly status: Mock; readonly json: Mock };
 
@@ -18,8 +22,14 @@ function createResponse(): MockResponse {
 	return { json, res, status };
 }
 
+function createRequest(token?: string): Request {
+	return { query: token === undefined ? {} : { token } } as unknown as Request;
+}
+
 beforeEach(() => {
 	vi.useFakeTimers();
+	vi.clearAllMocks();
+	vi.mocked(getEnvConfig).mockReturnValue({ apiToken: VALID_TOKEN } as ReturnType<typeof getEnvConfig>);
 });
 
 afterEach(() => {
@@ -35,7 +45,7 @@ it("returns 202 when the sync hasn't finished after 15 seconds", async () => {
 	);
 	const { res, status } = createResponse();
 
-	const pending = handleSync({} as Request, res);
+	const pending = handleSync(createRequest(VALID_TOKEN), res);
 	await vi.advanceTimersByTimeAsync(15_000);
 	await pending;
 
@@ -51,7 +61,7 @@ it("returns 409 syncAlreadyRunning when the lock is already held", async () => {
 	);
 	const { res, status } = createResponse();
 
-	await handleSync({} as Request, res);
+	await handleSync(createRequest(VALID_TOKEN), res);
 
 	expect(status).toHaveBeenCalledWith(409);
 });
@@ -75,7 +85,25 @@ it("returns 200 when the sync finishes within the timeout", async () => {
 	});
 	const { res, status } = createResponse();
 
-	await handleSync({} as Request, res);
+	await handleSync(createRequest(VALID_TOKEN), res);
 
 	expect(status).toHaveBeenCalledWith(200);
+});
+
+it("returns 401 when the token query parameter is missing", async () => {
+	const { res, status } = createResponse();
+
+	await handleSync(createRequest(), res);
+
+	expect(status).toHaveBeenCalledWith(401);
+	expect(runAndRecordSync).not.toHaveBeenCalled();
+});
+
+it("returns 401 when the token query parameter doesn't match", async () => {
+	const { res, status } = createResponse();
+
+	await handleSync(createRequest("wrong-token"), res);
+
+	expect(status).toHaveBeenCalledWith(401);
+	expect(runAndRecordSync).not.toHaveBeenCalled();
 });

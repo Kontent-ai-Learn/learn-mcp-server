@@ -1,4 +1,4 @@
-export type LearnMcpExceptionType = "syncAlreadyRunning";
+export type LearnMcpExceptionType = "syncAlreadyRunning" | "unauthorized";
 
 export class LearnMcpExceptionError extends Error {
 	public readonly type: LearnMcpExceptionType;
