@@ -14,6 +14,22 @@ AI-powered semantic search over [Kontent.ai](https://kontent.ai) Learn — docum
 - 🖥️ **Runs fully locally** — embeddings are computed on-device with [transformers.js](https://github.com/huggingface/transformers.js) and stored in a local [Turso](https://github.com/tursodatabase)/libSQL vector database. No external AI API key is required for search.
 - 🔌 **Two transports** — `stdio` for local MCP clients and Streamable HTTP for hosted/remote setups.
 
+## Hosted Instance
+
+Kontent.ai runs a public, always-on instance of this server — no install, Node.js, or index build required. Point any Streamable HTTP-capable MCP client at it:
+
+```json
+{
+  "mcpServers": {
+    "kontent-ai-learn": {
+      "url": "https://learn-mcp.kontent.ai/mcp"
+    }
+  }
+}
+```
+
+It exposes the same three read-only tools (`search-content`, `get-endpoint-details`, `get-object-details`) with no additional client-side configuration. Check `GET https://learn-mcp.kontent.ai/health` to confirm it's up and see the running version.
+
 ## Available Tools
 
 | Tool                   | Description                                                                                                                                                                         |
@@ -118,22 +134,6 @@ npx @kontent-ai/learn-mcp-server@latest shttp   # listens on http://localhost:30
   }
 }
 ```
-
-### Hosted Instance
-
-Kontent.ai runs a public, always-on instance of this server — no install, Node.js, or index build required. Point any Streamable HTTP-capable MCP client at it:
-
-```json
-{
-  "mcpServers": {
-    "kontent-ai-learn": {
-      "url": "https://learn-mcp.kontent.ai/mcp"
-    }
-  }
-}
-```
-
-It exposes the same three read-only tools (`search-content`, `get-endpoint-details`, `get-object-details`) with no additional client-side configuration. Check `GET https://learn-mcp.kontent.ai/health` to confirm it's up and see the running version.
 
 ## Transport Options
 
