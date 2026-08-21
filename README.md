@@ -119,6 +119,22 @@ npx @kontent-ai/learn-mcp-server@latest shttp   # listens on http://localhost:30
 }
 ```
 
+### Hosted Instance
+
+Kontent.ai runs a public, always-on instance of this server — no install, Node.js, or index build required. Point any Streamable HTTP-capable MCP client at it:
+
+```json
+{
+  "mcpServers": {
+    "kontent-ai-learn": {
+      "url": "https://learn-mcp.kontent.ai/mcp"
+    }
+  }
+}
+```
+
+It exposes the same three read-only tools (`search-content`, `get-endpoint-details`, `get-object-details`) with no additional client-side configuration. Check `GET https://learn-mcp.kontent.ai/health` to confirm it's up and see the running version.
+
 ## Transport Options
 
 | Transport           | Command                                         | Notes                                                           |
@@ -130,7 +146,10 @@ The HTTP server exposes:
 
 - `POST /mcp` — the MCP endpoint
 - `GET /health` — health check (status, timestamp, version, and automatic sync state)
-- `POST /sync` — (re)build the search index; returns counts of indexed search records, API-reference endpoints, objects, and the diff (added/changed/removed/unchanged).
+- `GET /search?text=<query>` — semantic search over Learn documentation and developer guides
+- `GET /endpoint-details?text=<query>` — API endpoint reference lookup by natural-language text
+- `GET /object-details?text=<query>` — API reference object lookup by natural-language text
+- `POST /sync?token=<ApiToken>` — (re)build the search index; requires a `token` query parameter matching the configured `ApiToken`. Returns `200` with index counts (added/changed/removed/unchanged) on completion, `202` if still running after 5s, `409` if a sync is already in progress, or `401` if the token is missing/invalid.
 
 ## Environment Variables
 
@@ -144,6 +163,7 @@ All variables are optional; copy `.env.template` to `.env` to override defaults.
 | `AutoSyncEnabled`    | `true`                  | Automatically re-sync the search index from `LearnHost` on a schedule (Streamable HTTP transport only). |
 | `SyncIntervalValue`  | `1`                     | How often automatic sync runs, paired with `SyncIntervalUnit`.           |
 | `SyncIntervalUnit`   | `days`                  | Unit for `SyncIntervalValue`: `minutes`, `hours`, or `days`.             |
+| `ApiToken`           | *(none)*                 | Secret token required as a `?token=` query parameter to call `POST /sync`. Unset by default — set it to protect the sync endpoint. |
 
 Endpoint URLs are composed as `LearnHost` + the corresponding path.
 
@@ -151,7 +171,7 @@ The embedding model cache is the committed root-level `transformers/` folder. It
 
 ## Security
 
-The server is read-only and exposes only public Kontent.ai Learn documentation — it requires no API keys or credentials and performs no write operations. As with any MCP server, be mindful that document content is passed to the connected AI client.
+The server is read-only and exposes only public Kontent.ai Learn documentation. The MCP endpoint and the read-only GET routes (`/search`, `/endpoint-details`, `/object-details`) require no API keys or credentials. `POST /sync` is the only write operation and is protected by the `ApiToken` token when one is configured. As with any MCP server, be mindful that document content is passed to the connected AI client.
 
 ## Deployment
 
