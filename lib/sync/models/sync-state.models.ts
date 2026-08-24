@@ -31,3 +31,18 @@ export const syncStateSchema = z.readonly(
 	}),
 );
 export type SyncState = z.infer<typeof syncStateSchema>;
+
+export const humanizedSyncStateSchema = z.readonly(
+	z.object({
+		duration: z.string(),
+		durationMs: z.number(),
+		ended: z.string(),
+		endedAt: z.string(),
+		error: z.optional(z.string()),
+		result: z.optional(syncOutcomeSchema),
+		started: z.string(),
+		startedAt: z.string(),
+		success: z.boolean(),
+	}),
+);
+export type HumanizedSyncState = z.infer<typeof humanizedSyncStateSchema>;

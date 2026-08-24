@@ -13,6 +13,13 @@ export function toIsoString(dt: DateTime): string {
 	return dt.toISO() ?? dt.toString();
 }
 
+export function toRelativeDateTimeString(dt: DateTime): string {
+	if (!dt.isValid) {
+		return "invalid datetime input";
+	}
+	return dt.toRelative() ?? "invalid datetime input";
+}
+
 export function formatDuration(durationMs: number): string {
 	const human = Duration.fromMillis(durationMs)
 		.shiftTo("hours", "minutes", "seconds")
