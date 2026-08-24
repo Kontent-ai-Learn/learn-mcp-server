@@ -8,7 +8,7 @@ const toolName: ToolName = "get-endpoint-details";
 
 export const getEndpointDetailsTools = defineReadOnlyTool({
 	description:
-		"Retrieves details for a requested endpoint. It includes the endpoint URL, title, description, code samples, request body schema, response body schema, query parameters and headers.",
+		"Retrieves details for a requested Kontent.ai API endpoint. It includes the endpoint URL, title, description, code samples, request body schema, response body schema, query parameters and headers.",
 	handler: async ({ text }) =>
 		await withToolHandler({
 			handler: async () => await getEndpointDetails(text),
