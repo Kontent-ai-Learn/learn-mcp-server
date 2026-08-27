@@ -1,4 +1,5 @@
 import compression from "compression";
+import cors from "cors";
 import express, { type Response } from "express";
 import { warmupEmbeddingPipeline } from "../indexing/embeddings.js";
 import { startAutoSyncIfEnabled } from "../sync/auto-sync.js";
@@ -33,8 +34,19 @@ const supportedRoutes: readonly SupportedRoute[] = [
 	{ description: "(Re)build the search index from the configured Learn host.", handler: handleSync, method: "post", path: "/sync" },
 ];
 
+// Public, unauthenticated, read-only API — safe to allow any origin. Browser-based clients
+// (e.g. Claude Desktop's connector UI) preflight non-simple requests with OPTIONS; without
+// This, that preflight fell through to the 405 handler with no CORS headers and the browser
+// Silently blocked every real request.
+const corsOptions: cors.CorsOptions = {
+	allowedHeaders: ["Content-Type", "Accept", "Mcp-Session-Id", "Mcp-Protocol-Version"],
+	methods: ["GET", "POST", "OPTIONS"],
+	origin: "*",
+};
+
 export function startStreamableHTTP(): void {
 	const app = express();
+	app.use(cors(corsOptions));
 	app.use(compression());
 	app.use(express.json());
 
