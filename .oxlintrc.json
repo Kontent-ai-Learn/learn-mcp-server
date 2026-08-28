@@ -53,6 +53,7 @@
 		"one-var": "off",
 		"sort-keys": "off",
 		"unicorn/no-null": "off",
-		"capitalized-comments": "off"
+		"capitalized-comments": "off",
+		"max-statements": ["error", { "max": 15 }]
 	}
 }
