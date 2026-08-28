@@ -7,6 +7,7 @@ import { getEnvConfig } from "../utils/environment.utils.js";
 import { getErrorMessage } from "../utils/error.utils.js";
 import { logger } from "../utils/logger.js";
 import { packageJsonName, packageJsonVersion } from "../utils/version.js";
+import { handleClean } from "./routes/clean.route.js";
 import { handleEndpointDetails } from "./routes/endpoint-details.route.js";
 import { handleHealth } from "./routes/health.route.js";
 import { handleMcpRequest } from "./routes/mcp.route.js";
@@ -18,6 +19,7 @@ import { handleSync } from "./routes/sync.route.js";
 const supportedRoutes: readonly SupportedRoute[] = [
 	{ description: "MCP endpoint (Streamable HTTP).", handler: handleMcpRequest, method: "post", path: "/mcp" },
 	{ description: "Health check — status, timestamp, and version.", handler: handleHealth, method: "get", path: "/health" },
+	{ description: "Cleans the search related data. ", handler: handleClean, method: "post", path: "/clean" },
 	{ description: "Searches Kontent.ai Learn documentation and developer guides.", handler: handleSearch, method: "get", path: "/search" },
 	{
 		description: "Retrieves details for a requested API endpoint.",
