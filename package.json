@@ -1,6 +1,6 @@
 {
 	"name": "@kontent-ai/learn-mcp-server",
-	"version": "0.0.15",
+	"version": "0.0.16",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/kontent-ai/mcp-server"
