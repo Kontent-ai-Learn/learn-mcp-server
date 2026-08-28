@@ -884,6 +884,7 @@
 	"apiReferenceEndpoints": [
 		{
 			"id": "api-ref-001",
+			"apiReference": "delivery_api",
 			"codename": "list_content_items",
 			"title": "List content items",
 			"markdownContent": "Retrieve a list of content items from the specified environment. By default, the API returns an unfiltered paginated list of content items in the default language, ordered alphabetically by codename. The response size{#a-response-size#} is limited to 2000 items.\n\nThe `modular_content` object property will contain both components and linked items in the API response. See Linked content and components for more details.\n\nIf you need to export all content items, we recommend you enumerate content items.",
@@ -1323,6 +1324,7 @@
 		},
 		{
 			"id": "api-ref-002",
+			"apiReference": "delivery_api",
 			"codename": "retrieve_a_content_item",
 			"title": "Retrieve a content item",
 			"markdownContent": "Retrieve a content item by its codename.\n\nThe response size{#a-response-size#} is limited to 2000 items.",
@@ -1690,6 +1692,7 @@
 		},
 		{
 			"id": "api-ref-003",
+			"apiReference": "delivery_api",
 			"codename": "enumerate_content_items",
 			"title": "Enumerate content items",
 			"markdownContent": "Retrieve a dynamically paginated list of content items ordered alphabetically by codename.\n\nWe recommend using this endpoint for scenarios such as:\n\n* Warming up your app's cache, that is getting all content into the cache after the app starts.\n* Exporting the content of your project's environment.\n\nThis endpoint, unlike the List content items endpoint, guarantees to enumerate all content items in the specified environment. The `modular_content` object property will contain only components used in rich text elements in the API response. See Linked content and components for more details.\n\n**Paging**\n\nIf the response comes with the `X-Continuation` header, it means that there are more pages to retrieve. To get the next page of results, send the `X-Continuation` header with your request as you received it.",
@@ -2005,6 +2008,7 @@
 		},
 		{
 			"id": "api-ref-004",
+			"apiReference": "delivery_api",
 			"codename": "list_items_that_reference_an_asset",
 			"title": "List items that reference an asset",
 			"markdownContent": "Returns a list of content items that contain references to a specific asset.\n\n**What is a used asset?**\n\nFor a content item to be included in the _Used in_ list of a specific asset, at least one of the following must occur:\n\n* The asset is inserted in a rich text element{#a-adding-content-items#} of another content item.\n* The asset is hyperlinked in a rich text element{#a-adding-links#} of another content item.\n* The asset is linked in an asset element of another content item.\n\n**References to unavailable assets**\n\nYou can use the endpoint even for assets that were deleted. For example, when you get a webhook notification about asset deletion, you can check whether the asset is still used anywhere in your published content.\n\n**Filtering**\n\nYou can filter the returned list of content items by the following content item `system` properties: `type`, `collection`, `workflow`, `workflow_step`, and `language`. For example, if you're interested only in items referencing the specified asset within a specific collection, you can filter by the `system.collection`.\n\n**Localization**\n\nBy default, the endpoint returns content items in the default language. If you want to check an asset's usage across multiple languages, you can specify the languages using the `system.language` parameter, for example `system.language[in]=english,spanish`.\n\nThe endpoint ignores language fallbacks{#a-language-fallbacks#}.\n\n**Paging**\n\nIf the response comes with the `X-Continuation` header, it means that there are more pages to retrieve. To get the next page of results, send the `X-Continuation` header with your request as you received it.",
@@ -2159,6 +2163,7 @@
 		},
 		{
 			"id": "api-ref-005",
+			"apiReference": "delivery_api",
 			"codename": "dapi_items_used_in",
 			"title": "List items that reference an item",
 			"markdownContent": "Returns a list of content items that contain references to a specific content item.\n\n**What is a used content item?**\n\nFor an item to be included in the _Used in_ list of a specific content item, at least one of the following must occur:\n\n* The content item is inserted in a rich text element{#a-adding-content-items#} of another content item.\n* The content item is hyperlinked in a rich text element{#a-adding-links#} of another content item.\n* The content item is linked in a linked items element of another content item.\n* The content item links to itself within a rich text or linked items element.\n\n**References to unavailable items**\n\nYou can use the endpoint even for content items that were archived or deleted. For example, when you get a webhook notification about content item unpublishing or deletion, you can check whether the content item is still used anywhere in your published content.\n\n**Filtering**\n\nYou can filter the returned list of content items by the following content item `system` properties: `type`, `collection`, `workflow`, `workflow_step`, and `language`. For example, if you're interested only in items referencing the specified content item within a specific collection, you can filter by the `system.collection`.\n\n**Localization**\n\nBy default, the endpoint returns content items in the default language. If you want to check an item's usage across multiple languages, you can specify the languages using the `system.language` parameter, for example `system.language[in]=english,spanish`.\n\nThe endpoint ignores language fallbacks{#a-language-fallbacks#}.\n\n**Paging**\n\nIf the response comes with the `X-Continuation` header, it means that there are more pages to retrieve. To get the next page of results, send the `X-Continuation` header with your request as you received it.",
@@ -2313,6 +2318,7 @@
 		},
 		{
 			"id": "api-ref-006",
+			"apiReference": "delivery_api",
 			"codename": "list_content_types",
 			"title": "List content types",
 			"markdownContent": "Retrieve a paginated list of content types. By default, the API returns all content types ordered alphabetically by codename.\n\nYou can customize pagination by specifying both the `skip` and `limit` query parameters.",
@@ -2518,6 +2524,7 @@
 		},
 		{
 			"id": "api-ref-007",
+			"apiReference": "delivery_api",
 			"codename": "retrieve_a_content_type_384b00d",
 			"title": "Retrieve a content type",
 			"markdownContent": "Retrieve a specific content type.",
@@ -2705,6 +2712,7 @@
 		},
 		{
 			"id": "api-ref-008",
+			"apiReference": "delivery_api",
 			"codename": "retrieve_a_content_element",
 			"title": "Retrieve a content type element",
 			"markdownContent": "Retrieve a content type element defined in a specific content type. Both the type and element must be specified by their codenames.",
@@ -2885,6 +2893,7 @@
 		},
 		{
 			"id": "api-ref-009",
+			"apiReference": "delivery_api",
 			"codename": "list_languages_f72e9ef",
 			"title": "List languages",
 			"markdownContent": "Retrieve a list of active languages. By default, the API returns all languages ordered alphabetically by codename.",
@@ -3048,6 +3057,7 @@
 		},
 		{
 			"id": "api-ref-010",
+			"apiReference": "delivery_api",
 			"codename": "list_taxonomy_groups",
 			"title": "List taxonomy groups",
 			"markdownContent": "Retrieve a paginated list of taxonomy groups. By default, the API returns all taxonomy groups ordered alphabetically by codename.\n\nYou can customize pagination by specifying both the `skip` and `limit` query parameters.",
