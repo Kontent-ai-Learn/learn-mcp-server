@@ -11,6 +11,7 @@ export interface DocumentRow {
 	readonly contentHash: string;
 	readonly lastModified: string | null;
 	readonly type: SearchRecordType;
+	readonly apiReference: string | null;
 }
 
 export interface ChunkRow {
@@ -25,6 +26,7 @@ export interface ChunkRow {
 
 export const DOCUMENTS_TABLE: TableDefinition<"documents", DocumentRow> = {
 	columns: {
+		apiReference: { name: "apiReference", type: "TEXT" },
 		body: { name: "body", notNull: true, type: "TEXT" },
 		codename: { name: "codename", notNull: true, type: "TEXT" },
 		contentHash: { name: "contentHash", notNull: true, type: "TEXT" },

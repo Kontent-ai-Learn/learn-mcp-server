@@ -6,7 +6,7 @@ import { setToFileCache } from "../cache/file-cache.js";
 import { getProdDbPath, getTestDbPath } from "../config.js";
 import { initializeApiReferenceEndpoints } from "../content/api-reference-endpoints.js";
 import { initializeApiReferenceObjects } from "../content/api-reference-objects.js";
-import { apiReferenceEndpointSchema } from "../content/models/api-reference-endpoints.models.js";
+import { type ApiReferenceEndpoint, apiReferenceEndpointSchema } from "../content/models/api-reference-endpoints.models.js";
 import { type ApiReferenceObject, apiReferenceObjectSchema } from "../content/models/api-reference-objects.models.js";
 import { type SearchRecord, searchRecordSchema } from "../content/models/search-records.models.js";
 import { initializeSearchRecords } from "../content/search-records.js";
@@ -91,13 +91,28 @@ async function finishSync({
 }: {
 	readonly isTest: boolean;
 	readonly searchRecords: readonly SearchRecord[];
-	readonly apiReferenceEndpoints: readonly unknown[];
+	readonly apiReferenceEndpoints: readonly ApiReferenceEndpoint[];
 	readonly apiReferenceObjects: readonly ApiReferenceObject[];
 }): Promise<SyncResult> {
 	const documents = [...searchRecords, ...apiReferenceObjects.map((object) => toSearchRecord(object))];
-	const index = await indexWithDb({ documents, isTest });
+	const apiReferenceByCodename = buildApiReferenceByCodename({ apiReferenceEndpoints, apiReferenceObjects });
+	const index = await indexWithDb({ apiReferenceByCodename, documents, isTest });
 
 	return toSyncResult({ apiReferenceEndpoints, apiReferenceObjects, index, isTest, searchRecords });
+}
+
+/** Keyed by codename: joins searchRecords (endpoint/object docs) to their owning API reference. */
+function buildApiReferenceByCodename({
+	apiReferenceEndpoints,
+	apiReferenceObjects,
+}: {
+	readonly apiReferenceEndpoints: readonly ApiReferenceEndpoint[];
+	readonly apiReferenceObjects: readonly ApiReferenceObject[];
+}): ReadonlyMap<string, string> {
+	return new Map([
+		...apiReferenceEndpoints.map((endpoint) => [endpoint.codename, endpoint.apiReference] as const),
+		...apiReferenceObjects.map((object) => [object.codename, object.apiReference] as const),
+	]);
 }
 
 /**
@@ -108,14 +123,16 @@ async function finishSync({
  */
 async function indexWithDb({
 	documents,
+	apiReferenceByCodename,
 	isTest,
 }: {
 	readonly documents: readonly SearchRecord[];
+	readonly apiReferenceByCodename: ReadonlyMap<string, string>;
 	readonly isTest: boolean;
 }): Promise<IndexDocumentsResult> {
 	const db = await getDb({ isTest });
 	try {
-		return await indexSearchRecords(db, documents);
+		return await indexSearchRecords(db, documents, apiReferenceByCodename);
 	} finally {
 		await db.close();
 	}

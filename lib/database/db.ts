@@ -88,7 +88,8 @@ function buildCreateIndexesQuery(): string {
 	return `
 CREATE INDEX IF NOT EXISTS idx_chunks_doc_id ON ${CHUNKS_TABLE.tableName}(${CHUNKS_TABLE.columns.docId.name});
 CREATE INDEX IF NOT EXISTS idx_chunks_fts ON ${CHUNKS_TABLE.tableName} USING fts (${CHUNKS_TABLE.columns.text.name});
-CREATE INDEX IF NOT EXISTS idx_documents_type ON ${DOCUMENTS_TABLE.tableName}(${DOCUMENTS_TABLE.columns.type.name});`;
+CREATE INDEX IF NOT EXISTS idx_documents_type ON ${DOCUMENTS_TABLE.tableName}(${DOCUMENTS_TABLE.columns.type.name});
+CREATE INDEX IF NOT EXISTS idx_documents_apiReference ON ${DOCUMENTS_TABLE.tableName}(${DOCUMENTS_TABLE.columns.apiReference.name});`;
 }
 
 function buildCreateTablesQuery(): string {

@@ -56,6 +56,7 @@ describe("chunkPlainText", () => {
 
 describe("chunkDoc", () => {
 	const doc: NormalizedDoc = {
+		apiReference: null,
 		body: "First paragraph.\n\nSecond paragraph.",
 		codename: "x",
 		contentHash: "hash",

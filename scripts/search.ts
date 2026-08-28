@@ -5,7 +5,7 @@ const query = "How do I turn on enhanced security mode for delivery API?";
 
 logger.log({ message: `Searching: "${query}"`, type: "process" });
 
-const results = await search(query);
+const results = await search({ query });
 
 logger.log({ message: `${results.length} result${results.length === 1 ? "" : "s"}`, type: "completed" });
 

@@ -61,4 +61,6 @@ export const learnUrls = {
 	},
 };
 
-export const apiReferenceCodenames: readonly string[] = ["delivery_api", "content_management_api_v2", "subscription_api", "sync_api_v2"];
+export const apiReferenceCodenames = ["delivery_api", "content_management_api_v2", "subscription_api", "sync_api_v2"] as const;
+
+export type ApiReferenceCodenames = (typeof apiReferenceCodenames)[number];

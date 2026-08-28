@@ -22,8 +22,12 @@ export interface IndexDocumentsResult {
  * changed docs, then embed any chunk lacking an embedding. Persistent +
  * incremental — unchanged docs keep their existing embeddings across restarts.
  */
-export async function indexSearchRecords(db: Database, searchRecords: readonly SearchRecord[]): Promise<IndexDocumentsResult> {
-	const normalized = searchRecords.map((doc) => normalize(doc));
+export async function indexSearchRecords(
+	db: Database,
+	searchRecords: readonly SearchRecord[],
+	apiReferenceByCodename: ReadonlyMap<string, string>,
+): Promise<IndexDocumentsResult> {
+	const normalized = searchRecords.map((doc) => normalize(doc, apiReferenceByCodename));
 
 	const result = await logger.logWithSpinnerAsync<IndexDocumentsResult>(async (spinner) => {
 		logger.log({ message: `Indexing ${colorize("yellow", normalized.length.toString())} source documents` });
@@ -47,14 +51,17 @@ function hashContent(parts: readonly string[]): string {
 	return createHash("sha256").update(parts.join(" ")).digest("hex");
 }
 
-function normalize(doc: SearchRecord): NormalizedDoc {
+function normalize(doc: SearchRecord, apiReferenceByCodename: ReadonlyMap<string, string>): NormalizedDoc {
 	const title = doc.title.trim();
 	const url = doc.url.trim();
 	const body = normalizeBody(doc.markdownContent);
+	const apiReference = apiReferenceByCodename.get(doc.codename) ?? null;
 	return {
+		apiReference,
 		body,
 		codename: doc.codename,
-		contentHash: hashContent([title, url, body]),
+		// Fold apiReference into the hash so a recategorised endpoint gets re-indexed.
+		contentHash: hashContent([title, url, body, apiReference ?? ""]),
 		id: doc.id,
 		title,
 		type: doc.type,

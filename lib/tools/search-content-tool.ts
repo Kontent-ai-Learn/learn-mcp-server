@@ -11,7 +11,7 @@ export const searchContentTool = defineReadOnlyTool({
 		"Searches Kontent.ai Learn documentation and developer guides. Returns the most relevant documents in full (title, source URL, and complete content) so you can answer the user's question directly — there is no need to fetch the URLs.",
 	handler: async ({ text }) =>
 		await withToolHandler({
-			handler: async () => [...(await search(text))],
+			handler: async () => [...(await search({ query: text }))],
 			toolName,
 		}),
 	inputSchema: {

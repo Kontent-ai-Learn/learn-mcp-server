@@ -8,6 +8,7 @@ export type NormalizedDoc = {
 	readonly contentHash: string;
 	readonly codename: string;
 	readonly type: SearchRecordType;
+	readonly apiReference: string | null;
 };
 
 export type DocChunk = {

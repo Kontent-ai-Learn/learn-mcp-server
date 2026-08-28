@@ -51,6 +51,8 @@
 		"oxc/no-rest-spread-properties": "off",
 		"no-undefined": "off",
 		"one-var": "off",
-		"sort-keys": "off"
+		"sort-keys": "off",
+		"unicorn/no-null": "off",
+		"capitalized-comments": "off"
 	}
 }

@@ -1,8 +1,10 @@
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
 import { z } from "zod/mini";
+import type { ApiReferenceCodenames } from "../config.js";
 import { type SearchRecordType, searchRecordTypeSchema } from "../content/models/search-records.models.js";
 import type { SearchResult } from "../indexing/indexer.models.js";
+import type { SqlValue } from "./db.utils.js";
 import { CHUNKS_TABLE, DOCUMENTS_TABLE, toVectorParam } from "./tables.js";
 
 const documentDistanceRow = z.readonly(
@@ -23,28 +25,56 @@ export async function getDocumentsFromDb({
 	queryVector,
 	limit,
 	type,
+	apiReference,
 }: {
 	readonly db: Database;
 	readonly queryVector: Float32Array;
 	readonly limit: number;
 	readonly type?: SearchRecordType;
+	readonly apiReference?: ApiReferenceCodenames;
 }): Promise<readonly SearchResult[]> {
+	const { sql, params } = buildSearchQuery({ apiReference, limit, queryVector, type });
+	const rows = await db.all(sql, ...params);
+	return toSearchResults(rows);
+}
+
+function buildSearchQuery({
+	queryVector,
+	limit,
+	type,
+	apiReference,
+}: {
+	readonly queryVector: Float32Array;
+	readonly limit: number;
+	readonly type?: SearchRecordType;
+	readonly apiReference?: ApiReferenceCodenames;
+}): { readonly sql: string; readonly params: readonly SqlValue[] } {
 	const c = CHUNKS_TABLE.columns;
 	const d = DOCUMENTS_TABLE.columns;
+
+	const filters: readonly { readonly condition: string; readonly value: SqlValue }[] = [
+		...(type ? [{ condition: `doc.${d.type.name} = ?`, value: type }] : []),
+		...(apiReference ? [{ condition: `doc.${d.apiReference.name} = ?`, value: apiReference }] : []),
+	];
+	const filterClause = filters.map(({ condition }) => `AND ${condition}`).join(" ");
+
 	// Rank documents by their best (smallest cosine distance) chunk; grouping in SQL
 	// Keeps one row per document. vector_distance_cos returns 1 - cosineSimilarity.
-	// Filtering by type here (rather than after LIMIT) keeps a type-specific lookup from
-	// Losing to unrelated types that rank higher in the global top-N.
+	// Filtering here (rather than after LIMIT) keeps a filtered lookup from
+	// Losing to unrelated rows that rank higher in the global top-N.
 	const sql = `SELECT doc.${d.title.name}, doc.${d.url.name}, doc.${d.body.name}, doc.${d.type.name}, doc.${d.codename.name},
 			MIN(vector_distance_cos(chunk.${c.embedding.name}, vector32(?))) AS distance
 		FROM ${CHUNKS_TABLE.tableName} chunk
 		JOIN ${DOCUMENTS_TABLE.tableName} doc ON doc.${d.id.name} = chunk.${c.docId.name}
-		WHERE chunk.${c.embedding.name} IS NOT NULL ${type ? `AND doc.${d.type.name} = ?` : ""}
+		WHERE chunk.${c.embedding.name} IS NOT NULL ${filterClause}
 		GROUP BY doc.${d.id.name}
 		ORDER BY distance ASC
 		LIMIT ?`;
-	const params = type ? [toVectorParam(queryVector), type, limit] : [toVectorParam(queryVector), limit];
-	const rows = await db.all(sql, ...params);
+	const params: readonly SqlValue[] = [toVectorParam(queryVector), ...filters.map(({ value }) => value), limit];
+	return { params, sql };
+}
+
+function toSearchResults(rows: readonly unknown[]): readonly SearchResult[] {
 	const parsedRows = rows.map((row) => documentDistanceRow.safeParse(row));
 	const invalidCount = parsedRows.filter((parsed) => !parsed.success).length;
 
