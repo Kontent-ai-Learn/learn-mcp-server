@@ -6,13 +6,13 @@
 		"url": "https://github.com/Kontent-ai-Learn/learn-mcp-server",
 		"source": "github"
 	},
-	"version": "0.0.14",
+	"version": "0.0.15",
 	"packages": [
 		{
 			"registryType": "npm",
 			"registryBaseUrl": "https://registry.npmjs.org",
 			"identifier": "@kontent-ai/learn-mcp-server",
-			"version": "0.0.14",
+			"version": "0.0.15",
 			"transport": {
 				"type": "stdio"
 			},
@@ -28,7 +28,7 @@
 			"registryType": "npm",
 			"registryBaseUrl": "https://registry.npmjs.org",
 			"identifier": "@kontent-ai/learn-mcp-server",
-			"version": "0.0.14",
+			"version": "0.0.15",
 			"transport": {
 				"type": "streamable-http",
 				"url": "http://localhost:3002/mcp"
