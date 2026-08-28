@@ -4,6 +4,22 @@ type Cache = Map<string, unknown>;
 
 const cache: Cache = new Map();
 
+export function setMemoryCache<T>({
+	key,
+	value,
+	schema,
+}: {
+	readonly key: string;
+	readonly value: T;
+	readonly schema: ZodMiniType<T>;
+}): void {
+	const parseResult = schema.safeParse(value);
+	if (!parseResult.success) {
+		throw new Error(`Failed to set value for memory cache key ${key} due to invalid schema with error: ${parseResult.error}`);
+	}
+	cache.set(key, value);
+}
+
 export function getOrSetFromMemoryCache<T>({
 	key,
 	value,
@@ -19,7 +35,7 @@ export function getOrSetFromMemoryCache<T>({
 	}
 
 	const resolvedValue = value();
-	cache.set(key, resolvedValue);
+	setMemoryCache({ key, value: resolvedValue, schema });
 	return resolvedValue;
 }
 
@@ -38,6 +54,6 @@ export async function getOrSetFromMemoryCacheAsync<T>({
 	}
 
 	const resolvedValue = await value();
-	cache.set(key, resolvedValue);
+	setMemoryCache({ key, value: resolvedValue, schema });
 	return resolvedValue;
 }

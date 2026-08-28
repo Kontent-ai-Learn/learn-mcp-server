@@ -60,3 +60,5 @@ export const learnUrls = {
 		return composeLearnUrl("/learn/api/mcp/getSearchRecords");
 	},
 };
+
+export const apiReferenceCodenames: readonly string[] = ["delivery_api", "content_management_api_v2", "subscription_api", "sync_api_v2"];

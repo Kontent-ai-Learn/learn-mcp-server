@@ -2,7 +2,7 @@ import { createFetchQuery, getDefaultHttpService, type JsonValue } from "@konten
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import { z } from "zod/mini";
 import { type FileCacheKey, getFromFileCache, setToFileCache } from "../cache/file-cache.js";
-import { getOrSetFromMemoryCache } from "../cache/memory-cache.js";
+import { getOrSetFromMemoryCache, setMemoryCache } from "../cache/memory-cache.js";
 import { logger } from "../utils/logger.js";
 import { packageJsonName, packageJsonVersion } from "../utils/version.js";
 
@@ -24,18 +24,66 @@ export async function initializeLearnEndpointData<TResponse extends JsonValue, T
 
 	logger.log({ message: `Successfully fetched data from ${colorize("yellow", url)}` });
 
+	const records = select(fetchedData);
+
+	updateCacheRecords({
+		cacheKey,
+		schema: recordSchema,
+		records,
+	});
+
+	return records;
+}
+
+function updateFileCacheRecords<TRecord extends JsonValue>({
+	cacheKey,
+	schema,
+	records,
+}: {
+	readonly cacheKey: FileCacheKey;
+	readonly schema: z.ZodMiniType<TRecord>;
+	readonly records: readonly TRecord[];
+}): void {
 	const filename = `${cacheKey}.json`;
-	const result = select(fetchedData);
 
 	setToFileCache({
 		cacheKey,
-		schema: z.readonly(z.array(recordSchema)),
-		value: result,
+		schema: z.readonly(z.array(schema)),
+		value: records,
 	});
 
 	logger.log({ message: `Data stored in ${colorize("yellow", filename)}` });
+}
 
-	return result;
+function updateMemoryCacheRecords<TRecord extends JsonValue>({
+	cacheKey,
+	schema,
+	records,
+}: {
+	readonly cacheKey: FileCacheKey;
+	readonly schema: z.ZodMiniType<TRecord>;
+	readonly records: readonly TRecord[];
+}): void {
+	setMemoryCache({
+		key: cacheKey,
+		schema: z.readonly(z.array(schema)),
+		value: records,
+	});
+
+	logger.log({ message: `Memory cache updated for key ${colorize("yellow", cacheKey)}` });
+}
+
+function updateCacheRecords<TRecord extends JsonValue>({
+	cacheKey,
+	schema,
+	records,
+}: {
+	readonly cacheKey: FileCacheKey;
+	readonly schema: z.ZodMiniType<TRecord>;
+	readonly records: readonly TRecord[];
+}): void {
+	updateFileCacheRecords({ cacheKey, schema, records });
+	updateMemoryCacheRecords({ cacheKey, schema, records });
 }
 
 /** Read a cached array of records: memory cache first, falling back to the file cache. */

@@ -44,6 +44,7 @@ export type ApiReferenceResponse = z.infer<typeof apiReferenceResponseSchema>;
 
 export const apiReferenceEndpointSchema = z.readonly(
 	z.object({
+		apiReference: z.string(),
 		bodyParameters: z.readonly(z.array(apiReferencePropertySchema)),
 		codename: z.string(),
 		endpointParameters: z.readonly(z.array(apiReferencePropertySchema)),
