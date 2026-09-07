@@ -24,7 +24,7 @@ export const apiReferencePropertySchema: z.ZodType<ApiReferenceProperty> = z.com
 		.readonly(),
 );
 
-const apiReferenceCodeSampleSchema = z.compile(
+export const apiReferenceCodeSampleSchema = z.compile(
 	z
 		.object({
 			code: z.string(),
@@ -35,7 +35,7 @@ const apiReferenceCodeSampleSchema = z.compile(
 
 export type ApiReferenceCodeSample = z.infer<typeof apiReferenceCodeSampleSchema>;
 
-const apiReferenceResponseSchema = z.compile(
+export const apiReferenceResponseSchema = z.compile(
 	z
 		.object({
 			description: z.string(),

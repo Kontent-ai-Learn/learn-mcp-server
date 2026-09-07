@@ -1,23 +1,5 @@
 import type { ApiReferenceEndpoint } from "../models/api-reference-endpoints.models.js";
-
-export type PublicApiReferenceEndpoint = Pick<
-	ApiReferenceEndpoint,
-	| "apiReference"
-	| "bodyParameters"
-	| "queryParameters"
-	| "endpointParameters"
-	| "endpointUrls"
-	| "headerParameters"
-	| "httpMethod"
-	| "responses"
-	| "tags"
-	| "title"
-	| "usageCodeSamples"
-> & {
-	readonly score: number;
-	readonly docsUrl: string | undefined;
-	readonly description: string;
-};
+import type { PublicApiReferenceEndpoint } from "../models/public-api-reference-endpoints.models.js";
 
 export function mapRecordToPublicApiReferenceEndpoint(record: ApiReferenceEndpoint, score: number): PublicApiReferenceEndpoint {
 	return {
