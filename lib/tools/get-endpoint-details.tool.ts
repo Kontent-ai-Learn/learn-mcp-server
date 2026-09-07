@@ -1,6 +1,7 @@
 import z from "zod";
 import { apiReferenceCodenames } from "../config.js";
 import { getEndpointDetails } from "../content/api-reference-details.js";
+import { mapRecordToPublicApiReferenceEndpoint } from "../content/utils/public-api-reference-endpoint-mapper.js";
 import { defineReadOnlyTool } from "./shared/tool-definitions.js";
 import { withToolHandler } from "./shared/tool-handler.js";
 import type { ToolName } from "./shared/tool-models.js";
@@ -12,7 +13,8 @@ export const getEndpointDetailsTools = defineReadOnlyTool({
 		"Retrieves details for a requested Kontent.ai API endpoint. It includes the endpoint URL, title, description, code samples, request body schema, response body schema, query parameters and headers.",
 	handler: async ({ text, apiReference }) =>
 		await withToolHandler({
-			handler: async () => await getEndpointDetails(text, apiReference),
+			handler: async () =>
+				await getEndpointDetails({ text, apiReference, mapRecordToPublicType: mapRecordToPublicApiReferenceEndpoint }),
 			toolName,
 		}),
 	inputSchema: {

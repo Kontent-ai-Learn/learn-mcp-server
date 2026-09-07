@@ -54,6 +54,8 @@
 		"sort-keys": "off",
 		"unicorn/no-null": "off",
 		"capitalized-comments": "off",
+		"unicorn/no-useless-undefined": "off",
+		"unicorn/no-array-callback-reference": "off",
 		"max-statements": ["error", { "max": 15 }]
 	}
 }

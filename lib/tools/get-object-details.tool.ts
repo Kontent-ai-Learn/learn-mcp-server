@@ -1,6 +1,7 @@
 import z from "zod";
 import { apiReferenceCodenames } from "../config.js";
 import { getObjectDetails } from "../content/api-reference-details.js";
+import { mapRecordToPublicApiReferenceObject } from "../content/utils/public-api-reference-object-mapper.js";
 import { defineReadOnlyTool } from "./shared/tool-definitions.js";
 import { withToolHandler } from "./shared/tool-handler.js";
 import type { ToolName } from "./shared/tool-models.js";
@@ -12,7 +13,7 @@ export const getObjectDetailsTools = defineReadOnlyTool({
 		"Retrieves details for a requested Kontent.ai API reference object. It includes the object's URL, title, description, the API it belongs to, and its properties (name, type, description, modifiers and nested properties).",
 	handler: async ({ text, apiReference }) =>
 		await withToolHandler({
-			handler: async () => await getObjectDetails(text, apiReference),
+			handler: async () => await getObjectDetails({ text, apiReference, mapRecordToPublicType: mapRecordToPublicApiReferenceObject }),
 			toolName,
 		}),
 	inputSchema: {

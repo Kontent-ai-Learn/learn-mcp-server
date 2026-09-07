@@ -1,6 +1,7 @@
 import { tryCatchAsync } from "@kontent-ai/core-sdk";
 import type { Request, Response } from "express";
 import { getObjectDetails } from "../../content/api-reference-details.js";
+import { mapRecordToPublicApiReferenceObject } from "../../content/utils/public-api-reference-object-mapper.js";
 import { logAndRespondError, setOkResponse } from "./route.utils.js";
 import { parseTextAndFilterQuery } from "./text-query.utils.js";
 
@@ -11,7 +12,14 @@ export async function handleObjectDetails(req: Request, res: Response): Promise<
 		return;
 	}
 
-	const { success, data, error } = await tryCatchAsync(async () => await getObjectDetails(parseData.text, parseData.apiReference));
+	const { success, data, error } = await tryCatchAsync(
+		async () =>
+			await getObjectDetails({
+				text: parseData.text,
+				apiReference: parseData.apiReference,
+				mapRecordToPublicType: mapRecordToPublicApiReferenceObject,
+			}),
+	);
 
 	if (!success) {
 		logAndRespondError({ error, requestLabel: "object-details", res });
