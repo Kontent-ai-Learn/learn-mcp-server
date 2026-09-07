@@ -1,23 +1,25 @@
 import path from "node:path";
 import { match } from "ts-pattern";
-import { z } from "zod/mini";
+import { z } from "zod";
 import { getOrSetFromMemoryCache } from "../cache/memory-cache.js";
 import { existsSync, loadEnvFile } from "./file.utils.js";
 
-const syncIntervalUnitSchema = z.literal(["minutes", "hours", "days"]);
+const syncIntervalUnitSchema = z.compile(z.literal(["minutes", "hours", "days"]));
 type SyncIntervalUnit = z.infer<typeof syncIntervalUnitSchema>;
 
-const envConfigSchema = z.readonly(
-	z.object({
-		apiToken: z.string(),
-		autoSyncEnabled: z.boolean(),
-		dataPath: z.string(),
-		isTest: z.boolean(),
-		learnHost: z.string(),
-		port: z.number(),
-		syncIntervalUnit: syncIntervalUnitSchema,
-		syncIntervalValue: z.number(),
-	}),
+const envConfigSchema = z.compile(
+	z
+		.object({
+			apiToken: z.string(),
+			autoSyncEnabled: z.boolean(),
+			dataPath: z.string(),
+			isTest: z.boolean(),
+			learnHost: z.string(),
+			port: z.number(),
+			syncIntervalUnit: syncIntervalUnitSchema,
+			syncIntervalValue: z.number(),
+		})
+		.readonly(),
 );
 type EnvConfig = z.infer<typeof envConfigSchema>;
 

@@ -1,22 +1,26 @@
-import { z } from "zod/mini";
+import { z } from "zod";
 import { apiReferencePropertySchema } from "./api-reference-endpoints.models.js";
 
-export const apiReferenceObjectSchema = z.readonly(
-	z.object({
-		apiReference: z.string(),
-		codename: z.string(),
-		id: z.string(),
-		markdownContent: z.string(),
-		properties: z.readonly(z.array(apiReferencePropertySchema)),
-		title: z.string(),
-		url: z.url(),
-	}),
+export const apiReferenceObjectSchema = z.compile(
+	z
+		.object({
+			apiReference: z.string(),
+			codename: z.string(),
+			id: z.string(),
+			markdownContent: z.string(),
+			properties: z.array(apiReferencePropertySchema).readonly(),
+			title: z.string(),
+			url: z.url(),
+		})
+		.readonly(),
 );
 
 export type ApiReferenceObject = z.infer<typeof apiReferenceObjectSchema>;
 
-export const apiReferenceObjectsResponseSchema = z.readonly(
-	z.object({
-		data: z.readonly(z.object({ apiReferenceObjects: z.readonly(z.array(apiReferenceObjectSchema)) })),
-	}),
+export const apiReferenceObjectsResponseSchema = z.compile(
+	z
+		.object({
+			data: z.object({ apiReferenceObjects: z.array(apiReferenceObjectSchema).readonly() }).readonly(),
+		})
+		.readonly(),
 );

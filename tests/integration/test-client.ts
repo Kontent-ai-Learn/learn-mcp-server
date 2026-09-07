@@ -11,8 +11,8 @@ export type ToolCallResult<T> =
 	| { readonly error: unknown; readonly record?: never; readonly success: false };
 
 const textContentBlockSchema = z.object({
-	text: z.string(),
-	type: z.literal("text"),
+	text: z.compile(z.string()),
+	type: z.compile(z.literal("text")),
 });
 
 const toolCallResultSchema = z.object({

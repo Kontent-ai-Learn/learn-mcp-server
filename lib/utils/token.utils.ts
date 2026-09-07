@@ -1,11 +1,13 @@
 import type { Request } from "express";
-import { z } from "zod/mini";
+import { z } from "zod";
 import { LearnMcpExceptionError } from "../exceptions/learn-mcp-exception.js";
 import { getEnvConfig } from "./environment.utils.js";
 
-const syncTokenQuerySchema = z.object({
-	token: z.string().check(z.minLength(1)),
-});
+const syncTokenQuerySchema = z.compile(
+	z.object({
+		token: z.string().min(1),
+	}),
+);
 
 export function validateSyncToken(req: Request): void {
 	const { success, data } = syncTokenQuerySchema.safeParse(req.query);

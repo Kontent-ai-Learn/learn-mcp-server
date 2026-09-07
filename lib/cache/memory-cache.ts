@@ -1,18 +1,10 @@
-import type { ZodMiniType } from "zod/mini";
+import type { ZodType } from "zod";
 
 type Cache = Map<string, unknown>;
 
 const cache: Cache = new Map();
 
-export function setMemoryCache<T>({
-	key,
-	value,
-	schema,
-}: {
-	readonly key: string;
-	readonly value: T;
-	readonly schema: ZodMiniType<T>;
-}): void {
+export function setMemoryCache<T>({ key, value, schema }: { readonly key: string; readonly value: T; readonly schema: ZodType<T> }): void {
 	const parseResult = schema.safeParse(value);
 	if (!parseResult.success) {
 		throw new Error(`Failed to set value for memory cache key ${key} due to invalid schema with error: ${parseResult.error}`);
@@ -27,7 +19,7 @@ export function getOrSetFromMemoryCache<T>({
 }: {
 	readonly key: string;
 	readonly value: () => T;
-	readonly schema: ZodMiniType<T>;
+	readonly schema: ZodType<T>;
 }): T {
 	const itemFromCache = cache.get(key);
 	if (itemFromCache) {
@@ -46,7 +38,7 @@ export async function getOrSetFromMemoryCacheAsync<T>({
 }: {
 	readonly key: string;
 	readonly value: () => Promise<T>;
-	readonly schema: ZodMiniType<T>;
+	readonly schema: ZodType<T>;
 }): Promise<T> {
 	const itemFromCache = cache.get(key);
 	if (itemFromCache) {

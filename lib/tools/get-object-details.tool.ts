@@ -16,13 +16,17 @@ export const getObjectDetailsTools = defineReadOnlyTool({
 			toolName,
 		}),
 	inputSchema: {
-		apiReference: z
-			.literal(apiReferenceCodenames)
-			.optional()
-			.describe(
-				"Optional. The API reference for which you want to get details. It has to be one of the supported API reference codenames.",
-			),
-		text: z.string().describe("The object for which you want to get details. It can object title or a description of the object."),
+		apiReference: z.compile(
+			z
+				.literal(apiReferenceCodenames)
+				.optional()
+				.describe(
+					"Optional. The API reference for which you want to get details. It has to be one of the supported API reference codenames.",
+				),
+		),
+		text: z.compile(
+			z.string().describe("The object for which you want to get details. It can object title or a description of the object."),
+		),
 	},
 	name: toolName,
 });

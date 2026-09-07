@@ -1,6 +1,6 @@
-import { createFetchQuery, getDefaultHttpService, type JsonValue } from "@kontent-ai/core-sdk";
+import { createFetchQuery, getDefaultHttpService, type JsonValue, type KontentSdkError } from "@kontent-ai/core-sdk";
 import { colorize } from "@kontent-ai/core-sdk/devkit";
-import { z } from "zod/mini";
+import { z } from "zod";
 import { type FileCacheKey, getFromFileCache, setToFileCache } from "../cache/file-cache.js";
 import { getOrSetFromMemoryCache, setMemoryCache } from "../cache/memory-cache.js";
 import { logger } from "../utils/logger.js";
@@ -15,8 +15,8 @@ export async function initializeLearnEndpointData<TResponse extends JsonValue, T
 }: {
 	readonly url: string;
 	readonly cacheKey: FileCacheKey;
-	readonly schema: z.ZodMiniType<TResponse>;
-	readonly recordSchema: z.ZodMiniType<TRecord>;
+	readonly schema: z.ZodType<TResponse>;
+	readonly recordSchema: z.ZodType<TRecord>;
 	readonly select: (payload: TResponse) => readonly TRecord[];
 }): Promise<readonly TRecord[]> {
 	logger.log({ message: `Requesting data from ${url}` });
@@ -41,14 +41,14 @@ function updateFileCacheRecords<TRecord extends JsonValue>({
 	records,
 }: {
 	readonly cacheKey: FileCacheKey;
-	readonly schema: z.ZodMiniType<TRecord>;
+	readonly schema: z.ZodType<TRecord>;
 	readonly records: readonly TRecord[];
 }): void {
 	const filename = `${cacheKey}.json`;
 
 	setToFileCache({
 		cacheKey,
-		schema: z.readonly(z.array(schema)),
+		schema: z.array(schema).readonly(),
 		value: records,
 	});
 
@@ -61,12 +61,12 @@ function updateMemoryCacheRecords<TRecord extends JsonValue>({
 	records,
 }: {
 	readonly cacheKey: FileCacheKey;
-	readonly schema: z.ZodMiniType<TRecord>;
+	readonly schema: z.ZodType<TRecord>;
 	readonly records: readonly TRecord[];
 }): void {
 	setMemoryCache({
 		key: cacheKey,
-		schema: z.readonly(z.array(schema)),
+		schema: z.array(schema).readonly(),
 		value: records,
 	});
 
@@ -79,7 +79,7 @@ function updateCacheRecords<TRecord extends JsonValue>({
 	records,
 }: {
 	readonly cacheKey: FileCacheKey;
-	readonly schema: z.ZodMiniType<TRecord>;
+	readonly schema: z.ZodType<TRecord>;
 	readonly records: readonly TRecord[];
 }): void {
 	updateFileCacheRecords({ cacheKey, schema, records });
@@ -92,9 +92,9 @@ export function readCachedRecords<TRecord extends JsonValue>({
 	schema,
 }: {
 	readonly cacheKey: FileCacheKey;
-	readonly schema: z.ZodMiniType<TRecord>;
+	readonly schema: z.ZodType<TRecord>;
 }): readonly TRecord[] | undefined {
-	const recordsSchema = z.readonly(z.array(schema));
+	const recordsSchema = z.array(schema).readonly();
 	return getOrSetFromMemoryCache<readonly TRecord[] | undefined>({
 		key: cacheKey,
 		schema: z.union([recordsSchema, z.undefined()]),
@@ -102,8 +102,8 @@ export function readCachedRecords<TRecord extends JsonValue>({
 	});
 }
 
-async function fetchFromEndpoint<TResponse extends JsonValue>(url: string, schema: z.ZodMiniType<TResponse>): Promise<TResponse> {
-	const query = createFetchQuery({
+async function fetchFromEndpoint<TResponse extends JsonValue>(url: string, schema: z.ZodType<TResponse>): Promise<TResponse> {
+	const query = createFetchQuery<TResponse, KontentSdkError, unknown, unknown>({
 		config: {
 			httpService: getDefaultHttpService(),
 			runtimeValidation: { validateResponses: true },

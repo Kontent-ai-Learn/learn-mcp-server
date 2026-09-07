@@ -1,5 +1,5 @@
 import { Database } from "@tursodatabase/database";
-import { z } from "zod/mini";
+import { z } from "zod";
 import { getOrSetFromMemoryCacheAsync } from "../cache/memory-cache.js";
 import { type ApiReferenceCodenames, getDbPath, SEARCH_LIMIT } from "../config.js";
 import type { SearchRecordType } from "../content/models/search-records.models.js";

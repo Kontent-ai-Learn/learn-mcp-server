@@ -1,21 +1,23 @@
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
-import { z } from "zod/mini";
+import { z } from "zod";
 import type { ApiReferenceCodenames } from "../config.js";
 import { type SearchRecordType, searchRecordTypeSchema } from "../content/models/search-records.models.js";
 import type { SearchResult } from "../indexing/indexer.models.js";
 import type { SqlValue } from "./db.utils.js";
 import { CHUNKS_TABLE, DOCUMENTS_TABLE, toVectorParam } from "./tables.js";
 
-const documentDistanceRow = z.readonly(
-	z.object({
-		body: z.string(),
-		codename: z.string(),
-		distance: z.number(),
-		title: z.string(),
-		type: searchRecordTypeSchema,
-		url: z.url(),
-	}),
+const documentDistanceRow = z.compile(
+	z
+		.object({
+			body: z.string(),
+			codename: z.string(),
+			distance: z.number(),
+			title: z.string(),
+			type: searchRecordTypeSchema,
+			url: z.url(),
+		})
+		.readonly(),
 );
 
 type DocumentDistanceRow = z.infer<typeof documentDistanceRow>;

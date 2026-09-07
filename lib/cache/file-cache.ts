@@ -1,5 +1,5 @@
 import type { JsonValue } from "@kontent-ai/core-sdk";
-import type { ZodMiniType } from "zod/mini";
+import type { ZodType } from "zod";
 import { getDataDir } from "../config.js";
 import { getEnvConfig } from "../utils/environment.utils.js";
 import { existsSync, readFileSync, writeFileSync } from "../utils/file.utils.js";
@@ -13,7 +13,7 @@ export function setToFileCache<T extends JsonValue>({
 }: {
 	readonly cacheKey: FileCacheKey;
 	readonly value: T;
-	readonly schema: ZodMiniType<T>;
+	readonly schema: ZodType<T>;
 }): void {
 	const filepath = getFullPath(cacheKey);
 
@@ -30,7 +30,7 @@ export function getFromFileCache<T extends JsonValue>({
 	schema,
 }: {
 	readonly cacheKey: FileCacheKey;
-	readonly schema: ZodMiniType<T>;
+	readonly schema: ZodType<T>;
 }): T | undefined {
 	const filepath = getFullPath(cacheKey);
 	if (!existsSync(filepath)) {

@@ -4,10 +4,12 @@ import * as z from "zod";
 import { type ApiReferenceCodenames, apiReferenceCodenames } from "../../config.js";
 import { setBadRequestResponse } from "./route.utils.js";
 
-const textQuerySchema = z.object({
-	text: z.string().min(1),
-	apiReference: z.literal(apiReferenceCodenames).optional(),
-});
+const textQuerySchema = z.compile(
+	z.object({
+		text: z.string().min(1),
+		apiReference: z.literal(apiReferenceCodenames).optional(),
+	}),
+);
 
 /**
  * Validates the `?text=` query-string param shared by /search, /endpoint-details, and

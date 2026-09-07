@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url";
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
-import { z } from "zod/mini";
+import { z } from "zod";
 import { setToFileCache } from "../cache/file-cache.js";
 import { getProdDbPath, getTestDbPath } from "../config.js";
 import { initializeApiReferenceEndpoints } from "../content/api-reference-endpoints.js";
@@ -31,12 +31,14 @@ export interface SyncResult {
 
 const testSearchRecordsPath = fileURLToPath(new URL("../../samples/test-db-source-docs.json", import.meta.url));
 
-const sourceSchema = z.readonly(
-	z.object({
-		apiReferenceEndpoints: z.array(apiReferenceEndpointSchema),
-		apiReferenceObjects: z.array(apiReferenceObjectSchema),
-		searchRecords: z.array(searchRecordSchema),
-	}),
+const sourceSchema = z.compile(
+	z
+		.object({
+			apiReferenceEndpoints: z.array(apiReferenceEndpointSchema),
+			apiReferenceObjects: z.array(apiReferenceObjectSchema),
+			searchRecords: z.array(searchRecordSchema),
+		})
+		.readonly(),
 );
 
 export async function syncAll(options?: { readonly isTest?: boolean }): Promise<SyncResult> {
@@ -70,15 +72,15 @@ async function initializeTestData(): Promise<SyncResult> {
 
 	setToFileCache({
 		cacheKey: "api-reference-endpoints",
-		schema: z.readonly(z.array(apiReferenceEndpointSchema)),
+		schema: z.array(apiReferenceEndpointSchema).readonly(),
 		value: apiReferenceEndpoints,
 	});
 	setToFileCache({
 		cacheKey: "api-reference-objects",
-		schema: z.readonly(z.array(apiReferenceObjectSchema)),
+		schema: z.array(apiReferenceObjectSchema).readonly(),
 		value: apiReferenceObjects,
 	});
-	setToFileCache({ cacheKey: "search-records", schema: z.readonly(z.array(searchRecordSchema)), value: searchRecords });
+	setToFileCache({ cacheKey: "search-records", schema: z.array(searchRecordSchema).readonly(), value: searchRecords });
 
 	return await finishSync({ apiReferenceEndpoints, apiReferenceObjects, isTest: true, searchRecords });
 }
@@ -191,5 +193,5 @@ async function getDb(options?: Parameters<typeof syncAll>[0]): Promise<Database>
 
 async function getTestData(): Promise<z.infer<typeof sourceSchema>> {
 	const raw: unknown = JSON.parse(await readFile(testSearchRecordsPath));
-	return z.parse(sourceSchema, raw);
+	return sourceSchema.parse(raw);
 }

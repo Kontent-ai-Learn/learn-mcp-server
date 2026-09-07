@@ -16,17 +16,21 @@ export const getEndpointDetailsTools = defineReadOnlyTool({
 			toolName,
 		}),
 	inputSchema: {
-		apiReference: z
-			.literal(apiReferenceCodenames)
-			.optional()
-			.describe(
-				"Optional. The API reference for which you want to get details. It has to be one of the supported API reference codenames.",
-			),
-		text: z
-			.string()
-			.describe(
-				"The endpoint for which you want to get details. It can be endpoint URL, endpoint title or description of the endpoint.",
-			),
+		apiReference: z.compile(
+			z
+				.literal(apiReferenceCodenames)
+				.optional()
+				.describe(
+					"Optional. The API reference for which you want to get details. It has to be one of the supported API reference codenames.",
+				),
+		),
+		text: z.compile(
+			z
+				.string()
+				.describe(
+					"The endpoint for which you want to get details. It can be endpoint URL, endpoint title or description of the endpoint.",
+				),
+		),
 	},
 	name: toolName,
 });

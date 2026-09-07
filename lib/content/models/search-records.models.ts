@@ -1,24 +1,28 @@
-import { z } from "zod/mini";
+import { z } from "zod";
 
-export const searchRecordTypeSchema = z.literal(["endpoint", "section", "object"]);
+export const searchRecordTypeSchema = z.compile(z.literal(["endpoint", "section", "object"]));
 
 export type SearchRecordType = z.infer<typeof searchRecordTypeSchema>;
 
-export const searchRecordSchema = z.readonly(
-	z.object({
-		codename: z.string(),
-		id: z.string(),
-		markdownContent: z.string(),
-		title: z.string(),
-		type: searchRecordTypeSchema,
-		url: z.url(),
-	}),
+export const searchRecordSchema = z.compile(
+	z
+		.object({
+			codename: z.string(),
+			id: z.string(),
+			markdownContent: z.string(),
+			title: z.string(),
+			type: searchRecordTypeSchema,
+			url: z.url(),
+		})
+		.readonly(),
 );
 
 export type SearchRecord = z.infer<typeof searchRecordSchema>;
 
-export const searchRecordsResponseSchema = z.readonly(
-	z.object({
-		data: z.readonly(z.object({ searchRecords: z.readonly(z.array(searchRecordSchema)) })),
-	}),
+export const searchRecordsResponseSchema = z.compile(
+	z
+		.object({
+			data: z.object({ searchRecords: z.array(searchRecordSchema).readonly() }).readonly(),
+		})
+		.readonly(),
 );

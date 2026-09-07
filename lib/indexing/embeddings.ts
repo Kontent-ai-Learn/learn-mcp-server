@@ -1,5 +1,5 @@
 import { env, type FeatureExtractionPipeline, pipeline } from "@huggingface/transformers";
-import { z } from "zod/mini";
+import { z } from "zod";
 import { getOrSetFromMemoryCacheAsync } from "../cache/memory-cache.js";
 import { EMBEDDING_MODEL, getTransformersCacheDir } from "../config.js";
 

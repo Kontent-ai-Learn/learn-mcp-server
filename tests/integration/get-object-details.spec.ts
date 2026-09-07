@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { z } from "zod/mini";
+import type { z } from "zod";
 import { apiReferenceObjectSchema } from "../../lib/content/models/api-reference-objects.models.js";
 import { callToolAndParse, type ToolCallResult } from "./test-client.js";
 

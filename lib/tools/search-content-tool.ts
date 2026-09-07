@@ -15,7 +15,7 @@ export const searchContentTool = defineReadOnlyTool({
 			toolName,
 		}),
 	inputSchema: {
-		text: z.string().describe("The user's question or search query"),
+		text: z.compile(z.string().describe("The user's question or search query")),
 	},
 	name: toolName,
 });
