@@ -20,6 +20,9 @@ export const CHUNK_OVERLAP_CHARS = 200;
 /** Number of search results returned via search-like tools */
 export const SEARCH_LIMIT = 10;
 
+/** Only return results with a score above this threshold */
+export const SEARCH_SCORE_THRESHOLD = 0.2;
+
 /** Data directory: prod uses DataPath; test artifacts live in the top-level `data-test` folder. */
 export const getDataDir = (isTest: boolean): string => (isTest ? "data-test" : getEnvConfig().dataPath);
 

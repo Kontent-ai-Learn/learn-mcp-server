@@ -1,7 +1,7 @@
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
 import { z } from "zod";
-import type { ApiReferenceCodenames } from "../config.js";
+import { type ApiReferenceCodenames, SEARCH_SCORE_THRESHOLD } from "../config.js";
 import { type SearchRecordType, searchRecordTypeSchema } from "../content/models/search-records.models.js";
 import type { SearchResult } from "../indexing/indexer.models.js";
 import type { SqlValue } from "./db.utils.js";
@@ -95,7 +95,8 @@ function toSearchResults(rows: readonly unknown[]): readonly SearchResult[] {
 			title: row.title,
 			type: row.type,
 			url: row.url,
-		}));
+		}))
+		.filter((m) => m.score >= SEARCH_SCORE_THRESHOLD);
 }
 
 function round(value: number, places: number): number {
