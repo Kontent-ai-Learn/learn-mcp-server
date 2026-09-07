@@ -19,7 +19,7 @@
 	"engines": {
 		"node": ">= 22"
 	},
-	"packageManager": "pnpm@11.21.0",
+	"packageManager": "pnpm@12.3.4",
 	"exports": {
 		".": {
 			"types": "./dist/public-api.d.ts",
@@ -75,21 +75,21 @@
 		"express": "5.2.1",
 		"luxon": "3.7.2",
 		"ts-pattern": "^5",
-		"zod": "^4"
+		"zod": "4.5.4"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.5.10",
+		"@biomejs/biome": "2.5.12",
 		"@kontent-ai/biome-config": "0.7.3",
 		"@types/compression": "1.8.1",
 		"@types/cors": "2.8.19",
 		"@types/express": "5.0.6",
 		"@types/luxon": "3.7.5",
-		"@types/node": "26.4.0",
+		"@types/node": "26.4.1",
 		"esbuild": "0.28.2",
-		"oxlint": "1.80.0",
+		"oxlint": "1.81.0",
 		"oxlint-tsgolint": "7.0.2001",
-		"tsx": "4.23.12",
+		"tsx": "4.23.13",
 		"typescript": "7.0.2",
-		"vitest": "4.1.11"
+		"vitest": "5.0.0"
 	}
 }
