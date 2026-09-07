@@ -1,9 +1,14 @@
-import type { JsonValue } from "@kontent-ai/core-sdk";
+import { isDefined, type JsonValue } from "@kontent-ai/core-sdk";
 import type { ApiReferenceCodenames } from "../config.js";
+import type { SearchResult } from "../indexing/indexer.models.js";
 import { search } from "../search/search.js";
 import { getApiReferenceEndpointsFromCache } from "./api-reference-endpoints.js";
 import { getApiReferenceObjectsFromCache } from "./api-reference-objects.js";
 import type { SearchRecordType } from "./models/search-records.models.js";
+
+type RecordWithScore = {
+	readonly score: number;
+};
 
 export async function getEndpointDetails(text: string, apiReference: ApiReferenceCodenames | undefined): Promise<JsonValue> {
 	return await findDetailsBySearch({
@@ -25,12 +30,6 @@ export async function getObjectDetails(text: string, apiReference: ApiReferenceC
 	});
 }
 
-/**
- * Shared core for the "get X details" queries: semantic-search for the best matching document
- * of the given type, then return the full cached record with the same codename. Returns a
- * human-readable message string when nothing matches — used verbatim as both the MCP tool
- * result and the HTTP route's 200 JSON body.
- */
 async function findDetailsBySearch<TRecord extends JsonValue & { readonly codename: string }>({
 	text,
 	type,
@@ -57,8 +56,24 @@ async function findDetailsBySearch<TRecord extends JsonValue & { readonly codena
 		return "Could not fetch learn records. Run indexer to initialize the cache.";
 	}
 
-	return (
-		records.find((record) => record.codename === topResult.codename) ??
-		`Found candidate ${label} but could not retrieve its details. Requested codename: ${topResult.codename}`
-	);
+	return getTopMatches(records, searchResults);
+}
+
+function getTopMatches<T extends { readonly codename: string }>(
+	records: readonly T[],
+	searchResults: readonly SearchResult[],
+): readonly (T & RecordWithScore)[] {
+	return searchResults
+		.map<[SearchResult, T] | undefined>((m) => {
+			const record = records.find((s) => s.codename === m.codename);
+
+			if (!record) {
+				return undefined;
+			}
+
+			return [m, record];
+		})
+		.filter(isDefined)
+		.map<T & RecordWithScore>((m) => ({ score: m[0].score, ...m[1] }))
+		.toSorted((a, b) => b.score - a.score);
 }

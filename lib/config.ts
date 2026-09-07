@@ -17,7 +17,7 @@ export const EMBED_BATCH_SIZE = 32;
 export const CHUNK_TARGET_CHARS = 1200;
 export const CHUNK_OVERLAP_CHARS = 200;
 
-/** Parent documents returned to the caller (bounds the response size). */
+/** Number of search results returned via search-like tools */
 export const SEARCH_LIMIT = 10;
 
 /** Data directory: prod uses DataPath; test artifacts live in the top-level `data-test` folder. */
