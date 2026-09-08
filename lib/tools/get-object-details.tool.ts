@@ -10,7 +10,7 @@ const toolName: ToolName = "get-object-details";
 
 export const getObjectDetailsTools = defineReadOnlyTool({
 	description:
-		"Retrieves details for a requested Kontent.ai API reference object. It includes the object's URL, title, description, the API it belongs to, and its properties (name, type, description, modifiers and nested properties).",
+		"Retrieves details for Kontent.ai API reference objects matching the input text. Returns an array of the most likely candidates, ordered by their semantic `score` (cosine similarity, 0–1, highest first) — use the score to judge how confident a match is. Each candidate includes the object's URL, description, the API it belongs to, and its properties (name, type, description, modifiers and nested properties).",
 	handler: async ({ text, apiReference }) =>
 		await withToolHandler({
 			handler: async () => await getObjectDetails({ text, apiReference, mapRecordToPublicType: mapRecordToPublicApiReferenceObject }),

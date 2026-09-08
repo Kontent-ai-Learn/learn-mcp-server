@@ -32,11 +32,11 @@ It exposes the same three read-only tools (`search-content`, `get-endpoint-detai
 
 ## Available Tools
 
-| Tool                   | Description                                                                                                                                                                         |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `search-content`       | Searches Kontent.ai Learn documentation and developer guides. Returns the most relevant documents in full (title, source URL, and complete content).                                |
-| `get-endpoint-details` | Retrieves details for a requested API endpoint: endpoint URL, title, description, code samples, request/response body schemas, query parameters, and headers.                       |
-| `get-object-details`   | Retrieves details for a requested API reference object: URL, title, description, the API it belongs to, and its properties (name, type, description, modifiers, nested properties). |
+| Tool                   | Description                                                                                                                                                                                                                                                                             |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `search-content`       | Searches Kontent.ai Learn documentation and developer guides. Returns the most relevant documents in full (title, source URL, and complete content).                                                                                                                                    |
+| `get-endpoint-details` | Retrieves details for API endpoints matching the input text. Returns an array of the most likely candidates, ordered by semantic score (best match first): endpoint URL, title, description, code samples, request/response body schemas, query parameters, and headers.                |
+| `get-object-details`   | Retrieves details for API reference objects matching the input text. Returns an array of the most likely candidates, ordered by semantic score (best match first): URL, description, the API it belongs to, and its properties (name, type, description, modifiers, nested properties). |
 
 All tools are **read-only** and operate on public Kontent.ai Learn content.
 
