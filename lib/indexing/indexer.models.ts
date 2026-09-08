@@ -26,5 +26,5 @@ export type SearchResult = {
 	readonly codename: string;
 	readonly type: SearchRecordType;
 	/** Cosine similarity (0–1) of the document's best-matching chunk. */
-	readonly relevanceScore: number;
+	readonly score: number;
 };

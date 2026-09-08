@@ -14,7 +14,7 @@ export const publicApiReferenceEndpointSchema = z.compile(
 			httpMethod: z.string(),
 			queryParameters: z.array(apiReferencePropertySchema).readonly(),
 			responses: z.array(apiReferenceResponseSchema).readonly(),
-			relevanceScore: z.number(),
+			score: z.number(),
 			tags: z.array(z.string()).readonly(),
 			title: z.string(),
 			usageCodeSamples: z.array(apiReferenceCodeSampleSchema).readonly(),

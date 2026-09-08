@@ -12,8 +12,6 @@ logger.log({ message: `${results.length} result${results.length === 1 ? "" : "s"
 results.forEach((result, index) => {
 	const snippet = result.body.replaceAll(/\s+/g, " ").trim().slice(0, 200);
 	logger.log({
-		message: ["", `${index + 1}. ${result.title}  ·  score ${result.relevanceScore}`, `   ${result.docsUrl}`, `   ${snippet}…`].join(
-			"\n",
-		),
+		message: ["", `${index + 1}. ${result.title}  ·  score ${result.score}`, `   ${result.docsUrl}`, `   ${snippet}…`].join("\n"),
 	});
 });
