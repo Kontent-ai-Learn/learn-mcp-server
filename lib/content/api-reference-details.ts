@@ -1,5 +1,6 @@
-import { isDefined, type JsonValue } from "@kontent-ai/core-sdk";
+import { isDefined } from "@kontent-ai/core-sdk";
 import type { ApiReferenceCodenames } from "../config.js";
+import { LearnMcpExceptionError } from "../exceptions/learn-mcp-exception.js";
 import type { SearchResult } from "../indexing/indexer.models.js";
 import { search } from "../search/search.js";
 import { getApiReferenceEndpointsFromCache } from "./api-reference-endpoints.js";
@@ -24,7 +25,7 @@ export async function getEndpointDetails<TPublicType extends ItemWithScore>({
 	readonly text: string;
 	readonly apiReference: ApiReferenceCodenames | undefined;
 	readonly mapRecordToPublicType: (record: ApiReferenceEndpoint, score: number) => TPublicType;
-}): Promise<JsonValue> {
+}): Promise<readonly TPublicType[]> {
 	return await findDetailsBySearch<ApiReferenceEndpoint, TPublicType>({
 		getRecordsFromCache: getApiReferenceEndpointsFromCache,
 		label: "endpoint",
@@ -43,7 +44,7 @@ export async function getObjectDetails<TPublicType extends ItemWithScore>({
 	readonly text: string;
 	readonly apiReference: ApiReferenceCodenames | undefined;
 	readonly mapRecordToPublicType: (record: ApiReferenceObject, score: number) => TPublicType;
-}): Promise<JsonValue> {
+}): Promise<readonly TPublicType[]> {
 	return await findDetailsBySearch<ApiReferenceObject, TPublicType>({
 		getRecordsFromCache: getApiReferenceObjectsFromCache,
 		label: "object",
@@ -68,19 +69,17 @@ async function findDetailsBySearch<TRecord extends RecordWithCodename, TPublicTy
 	readonly getRecordsFromCache: () => readonly TRecord[] | undefined;
 	readonly mapRecordToPublicType: (record: TRecord, score: number) => TPublicType;
 	apiReference: ApiReferenceCodenames | undefined;
-}): Promise<JsonValue> {
-	const searchResults = await search({ query: text, type, apiReference });
-	const topResult = searchResults?.[0];
-
-	if (!topResult) {
-		return `Could not find ${label} details for the given input.`;
-	}
-
+}): Promise<readonly TPublicType[]> {
 	const records = getRecordsFromCache();
 
 	if (!records) {
-		return "Could not fetch learn records. Run indexer to initialize the cache.";
+		throw new LearnMcpExceptionError(
+			"cacheNotInitialized",
+			`Could not fetch learn ${label} records. Run indexer to initialize the cache.`,
+		);
 	}
+
+	const searchResults = await search({ query: text, type, apiReference });
 
 	return getTopMatches({ records, searchResults, mapRecordToPublicType });
 }

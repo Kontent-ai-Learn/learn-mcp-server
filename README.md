@@ -32,13 +32,14 @@ It exposes the same three read-only tools (`search-content`, `get-endpoint-detai
 
 ## Available Tools
 
-| Tool                   | Description                                                                                                                                                                                                                                                                             |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `search-content`       | Searches Kontent.ai Learn documentation and developer guides. Returns the most relevant documents in full (title, source URL, and complete content).                                                                                                                                    |
-| `get-endpoint-details` | Retrieves details for API endpoints matching the input text. Returns an array of the most likely candidates, ordered by semantic score (best match first): endpoint URL, title, description, code samples, request/response body schemas, query parameters, and headers.                |
-| `get-object-details`   | Retrieves details for API reference objects matching the input text. Returns an array of the most likely candidates, ordered by semantic score (best match first): URL, description, the API it belongs to, and its properties (name, type, description, modifiers, nested properties). |
+| Tool                   | Description                                                                                                                                                                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `search-content`       | Searches Kontent.ai Learn documentation and developer guides. Returns the most relevant documents in full (title, source URL, and complete content).                                                                                  |
+| `get-endpoint-details` | Retrieves details for API endpoints matching the input text. Returns an array of the most likely candidates (title, description, documentation URL, and the full endpoint definition), ordered by semantic score (best match first).  |
+| `get-object-details`   | Retrieves details for API reference objects matching the input text. Returns an array of the most likely candidates (title, description, documentation URL, and the API it belongs to), ordered by semantic score (best match first). |
 
-All tools are **read-only** and operate on public Kontent.ai Learn content.
+All tools are **read-only** and operate on public Kontent.ai Learn content. The detail tools declare an `outputSchema`, so the exact response fields are published in
+`tools/list` — that schema is the source of truth, not this table.
 
 ## How It Works
 

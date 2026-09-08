@@ -1,16 +1,15 @@
 import { type JsonValue, tryCatchAsync } from "@kontent-ai/core-sdk";
-import { match, P } from "ts-pattern";
 import { getErrorMessage } from "../../utils/error.utils.js";
 import type { McpToolErrorResponse, McpToolResponse, McpToolSuccessResponse, ToolName } from "./tool-models.js";
 
-export async function withToolHandler({
+export async function withStructuredToolHandler<T extends Record<string, JsonValue>>({
 	toolName,
 	handler,
 }: {
-	readonly handler: () => Promise<JsonValue>;
+	readonly handler: () => Promise<T>;
 	readonly toolName: ToolName;
 }): Promise<McpToolResponse> {
-	const { success, data, error } = await tryCatchAsync(async () => createMcpToolSuccessResponse(await handler()));
+	const { success, data, error } = await tryCatchAsync(async () => createMcpStructuredSuccessResponse(await handler()));
 
 	if (success) {
 		return data;
@@ -20,27 +19,18 @@ export async function withToolHandler({
 }
 
 /**
- * Converts data to MCP tool success response format.
- * Handles undefined separately as JSON.stringify(undefined) returns undefined (not a string).
- * Skips stringify for strings as they don't need JSON encoding for MCP text response.
+ * Tools declaring an `outputSchema` must return `structuredContent`, or the MCP SDK rejects the call.
+ * The serialized JSON stays in `content` because not every client surfaces `structuredContent`.
  */
-const createMcpToolSuccessResponse = (data: JsonValue): McpToolSuccessResponse => {
-	// Matched as `unknown` because `JsonValue` is deeply recursive and overflows
-	const text = match<unknown>(data)
-		.returnType<string>()
-		.with(undefined, () => "undefined")
-		.with(P.string, (value) => value)
-		.otherwise((value) => JSON.stringify(value));
-
-	return {
-		content: [
-			{
-				text,
-				type: "text",
-			},
-		],
-	};
-};
+const createMcpStructuredSuccessResponse = <T extends Record<string, JsonValue>>(data: T): McpToolSuccessResponse => ({
+	content: [
+		{
+			text: JSON.stringify(data),
+			type: "text",
+		},
+	],
+	structuredContent: data,
+});
 
 /**
  * Handles various types of errors and returns a standardized MCP tool error response

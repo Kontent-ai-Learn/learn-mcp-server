@@ -3,7 +3,7 @@ import type { PublicApiReferenceEndpoint } from "../models/public-api-reference-
 
 export function mapRecordToPublicApiReferenceEndpoint(record: ApiReferenceEndpoint, score: number): PublicApiReferenceEndpoint {
 	return {
-		score: score,
+		score,
 		docsUrl: record.url,
 		description: record.description,
 		apiReference: record.apiReference,

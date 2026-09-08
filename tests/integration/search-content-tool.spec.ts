@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
-import type { SearchResult } from "../../lib/indexing/indexer.models.js";
-import { withTestClient } from "./test-client.js";
+import { z } from "zod";
+import { searchResultSchema } from "../../lib/indexing/indexer.models.js";
+import { parseFirstJsonContent, withTestClient } from "./test-client.js";
 
-interface TextContent {
-	readonly type: string;
-	readonly text: string;
-}
+/** The `documents` key is written literally so renaming the wrapper fails the test loudly. */
+const searchContentResultSchema = z.object({
+	documents: z.array(searchResultSchema),
+});
 
 describe("search-content tool (in-memory e2e)", () => {
 	it("is advertised via listTools", async (): Promise<void> => {
@@ -22,19 +23,17 @@ describe("search-content tool (in-memory e2e)", () => {
 			const res = await client.callTool({ arguments: { text: "how do I secure a webhook" }, name: "search-content" });
 			expect(res.isError).toBeFalsy();
 
-			const content = res.content as readonly TextContent[];
-			const [first] = content;
+			const { data: parsedText } = parseFirstJsonContent(res);
+			const { documents } = searchContentResultSchema.parse(parsedText);
 
-			expect(first?.type).toBe("text");
+			expect(documents.length).toBeGreaterThan(0);
+			expect(documents.some((d) => /webhook/i.test(d.title) || /webhook/i.test(d.body))).toBe(true);
 
-			const results = JSON.parse(first?.text ?? "[]") as readonly SearchResult[];
-			expect(results.length).toBeGreaterThan(0);
-			expect(results.some((r) => /webhook/i.test(r.title) || /webhook/i.test(r.body))).toBe(true);
+			// Every result carries its cosine-similarity score, ordered best match first.
+			const scores = documents.map((d) => d.score);
+			expect(scores).toEqual(scores.toSorted((a, b) => b - a));
 
-			// Every result carries its cosine-similarity score.
-			for (const result of results) {
-				expect(typeof result.score).toBe("number");
-			}
+			expect(res.structuredContent).toEqual(parsedText);
 		});
 	}, 120_000);
 

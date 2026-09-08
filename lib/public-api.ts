@@ -8,10 +8,16 @@ export type {
 	ApiReferenceResponse,
 } from "./content/models/api-reference-endpoints.models.js";
 export type { ApiReferenceObject } from "./content/models/api-reference-objects.models.js";
-export type { PublicApiReferenceEndpoint } from "./content/models/public-api-reference-endpoints.models.js";
-export type { PublicApiReferenceObject } from "./content/models/public-api-reference-objects.models.js";
+export {
+	type PublicApiReferenceEndpoint,
+	publicApiReferenceEndpointSchema,
+} from "./content/models/public-api-reference-endpoints.models.js";
+export {
+	type PublicApiReferenceObject,
+	publicApiReferenceObjectSchema,
+} from "./content/models/public-api-reference-objects.models.js";
 export type { SearchRecordType } from "./content/models/search-records.models.js";
-export type { SearchResult } from "./indexing/indexer.models.js";
+export { type SearchResult, searchResultSchema } from "./indexing/indexer.models.js";
 export { search } from "./search/search.js";
 export { createServer } from "./server.js";
 export { allTools } from "./tools/index.js";

@@ -9,7 +9,6 @@ export type ApiReferenceProperty = {
 };
 
 // Hand-written type + explicit annotation break the self-reference cycle that TS
-// Cannot infer; the getter defers evaluation until the const is initialised.
 export const apiReferencePropertySchema: z.ZodType<ApiReferenceProperty> = z.compile(
 	z
 		.object({

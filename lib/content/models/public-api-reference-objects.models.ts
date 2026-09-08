@@ -9,6 +9,7 @@ export const publicApiReferenceObjectSchema = z.compile(
 			docsUrl: z.url().optional(),
 			properties: z.array(apiReferencePropertySchema).readonly(),
 			score: z.number(),
+			title: z.string(),
 		})
 		.readonly(),
 );

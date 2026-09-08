@@ -88,13 +88,13 @@ function toSearchResults(rows: readonly unknown[]): readonly SearchResult[] {
 
 	return parsedRows
 		.filter((parsed): parsed is { readonly success: true; readonly data: DocumentDistanceRow } => parsed.success)
-		.map(({ data: row }) => ({
+		.map<SearchResult>(({ data: row }) => ({
 			body: row.body,
 			codename: row.codename,
 			score: round(1 - row.distance, 4),
 			title: row.title,
 			type: row.type,
-			url: row.url,
+			docsUrl: row.url,
 		}))
 		.filter((m) => m.score >= SEARCH_SCORE_THRESHOLD);
 }

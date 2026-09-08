@@ -15,6 +15,7 @@ export const createServer = (): { readonly server: McpServer } => {
 				annotations: tool.annotations,
 				description: tool.description,
 				inputSchema: tool.inputSchema,
+				...(tool.outputSchema ? { outputSchema: tool.outputSchema } : {}),
 			},
 			tool.handler,
 		);

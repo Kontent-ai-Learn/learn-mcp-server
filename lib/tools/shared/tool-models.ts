@@ -1,3 +1,5 @@
+import type { JsonValue } from "@kontent-ai/core-sdk";
+
 export interface McpToolErrorResponse {
 	[x: string]: unknown;
 	content: {
@@ -13,6 +15,7 @@ export interface McpToolSuccessResponse {
 		type: "text";
 		text: string;
 	}[];
+	structuredContent?: Record<string, JsonValue>;
 	isError?: false;
 }
 

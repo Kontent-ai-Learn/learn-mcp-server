@@ -1,4 +1,5 @@
-import type { SearchRecordType } from "../content/models/search-records.models.js";
+import { z } from "zod";
+import { type SearchRecordType, searchRecordTypeSchema } from "../content/models/search-records.models.js";
 
 export type NormalizedDoc = {
 	readonly id: string;
@@ -19,12 +20,18 @@ export type DocChunk = {
 	readonly text: string;
 };
 
-export type SearchResult = {
-	readonly title: string;
-	readonly docsUrl: string;
-	readonly body: string;
-	readonly codename: string;
-	readonly type: SearchRecordType;
-	/** Cosine similarity (0–1) of the document's best-matching chunk. */
-	readonly score: number;
-};
+export const searchResultSchema = z.compile(
+	z
+		.object({
+			body: z.string(),
+			codename: z.string(),
+			docsUrl: z.url(),
+			/** Cosine similarity (0–1) of the document's best-matching chunk. */
+			score: z.number(),
+			title: z.string(),
+			type: searchRecordTypeSchema,
+		})
+		.readonly(),
+);
+
+export type SearchResult = z.infer<typeof searchResultSchema>;

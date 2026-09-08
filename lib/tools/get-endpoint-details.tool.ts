@@ -1,20 +1,26 @@
 import z from "zod";
 import { apiReferenceCodenames } from "../config.js";
 import { getEndpointDetails } from "../content/api-reference-details.js";
+import { publicApiReferenceEndpointSchema } from "../content/models/public-api-reference-endpoints.models.js";
 import { mapRecordToPublicApiReferenceEndpoint } from "../content/utils/public-api-reference-endpoint-mapper.js";
 import { defineReadOnlyTool } from "./shared/tool-definitions.js";
-import { withToolHandler } from "./shared/tool-handler.js";
+import { withStructuredToolHandler } from "./shared/tool-handler.js";
 import type { ToolName } from "./shared/tool-models.js";
 
 const toolName: ToolName = "get-endpoint-details";
 
 export const getEndpointDetailsTools = defineReadOnlyTool({
 	description:
-		"Retrieves details for Kontent.ai API endpoints matching the input text. Returns an array of the most likely candidates, ordered by their semantic `score` (cosine similarity, 0–1, highest first) — use the score to judge how confident a match is. Each candidate includes the endpoint URL, title, description, code samples, request body schema, response body schema, query parameters and headers.",
+		"Retrieves details for Kontent.ai API endpoints matching the input text. Returns an array of the most likely candidates, ordered by their semantic `score` (cosine similarity, 0–1, highest first) — use the score to judge how confident a match is. An empty array means nothing matched closely enough.",
 	handler: async ({ text, apiReference }) =>
-		await withToolHandler({
-			handler: async () =>
-				await getEndpointDetails({ text, apiReference, mapRecordToPublicType: mapRecordToPublicApiReferenceEndpoint }),
+		await withStructuredToolHandler({
+			handler: async () => ({
+				candidates: await getEndpointDetails({
+					text,
+					apiReference,
+					mapRecordToPublicType: mapRecordToPublicApiReferenceEndpoint,
+				}),
+			}),
 			toolName,
 		}),
 	inputSchema: {
@@ -35,4 +41,7 @@ export const getEndpointDetailsTools = defineReadOnlyTool({
 		),
 	},
 	name: toolName,
+	outputSchema: {
+		candidates: z.array(publicApiReferenceEndpointSchema).readonly(),
+	},
 });

@@ -3,10 +3,14 @@ import type { ZodRawShapeCompat } from "@modelcontextprotocol/sdk/server/zod-com
 import type { ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
 import type { ToolName } from "./tool-models.js";
 
-export interface ToolDefinition<Schema extends ZodRawShapeCompat = ZodRawShapeCompat> {
+export interface ToolDefinition<
+	Schema extends ZodRawShapeCompat = ZodRawShapeCompat,
+	OutputSchema extends ZodRawShapeCompat = ZodRawShapeCompat,
+> {
 	readonly name: ToolName;
 	readonly description: string;
 	readonly inputSchema: Schema;
+	readonly outputSchema?: OutputSchema;
 	readonly handler: ToolCallback<Schema>;
 	readonly annotations: ToolAnnotations;
 }
@@ -14,17 +18,19 @@ export interface ToolDefinition<Schema extends ZodRawShapeCompat = ZodRawShapeCo
 /**
  * Defines a read-only tool. Compliant MCP clients may run read-only tools without a confirmation prompt.
  */
-export const defineReadOnlyTool = <Schema extends ZodRawShapeCompat>({
+export const defineReadOnlyTool = <Schema extends ZodRawShapeCompat, OutputSchema extends ZodRawShapeCompat>({
 	name,
 	description,
 	inputSchema,
+	outputSchema,
 	handler,
 }: {
 	readonly name: ToolName;
 	readonly description: string;
 	readonly inputSchema: Schema;
+	readonly outputSchema?: OutputSchema;
 	readonly handler: ToolCallback<Schema>;
-}): ToolDefinition<Schema> => ({
+}): ToolDefinition<Schema, OutputSchema> => ({
 	annotations: {
 		destructiveHint: false,
 		openWorldHint: false,
@@ -34,4 +40,5 @@ export const defineReadOnlyTool = <Schema extends ZodRawShapeCompat>({
 	handler,
 	inputSchema,
 	name,
+	outputSchema,
 });

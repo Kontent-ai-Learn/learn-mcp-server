@@ -50,6 +50,9 @@ function respondWithSyncError(res: Response, error: unknown): void {
 			.with("unauthorized", () => {
 				setUnauthorizedResponse(res, { message: error.message, type: error.type });
 			})
+			.with("cacheNotInitialized", () => {
+				logAndRespondError({ error, requestLabel: "sync", res });
+			})
 			.exhaustive();
 		return;
 	}
