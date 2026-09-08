@@ -176,7 +176,8 @@ The server is read-only and exposes only public Kontent.ai Learn documentation. 
 
 ## Deployment
 
-See [`DEPLOY.md`](./DEPLOY.md) for how this server is released.
+Bump the version with `pnpm run bump` before releasing — it bumps the patch version, syncs
+`server.json`, and commits both. See [`DEPLOY.md`](./DEPLOY.md) for how this server is released.
 
 ## Development
 
@@ -197,6 +198,9 @@ pnpm run start:stdio    # or start:shttp
 # Quality
 pnpm run lint           # biome + oxlint
 pnpm run biome:fix      # auto-format & fix
+
+# Version (patch bump, syncs server.json, commits both)
+pnpm run bump
 
 # Tests (builds a local test index from ./samples first)
 pnpm test               # full suite
