@@ -21,10 +21,10 @@ export type DocChunk = {
 
 export type SearchResult = {
 	readonly title: string;
-	readonly url: string;
+	readonly docsUrl: string;
 	readonly body: string;
 	readonly codename: string;
 	readonly type: SearchRecordType;
 	/** Cosine similarity (0–1) of the document's best-matching chunk. */
-	readonly score: number;
+	readonly relevanceScore: number;
 };

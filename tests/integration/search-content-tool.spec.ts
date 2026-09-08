@@ -33,7 +33,7 @@ describe("search-content tool (in-memory e2e)", () => {
 
 			// Every result carries its cosine-similarity score.
 			for (const result of results) {
-				expect(typeof result.score).toBe("number");
+				expect(typeof result.relevanceScore).toBe("number");
 			}
 		});
 	}, 120_000);

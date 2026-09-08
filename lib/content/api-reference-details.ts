@@ -102,7 +102,7 @@ function getTopMatches<TRecord extends RecordWithCodename, TPublicType extends I
 				return undefined;
 			}
 
-			return mapRecordToPublicType(record, m.score);
+			return mapRecordToPublicType(record, m.relevanceScore);
 		})
 		.filter(isDefined)
 		.toSorted((a, b) => b.score - a.score);
