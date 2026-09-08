@@ -9,10 +9,12 @@
 			"formatter": { "language_server": { "name": "biome" } }
 		},
 		"TypeScript": {
-			"formatter": { "language_server": { "name": "biome" } }
+			"formatter": { "language_server": { "name": "biome" } },
+			"language_servers": ["!angular"]
 		},
 		"TSX": {
-			"formatter": { "language_server": { "name": "biome" } }
+			"formatter": { "language_server": { "name": "biome" } },
+			"language_servers": ["!angular"]
 		},
 		"JSON": {
 			"formatter": { "language_server": { "name": "biome" } }
