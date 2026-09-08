@@ -10,11 +10,11 @@
 		},
 		"TypeScript": {
 			"formatter": { "language_server": { "name": "biome" } },
-			"language_servers": ["!angular"]
+			"language_servers": ["typescript-ls", "!vtsls", "!angular", "..."]
 		},
 		"TSX": {
 			"formatter": { "language_server": { "name": "biome" } },
-			"language_servers": ["!angular"]
+			"language_servers": ["typescript-ls", "!vtsls", "!angular", "..."]
 		},
 		"JSON": {
 			"formatter": { "language_server": { "name": "biome" } }
