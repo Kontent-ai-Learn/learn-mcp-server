@@ -9,7 +9,7 @@ export const searchRecordSchema = z.compile(
 		.object({
 			codename: z.string(),
 			id: z.string(),
-			markdownContent: z.string(),
+			description: z.string(),
 			title: z.string(),
 			type: searchRecordTypeSchema,
 			url: z.url(),

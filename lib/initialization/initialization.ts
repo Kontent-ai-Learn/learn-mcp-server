@@ -142,13 +142,13 @@ async function indexWithDb({
 
 /**
  * Objects are not part of the search endpoint, so they are indexed as their own
- * search records; the endpoint's markdownContent already includes the title.
+ * search records; the endpoint's description already includes the title.
  */
 function toSearchRecord(object: ApiReferenceObject): SearchRecord {
 	return {
 		codename: object.codename,
 		id: object.id,
-		markdownContent: object.markdownContent,
+		description: object.description,
 		title: object.title,
 		type: "object",
 		url: object.url,

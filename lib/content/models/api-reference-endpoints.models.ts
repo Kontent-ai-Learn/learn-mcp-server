@@ -59,7 +59,7 @@ export const apiReferenceEndpointSchema = z.compile(
 			headerParameters: z.array(apiReferencePropertySchema).readonly(),
 			httpMethod: z.string(),
 			id: z.string(),
-			markdownContent: z.string(),
+			description: z.string(),
 			queryParameters: z.array(apiReferencePropertySchema).readonly(),
 			responses: z.array(apiReferenceResponseSchema).readonly(),
 			tags: z.array(z.string()).readonly(),

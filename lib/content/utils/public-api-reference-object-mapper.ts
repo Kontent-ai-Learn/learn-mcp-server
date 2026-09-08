@@ -5,7 +5,7 @@ export function mapRecordToPublicApiReferenceObject(record: ApiReferenceObject, 
 	return {
 		score: score,
 		docsUrl: record.url,
-		description: record.markdownContent,
+		description: record.description,
 		apiReference: record.apiReference,
 		properties: record.properties,
 	};

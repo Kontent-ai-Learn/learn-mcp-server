@@ -5,7 +5,7 @@ export function mapRecordToPublicApiReferenceEndpoint(record: ApiReferenceEndpoi
 	return {
 		score: score,
 		docsUrl: record.url,
-		description: record.markdownContent,
+		description: record.description,
 		apiReference: record.apiReference,
 		bodyParameters: record.bodyParameters,
 		queryParameters: record.queryParameters,

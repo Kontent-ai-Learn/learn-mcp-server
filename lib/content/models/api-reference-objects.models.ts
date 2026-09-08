@@ -7,7 +7,7 @@ export const apiReferenceObjectSchema = z.compile(
 			apiReference: z.string(),
 			codename: z.string(),
 			id: z.string(),
-			markdownContent: z.string(),
+			description: z.string(),
 			properties: z.array(apiReferencePropertySchema).readonly(),
 			title: z.string(),
 			url: z.url(),

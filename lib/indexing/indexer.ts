@@ -54,7 +54,7 @@ function hashContent(parts: readonly string[]): string {
 function normalize(doc: SearchRecord, apiReferenceByCodename: ReadonlyMap<string, string>): NormalizedDoc {
 	const title = doc.title.trim();
 	const url = doc.url.trim();
-	const body = normalizeBody(doc.markdownContent);
+	const body = normalizeBody(doc.description);
 	const apiReference = apiReferenceByCodename.get(doc.codename) ?? null;
 	return {
 		apiReference,
