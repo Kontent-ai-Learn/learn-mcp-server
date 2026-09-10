@@ -9,7 +9,7 @@ const toolName: ToolName = "search-content";
 
 export const searchContentTool = defineReadOnlyTool({
 	description:
-		"Searches Kontent.ai Learn documentation and developer guides. Returns the most relevant documents in full, ordered by their semantic `score` (cosine similarity, 0–1, highest first) — the complete content is included, so you can answer the user's question directly without fetching the URLs.",
+		"Searches Kontent.ai Learn documentation and developer guides. Returns the most relevant documents in full, ordered by their semantic `score` (0–1, highest first; title and body relevance combined) — the complete content is included, so you can answer the user's question directly without fetching the URLs.",
 	handler: async ({ text }) =>
 		await withStructuredToolHandler({
 			handler: async () => ({ documents: [...(await search({ query: text }))] }),

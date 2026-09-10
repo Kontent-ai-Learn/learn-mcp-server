@@ -12,11 +12,17 @@ export type NormalizedDoc = {
 	readonly apiReference: string | null;
 };
 
+export const chunkSourceFieldSchema = z.compile(z.literal(["title", "body"]));
+
+/** Which field of the source document a chunk's text was drawn from — `documents.title` or `documents.body`. */
+export type ChunkSourceField = z.infer<typeof chunkSourceFieldSchema>;
+
 export type DocChunk = {
-	// `${docId}:${chunkIndex}`
+	// `${docId}:${chunkIndex}`, or `${docId}:title` for the title chunk
 	readonly chunkKey: string;
 	readonly docId: string;
 	readonly chunkIndex: number;
+	readonly sourceField: ChunkSourceField;
 	readonly text: string;
 };
 
@@ -26,7 +32,7 @@ export const searchResultSchema = z.compile(
 			body: z.string(),
 			codename: z.string(),
 			docsUrl: z.url(),
-			/** Cosine similarity (0–1) of the document's best-matching chunk. */
+			/** Blended relevance (0–1): title similarity and best body-chunk similarity, weighted by `TITLE_SCORE_WEIGHT`/`BODY_SCORE_WEIGHT`. */
 			score: z.number(),
 			title: z.string(),
 			type: searchRecordTypeSchema,

@@ -11,7 +11,7 @@ const toolName: ToolName = "get-object-details";
 
 export const getObjectDetailsTools = defineReadOnlyTool({
 	description:
-		"Retrieves details for Kontent.ai API reference objects matching the input text. Returns an array of the most likely candidates, ordered by their semantic `score` (cosine similarity, 0–1, highest first) — use the score to judge how confident a match is. An empty array means nothing matched closely enough.",
+		"Retrieves details for Kontent.ai API reference objects matching the input text. Returns an array of the most likely candidates, ordered by their semantic `score` (0–1, highest first; title and body relevance combined) — use the score to judge how confident a match is. An empty array means nothing matched closely enough.",
 	handler: async ({ text, apiReference }) =>
 		await withStructuredToolHandler({
 			handler: async () => ({

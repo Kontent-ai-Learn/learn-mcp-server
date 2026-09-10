@@ -49,7 +49,13 @@ export async function replaceDocument(db: Database, doc: NormalizedDoc, chunks: 
 		for (const chunk of chunks) {
 			await insertInto(txn, {
 				definition: CHUNKS_TABLE,
-				values: { chunkIndex: chunk.chunkIndex, chunkKey: chunk.chunkKey, docId: chunk.docId, text: chunk.text },
+				values: {
+					chunkIndex: chunk.chunkIndex,
+					chunkKey: chunk.chunkKey,
+					docId: chunk.docId,
+					sourceField: chunk.sourceField,
+					text: chunk.text,
+				},
 			});
 		}
 	});

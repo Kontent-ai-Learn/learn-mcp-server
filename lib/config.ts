@@ -23,6 +23,14 @@ export const SEARCH_LIMIT = 10;
 /** Only return results with a score above this threshold */
 export const SEARCH_SCORE_THRESHOLD = 0.2;
 
+/**
+ * Relevance blend: `TITLE_SCORE_WEIGHT * titleSimilarity + BODY_SCORE_WEIGHT * bestBodyChunkSimilarity`.
+ * Deriving the body weight keeps the pair summing to 1, so the score stays in 0-1 and
+ * `SEARCH_SCORE_THRESHOLD` keeps its meaning when the split is retuned.
+ */
+export const TITLE_SCORE_WEIGHT = 0.6;
+export const BODY_SCORE_WEIGHT = 1 - TITLE_SCORE_WEIGHT;
+
 /** Data directory: prod uses DataPath; test artifacts live in the top-level `data-test` folder. */
 export const getDataDir = (isTest: boolean): string => (isTest ? "data-test" : getEnvConfig().dataPath);
 

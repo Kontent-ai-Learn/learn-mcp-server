@@ -29,7 +29,7 @@ describe("search-content tool (in-memory e2e)", () => {
 			expect(documents.length).toBeGreaterThan(0);
 			expect(documents.some((d) => /webhook/i.test(d.title) || /webhook/i.test(d.body))).toBe(true);
 
-			// Every result carries its cosine-similarity score, ordered best match first.
+			// Every result carries its blended relevance score, ordered best match first.
 			const scores = documents.map((d) => d.score);
 			expect(scores).toEqual(scores.toSorted((a, b) => b - a));
 
@@ -43,4 +43,27 @@ describe("search-content tool (in-memory e2e)", () => {
 			expect(res.isError).toBe(true);
 		});
 	});
+});
+
+/**
+ * The sample corpus gives `Introduction to X` / `How to configure X` / `X best practices` near-identical
+ * bodies, so the title is the only discriminating signal. Both of these ranked 3rd and 2nd respectively
+ * back when only the body was embedded.
+ */
+describe("search-content title weighting (in-memory e2e)", () => {
+	it.each([
+		["list content items", "List content items"],
+		["how to configure taxonomy", "How to configure Taxonomy"],
+	])(
+		"ranks the title match first for %j",
+		async (text, expectedTitle): Promise<void> => {
+			await withTestClient(async (client): Promise<void> => {
+				const res = await client.callTool({ arguments: { text }, name: "search-content" });
+				const { documents } = searchContentResultSchema.parse(parseFirstJsonContent(res).data);
+
+				expect(documents[0]?.title).toBe(expectedTitle);
+			});
+		},
+		120_000,
+	);
 });

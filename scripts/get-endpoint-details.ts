@@ -2,7 +2,9 @@ import { mapRecordToPublicApiReferenceEndpoint } from "../lib/content/utils/publ
 import { getEndpointDetails } from "../lib/public-api.js";
 import { logger } from "../lib/utils/logger.js";
 
-const text = "list content items";
+const defaultText = "list content items";
+
+const text = process.argv.slice(2).join(" ").trim() || defaultText;
 
 logger.log({ message: `Simulating get-endpoint-details for: "${text}"`, type: "process" });
 

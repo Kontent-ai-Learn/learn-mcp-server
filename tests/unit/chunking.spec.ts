@@ -66,13 +66,41 @@ describe("chunkDoc", () => {
 		url: "https://example.com/doc-1",
 	};
 
-	it("assigns sequential keys and indices", () => {
-		const chunks = chunkDoc(doc, { overlapChars: 0, targetChars: 20 });
+	it("assigns sequential keys and indices to body chunks", () => {
+		const chunks = chunkDoc(doc, { overlapChars: 0, targetChars: 20 }).filter((chunk) => chunk.sourceField === "body");
 		expect(chunks.length).toBeGreaterThan(1);
 		chunks.forEach((chunk, index) => {
 			expect(chunk.docId).toBe("doc-1");
 			expect(chunk.chunkIndex).toBe(index);
 			expect(chunk.chunkKey).toBe(`doc-1:${index}`);
 		});
+	});
+
+	it("emits the title as its own leading chunk", () => {
+		const chunks = chunkDoc(doc, { overlapChars: 0, targetChars: 20 });
+		expect(chunks[0]).toEqual({
+			chunkIndex: -1,
+			chunkKey: "doc-1:title",
+			docId: "doc-1",
+			sourceField: "title",
+			text: "Title",
+		});
+	});
+
+	/** Regression guard: before the title chunk existed, a description-less doc had no chunks and no search could ever return it. */
+	it("still emits the title chunk when the body is empty", () => {
+		const chunks = chunkDoc({ ...doc, body: "" });
+		expect(chunks).toHaveLength(1);
+		expect(chunks[0]?.sourceField).toBe("title");
+	});
+
+	it("emits no title chunk when the title is empty", () => {
+		const chunks = chunkDoc({ ...doc, title: "" });
+		expect(chunks.every((chunk) => chunk.sourceField === "body")).toBe(true);
+	});
+
+	it("produces unique chunk keys", () => {
+		const chunks = chunkDoc(doc, { overlapChars: 0, targetChars: 20 });
+		expect(new Set(chunks.map((chunk) => chunk.chunkKey)).size).toBe(chunks.length);
 	});
 });

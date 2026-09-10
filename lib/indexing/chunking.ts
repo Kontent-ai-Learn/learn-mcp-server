@@ -17,6 +17,9 @@ const defaultOptions: ChunkOptions = {
 	targetChars: CHUNK_TARGET_CHARS,
 };
 
+/** Sorts the title chunk ahead of body chunks and keeps body indices 0-based. */
+const TITLE_CHUNK_INDEX = -1;
+
 export function chunkPlainText(text: string, options: ChunkOptions = defaultOptions): readonly string[] {
 	const { targetChars, overlapChars } = options;
 	const units = splitParagraphs(text).flatMap((paragraph) =>
@@ -39,10 +42,22 @@ export function chunkPlainText(text: string, options: ChunkOptions = defaultOpti
 }
 
 export function chunkDoc(doc: NormalizedDoc, options: ChunkOptions = defaultOptions): readonly DocChunk[] {
+	return [...titleChunk(doc), ...bodyChunks(doc, options)];
+}
+
+/** The title is embedded on its own so retrieval can weight it independently of the body. */
+function titleChunk(doc: NormalizedDoc): readonly DocChunk[] {
+	return doc.title.length === 0
+		? []
+		: [{ chunkIndex: TITLE_CHUNK_INDEX, chunkKey: `${doc.id}:title`, docId: doc.id, sourceField: "title", text: doc.title }];
+}
+
+function bodyChunks(doc: NormalizedDoc, options: ChunkOptions): readonly DocChunk[] {
 	return chunkPlainText(doc.body, options).map((text, chunkIndex) => ({
 		chunkIndex,
 		chunkKey: `${doc.id}:${chunkIndex}`,
 		docId: doc.id,
+		sourceField: "body",
 		text,
 	}));
 }

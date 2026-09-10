@@ -1,5 +1,6 @@
 import { EMBEDDING_DIM } from "../config.js";
 import type { SearchRecordType } from "../content/models/search-records.models.js";
+import type { ChunkSourceField } from "../indexing/indexer.models.js";
 import type { TableDefinition } from "./db.utils.js";
 
 export interface DocumentRow {
@@ -19,6 +20,7 @@ export interface ChunkRow {
 	readonly chunkKey: string;
 	readonly docId: string;
 	readonly chunkIndex: number;
+	readonly sourceField: ChunkSourceField;
 	readonly text: string;
 	readonly embedding: Uint8Array | null;
 	readonly embeddingModel: string | null;
@@ -47,6 +49,7 @@ export const CHUNKS_TABLE: TableDefinition<"chunks", ChunkRow> = {
 		embedding: { name: "embedding", type: `F32_BLOB(${EMBEDDING_DIM})` },
 		embeddingModel: { name: "embeddingModel", type: "TEXT" },
 		id: { name: "id", primaryKey: true, type: "INTEGER" },
+		sourceField: { name: "sourceField", notNull: true, type: "TEXT" },
 		text: { name: "text", notNull: true, type: "TEXT" },
 	},
 	tableName: "chunks",

@@ -1,18 +1,20 @@
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
 import { z } from "zod";
-import { type ApiReferenceCodenames, SEARCH_SCORE_THRESHOLD } from "../config.js";
+import { type ApiReferenceCodenames, BODY_SCORE_WEIGHT, SEARCH_SCORE_THRESHOLD, TITLE_SCORE_WEIGHT } from "../config.js";
 import { type SearchRecordType, searchRecordTypeSchema } from "../content/models/search-records.models.js";
-import type { SearchResult } from "../indexing/indexer.models.js";
+import type { ChunkSourceField, SearchResult } from "../indexing/indexer.models.js";
 import type { SqlValue } from "./db.utils.js";
 import { CHUNKS_TABLE, DOCUMENTS_TABLE, toVectorParam } from "./tables.js";
 
-const documentDistanceRow = z.compile(
+type SearchQueryParams = Readonly<Record<string, SqlValue>>;
+
+const documentScoreRow = z.compile(
 	z
 		.object({
 			body: z.string(),
 			codename: z.string(),
-			distance: z.number(),
+			score: z.number(),
 			title: z.string(),
 			type: searchRecordTypeSchema,
 			url: z.url(),
@@ -20,7 +22,10 @@ const documentDistanceRow = z.compile(
 		.readonly(),
 );
 
-type DocumentDistanceRow = z.infer<typeof documentDistanceRow>;
+type DocumentScoreRow = z.infer<typeof documentScoreRow>;
+
+const TITLE_SOURCE_FIELD: ChunkSourceField = "title";
+const BODY_SOURCE_FIELD: ChunkSourceField = "body";
 
 export async function getDocumentsFromDb({
 	db,
@@ -36,7 +41,7 @@ export async function getDocumentsFromDb({
 	readonly apiReference?: ApiReferenceCodenames;
 }): Promise<readonly SearchResult[]> {
 	const { sql, params } = buildSearchQuery({ apiReference, limit, queryVector, type });
-	const rows = await db.all(sql, ...params);
+	const rows = await db.all(sql, params);
 	return toSearchResults(rows);
 }
 
@@ -50,34 +55,60 @@ function buildSearchQuery({
 	readonly limit: number;
 	readonly type?: SearchRecordType;
 	readonly apiReference?: ApiReferenceCodenames;
-}): { readonly sql: string; readonly params: readonly SqlValue[] } {
+}): { readonly sql: string; readonly params: SearchQueryParams } {
+	const d = DOCUMENTS_TABLE.columns;
+	const filterClause = [
+		...(type ? [`AND doc.${d.type.name} = :type`] : []),
+		...(apiReference ? [`AND doc.${d.apiReference.name} = :apiReference`] : []),
+	].join(" ");
+
+	// Unreferenced named parameters are ignored by the driver, so the filter values can be bound
+	// unconditionally even when their conjunct is absent from the SQL.
+	const params: SearchQueryParams = {
+		apiReference: apiReference ?? null,
+		bodySourceField: BODY_SOURCE_FIELD,
+		bodyWeight: BODY_SCORE_WEIGHT,
+		limit,
+		queryVector: toVectorParam(queryVector),
+		titleSourceField: TITLE_SOURCE_FIELD,
+		titleWeight: TITLE_SCORE_WEIGHT,
+		type: type ?? null,
+	};
+	return { params, sql: buildSql(filterClause) };
+}
+
+function buildSql(filterClause: string): string {
 	const c = CHUNKS_TABLE.columns;
 	const d = DOCUMENTS_TABLE.columns;
 
-	const filters: readonly { readonly condition: string; readonly value: SqlValue }[] = [
-		...(type ? [{ condition: `doc.${d.type.name} = ?`, value: type }] : []),
-		...(apiReference ? [{ condition: `doc.${d.apiReference.name} = ?`, value: apiReference }] : []),
-	];
-	const filterClause = filters.map(({ condition }) => `AND ${condition}`).join(" ");
+	const bestDistanceIn = (sourceField: string): string =>
+		`MIN(CASE WHEN chunk.${c.sourceField.name} = ${sourceField} THEN vector_distance_cos(chunk.${c.embedding.name}, vector32(:queryVector)) END)`;
 
-	// Rank documents by their best (smallest cosine distance) chunk; grouping in SQL
-	// Keeps one row per document. vector_distance_cos returns 1 - cosineSimilarity.
-	// Filtering here (rather than after LIMIT) keeps a filtered lookup from
-	// Losing to unrelated rows that rank higher in the global top-N.
-	const sql = `SELECT doc.${d.title.name}, doc.${d.url.name}, doc.${d.body.name}, doc.${d.type.name}, doc.${d.codename.name},
-			MIN(vector_distance_cos(chunk.${c.embedding.name}, vector32(?))) AS distance
-		FROM ${CHUNKS_TABLE.tableName} chunk
-		JOIN ${DOCUMENTS_TABLE.tableName} doc ON doc.${d.id.name} = chunk.${c.docId.name}
-		WHERE chunk.${c.embedding.name} IS NOT NULL ${filterClause}
-		GROUP BY doc.${d.id.name}
-		ORDER BY distance ASC
-		LIMIT ?`;
-	const params: readonly SqlValue[] = [toVectorParam(queryVector), ...filters.map(({ value }) => value), limit];
-	return { params, sql };
+	// A CTE, not one SELECT: SQLite cannot reference a select-list alias from a later expression in
+	// the same list, so inlining the score would spell each MIN(CASE ...) twice more. Named params
+	// let the query vector appear twice in the text while being bound once.
+	// The title is its own `sourceField = 'title'` chunk, so a doc with an empty body still has one chunk
+	// and survives the join; its missing bodyDistance coalesces to zero similarity rather than
+	// renormalising the weights, which would put title-only hits on a different scale to the rest.
+	return `WITH scored AS (
+			SELECT doc.${d.id.name} AS id, doc.${d.title.name} AS title, doc.${d.url.name} AS url, doc.${d.body.name} AS body, doc.${d.type.name} AS type, doc.${d.codename.name} AS codename,
+				${bestDistanceIn(":titleSourceField")} AS titleDistance,
+				${bestDistanceIn(":bodySourceField")} AS bodyDistance
+			FROM ${CHUNKS_TABLE.tableName} chunk
+			JOIN ${DOCUMENTS_TABLE.tableName} doc ON doc.${d.id.name} = chunk.${c.docId.name}
+			WHERE chunk.${c.embedding.name} IS NOT NULL ${filterClause}
+			GROUP BY doc.${d.id.name}
+		)
+		SELECT title, url, body, type, codename,
+			:titleWeight * (1 - titleDistance) + :bodyWeight * (1 - COALESCE(bodyDistance, 1.0)) AS score
+		FROM scored
+		WHERE titleDistance IS NOT NULL
+		ORDER BY score DESC
+		LIMIT :limit`;
 }
 
 function toSearchResults(rows: readonly unknown[]): readonly SearchResult[] {
-	const parsedRows = rows.map((row) => documentDistanceRow.safeParse(row));
+	const parsedRows = rows.map((row) => documentScoreRow.safeParse(row));
 	const invalidCount = parsedRows.filter((parsed) => !parsed.success).length;
 
 	if (invalidCount > 0) {
@@ -87,11 +118,11 @@ function toSearchResults(rows: readonly unknown[]): readonly SearchResult[] {
 	}
 
 	return parsedRows
-		.filter((parsed): parsed is { readonly success: true; readonly data: DocumentDistanceRow } => parsed.success)
+		.filter((parsed): parsed is { readonly success: true; readonly data: DocumentScoreRow } => parsed.success)
 		.map<SearchResult>(({ data: row }) => ({
 			body: row.body,
 			codename: row.codename,
-			score: round(1 - row.distance, 4),
+			score: round(row.score, 4),
 			title: row.title,
 			type: row.type,
 			docsUrl: row.url,

@@ -46,9 +46,9 @@ All tools are **read-only** and operate on public Kontent.ai Learn content. The 
 On initialization the server pulls content from the Learn host and builds a local search index:
 
 1. **Fetch** search records, API-reference endpoints, and API-reference objects from the Learn AI endpoints, caching each response as JSON on disk.
-2. **Chunk & embed** the documents with the `Xenova/all-MiniLM-L6-v2` model (384-dim embeddings).
+2. **Chunk & embed** the documents with the `Xenova/all-MiniLM-L6-v2` model (384-dim embeddings). Each document's title is embedded as its own chunk, separately from the body.
 3. **Store** documents and chunk embeddings in a local libSQL/Turso vector database.
-4. **Search** at query time by embedding the query and ranking documents by cosine similarity.
+4. **Search** at query time by embedding the query and ranking documents by a weighted blend of title and best-body-chunk cosine similarity, with the title weighted higher (see `TITLE_SCORE_WEIGHT` in `lib/config.ts`).
 
 Indexing is incremental — unchanged documents keep their embeddings across restarts, so re-initializing only re-embeds what changed.
 
