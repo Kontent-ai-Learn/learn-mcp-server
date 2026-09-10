@@ -49,3 +49,17 @@ export async function getOrSetFromMemoryCacheAsync<T>({
 	setMemoryCache({ key, value: resolvedValue, schema });
 	return resolvedValue;
 }
+
+/**
+ * Remove an entry and return its validated value, or `undefined` when absent.
+ *
+ * A single remove-and-return rather than a get followed by a delete: callers that dispose of the
+ * value (closing a database handle, say) `await` in between, and nothing must be able to hand the
+ * same value to another caller in that gap.
+ */
+export function takeFromMemoryCache<T>({ key, schema }: { readonly key: string; readonly schema: ZodType<T> }): T | undefined {
+	const itemFromCache = cache.get(key);
+	cache.delete(key);
+
+	return itemFromCache === undefined ? undefined : schema.parse(itemFromCache);
+}

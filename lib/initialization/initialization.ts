@@ -10,9 +10,10 @@ import { type ApiReferenceEndpoint, apiReferenceEndpointSchema } from "../conten
 import { type ApiReferenceObject, apiReferenceObjectSchema } from "../content/models/api-reference-objects.models.js";
 import { type SearchRecord, searchRecordSchema } from "../content/models/search-records.models.js";
 import { initializeSearchRecords } from "../content/search-records.js";
-import { openDb } from "../database/db.js";
+import { closeCachedDb, openDb } from "../database/db.js";
 import { type IndexDocumentsResult, indexSearchRecords } from "../indexing/indexer.js";
 import type { DocumentToIndex } from "../indexing/indexer.models.js";
+import { acquireSyncLock, releaseSyncLock } from "../sync/sync-lock.js";
 import { findDuplicateKeys } from "../utils/duplicates.utils.js";
 import { readFile, rm } from "../utils/file.utils.js";
 import { logger } from "../utils/logger.js";
@@ -51,14 +52,25 @@ export async function syncAll(options?: { readonly isTest?: boolean }): Promise<
 	return options?.isTest === true ? await initializeTestData() : await initializeProdData();
 }
 
+/**
+ * Under the sync lock, so a clean cannot unlink the database out from under an indexing run.
+ * The cached connection is closed first: deleting the files while it is open leaves it reading the
+ * unlinked inode, so searches would keep serving pre-clean data and never see the next sync.
+ */
 export async function cleanData(options?: Parameters<typeof syncAll>[0]): Promise<void> {
 	const dbPath = getDbPath(options);
+	acquireSyncLock();
 
-	await Promise.all(
-		[dbPath, `${dbPath}-wal`, `${dbPath}-shm`].map(async (file) => {
-			await rm(file);
-		}),
-	);
+	try {
+		await closeCachedDb();
+		await Promise.all(
+			[dbPath, `${dbPath}-wal`, `${dbPath}-shm`].map(async (file) => {
+				await rm(file);
+			}),
+		);
+	} finally {
+		releaseSyncLock();
+	}
 }
 
 async function initializeProdData(): Promise<SyncResult> {

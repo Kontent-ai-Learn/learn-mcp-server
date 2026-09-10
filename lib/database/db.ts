@@ -1,16 +1,50 @@
-import { dirname } from "node:path";
-import { connect, type Database } from "@tursodatabase/database";
+import { dirname, resolve } from "node:path";
+import { tryCatchAsync } from "@kontent-ai/core-sdk";
+import { connect, Database } from "@tursodatabase/database";
+import { z } from "zod";
+import { getOrSetFromMemoryCacheAsync, takeFromMemoryCache } from "../cache/memory-cache.js";
+import { getDbPath } from "../config.js";
 import type { DocChunk, NormalizedDoc } from "../indexing/indexer.models.js";
-import { mkdir } from "../utils/file.utils.js";
+import { existsSync, mkdir } from "../utils/file.utils.js";
 import { yieldToEventLoop } from "../utils/timeout.utils.js";
 import { buildCreateTableQuery, deleteFrom, insertInto, selectFrom } from "./db.utils.js";
 import { CHUNKS_TABLE, DOCUMENTS_TABLE, toVectorParam } from "./tables.js";
 
+const DB_CACHE_KEY = "db";
+
 export async function openDb(path: string): Promise<Database> {
-	await mkdir(dirname(path));
-	const db = await connect(path, { experimental: ["index_method"] });
-	await db.exec(buildCreateTablesQuery());
-	return db;
+	// Resolved up front so the directory that gets created and the file that gets opened cannot
+	// disagree, and so a failure reports somewhere a human can go and look.
+	const absolutePath = resolve(path);
+	const directory = dirname(absolutePath);
+	await mkdir(directory);
+
+	const opened = await tryCatchAsync(async () => await connect(absolutePath, { experimental: ["index_method"] }));
+
+	if (!opened.success) {
+		throw new Error(describeOpenFailure({ directory, path: absolutePath }), { cause: opened.error });
+	}
+	await opened.data.exec(buildCreateTablesQuery());
+	return opened.data;
+}
+
+/** The one connection used to serve searches; reopened lazily after `closeCachedDb`. */
+export async function getCachedDb(): Promise<Database> {
+	return await getOrSetFromMemoryCacheAsync({
+		key: DB_CACHE_KEY,
+		schema: z.instanceof(Database),
+		value: async () => await openDb(getDbPath()),
+	});
+}
+
+/**
+ * Close and forget the cached connection. Deleting the database files while it is open leaves it
+ * reading the unlinked inode — searches would keep serving the pre-clean data and never see a
+ * later re-sync — so anything that removes those files must call this first.
+ */
+export async function closeCachedDb(): Promise<void> {
+	const cached = takeFromMemoryCache({ key: DB_CACHE_KEY, schema: z.instanceof(Database) });
+	await cached?.close();
 }
 
 /** Map of document id -> content hash, for change detection. */
@@ -100,4 +134,14 @@ CREATE INDEX IF NOT EXISTS idx_documents_apiReference ON ${DOCUMENTS_TABLE.table
 
 function buildCreateTablesQuery(): string {
 	return [buildCreateTableQuery(DOCUMENTS_TABLE), buildCreateTableQuery(CHUNKS_TABLE), buildCreateIndexesQuery()].join("\n");
+}
+
+/**
+ * libSQL reports a missing parent directory as an opaque
+ * `I/O error (statfs shared WAL coordination path): entity not found`, so say what was actually
+ * wrong — the directory is the only thing this layer can be responsible for.
+ */
+function describeOpenFailure({ path, directory }: { readonly path: string; readonly directory: string }): string {
+	const directoryState = existsSync(directory) ? "exists" : "does not exist, even though openDb creates it immediately before connecting";
+	return `Failed to open database at ${path}. Its directory ${directory} ${directoryState}. Working directory: ${process.cwd()}.`;
 }
