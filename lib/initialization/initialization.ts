@@ -12,6 +12,7 @@ import { type SearchRecord, searchRecordSchema } from "../content/models/search-
 import { initializeSearchRecords } from "../content/search-records.js";
 import { openDb } from "../database/db.js";
 import { type IndexDocumentsResult, indexSearchRecords } from "../indexing/indexer.js";
+import { findDuplicateKeys } from "../utils/duplicates.utils.js";
 import { readFile, rm } from "../utils/file.utils.js";
 import { logger } from "../utils/logger.js";
 
@@ -25,7 +26,9 @@ export interface SyncResult {
 		readonly changed: number;
 		readonly removed: number;
 		readonly unchanged: number;
+		/** Documents actually in the index — source records minus any collapsed by a duplicate id. */
 		readonly total: number;
+		readonly duplicateIdCount: number;
 	};
 }
 
@@ -111,10 +114,24 @@ function buildApiReferenceByCodename({
 	readonly apiReferenceEndpoints: readonly ApiReferenceEndpoint[];
 	readonly apiReferenceObjects: readonly ApiReferenceObject[];
 }): ReadonlyMap<string, string> {
-	return new Map([
+	const entries: readonly (readonly [string, string])[] = [
 		...apiReferenceEndpoints.map((endpoint) => [endpoint.codename, endpoint.apiReference] as const),
 		...apiReferenceObjects.map((object) => [object.codename, object.apiReference] as const),
-	]);
+	];
+	warnAboutDuplicateCodenames(findDuplicateKeys(entries, ([codename]) => codename));
+
+	return new Map(entries);
+}
+
+/** `getTopMatches` resolves a search hit back to its record by codename, so a repeated one is ambiguous. */
+function warnAboutDuplicateCodenames(duplicateCodenames: readonly string[]): void {
+	if (duplicateCodenames.length === 0) {
+		return;
+	}
+	logger.log({
+		message: `${colorize("yellow", duplicateCodenames.length.toString())} API reference codename(s) used by more than one record; lookups by codename are ambiguous: ${duplicateCodenames.join(", ")}`,
+		type: "warning",
+	});
 }
 
 /**
@@ -175,8 +192,9 @@ function toSyncResult({
 		index: {
 			added: index.addedCount,
 			changed: index.changedCount,
+			duplicateIdCount: index.duplicateIdCount,
 			removed: index.removedCount,
-			total: searchRecords.length + apiReferenceObjects.length,
+			total: index.indexedCount,
 			unchanged: index.unchangedCount,
 		},
 		searchRecordsCount: searchRecords.length,

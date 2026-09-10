@@ -4,6 +4,7 @@ import type { Database } from "@tursodatabase/database";
 import { EMBED_BATCH_SIZE, EMBEDDING_MODEL } from "../config.js";
 import type { SearchRecord } from "../content/models/search-records.models.js";
 import { deleteDocuments, getDocHashes, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "../database/db.js";
+import { findDuplicateKeys } from "../utils/duplicates.utils.js";
 import { logger, type SpinnerLog } from "../utils/logger.js";
 import { yieldToEventLoop } from "../utils/timeout.utils.js";
 import { chunkDoc } from "./chunking.js";
@@ -15,6 +16,10 @@ export interface IndexDocumentsResult {
 	readonly changedCount: number;
 	readonly removedCount: number;
 	readonly unchangedCount: number;
+	/** Source ids seen more than once; each collapses to a single row, so this many documents are lost. */
+	readonly duplicateIdCount: number;
+	/** Documents actually written, i.e. source records minus the collapsed duplicates. */
+	readonly indexedCount: number;
 }
 
 /**
@@ -28,19 +33,49 @@ export async function indexSearchRecords(
 	apiReferenceByCodename: ReadonlyMap<string, string>,
 ): Promise<IndexDocumentsResult> {
 	const normalized = searchRecords.map((doc) => normalize(doc, apiReferenceByCodename));
+	const duplicateIds = findDuplicateKeys(normalized, (doc) => doc.id);
+	warnAboutDuplicateIds(duplicateIds);
+	const deduplicated = keepLastById(normalized);
 
 	const result = await logger.logWithSpinnerAsync<IndexDocumentsResult>(async (spinner) => {
-		logger.log({ message: `Indexing ${colorize("yellow", normalized.length.toString())} source documents` });
-		const { added, changed, removed, unchanged } = await applyDiff({ db, normalizedDocuments: normalized, spinner });
+		logger.log({ message: `Indexing ${colorize("yellow", deduplicated.length.toString())} source documents` });
+		const { added, changed, removed, unchanged } = await applyDiff({ db, normalizedDocuments: deduplicated, spinner });
 		const embedded = await embedMissing(db, spinner);
 		spinner({
-			message: `Index ready: ${colorize("yellow", normalized.length.toString())} docs (${colorize("green", added.toString())} added, ${colorize("green", changed.toString())} changed, ${colorize("gray", unchanged.toString())} unchanged, ${colorize("red", removed.toString())} removed), ${colorize("yellow", embedded.toString())} chunks embedded`,
+			message: `Index ready: ${colorize("yellow", deduplicated.length.toString())} docs (${colorize("green", added.toString())} added, ${colorize("green", changed.toString())} changed, ${colorize("gray", unchanged.toString())} unchanged, ${colorize("red", removed.toString())} removed), ${colorize("yellow", embedded.toString())} chunks embedded`,
 			type: "completed",
 		});
 
-		return { addedCount: added, changedCount: changed, removedCount: removed, unchangedCount: unchanged };
+		return {
+			addedCount: added,
+			changedCount: changed,
+			duplicateIdCount: duplicateIds.length,
+			indexedCount: deduplicated.length,
+			removedCount: removed,
+			unchangedCount: unchanged,
+		};
 	});
 	return result;
+}
+
+/**
+ * Collapse colliding ids up front, keeping the last. `replaceDocument` writes by id, so this is
+ * what the database does anyway — doing it here makes the reported counts match the rows written
+ * and avoids writing (and re-chunking) the same document twice.
+ */
+function keepLastById(docs: readonly NormalizedDoc[]): readonly NormalizedDoc[] {
+	return [...new Map(docs.map((doc) => [doc.id, doc])).values()];
+}
+
+/** `replaceDocument` writes by id, so only the last record of a colliding group survives. */
+function warnAboutDuplicateIds(duplicateIds: readonly string[]): void {
+	if (duplicateIds.length === 0) {
+		return;
+	}
+	logger.log({
+		message: `${colorize("yellow", duplicateIds.length.toString())} duplicate document id(s) in the source; only the last record of each is indexed: ${duplicateIds.join(", ")}`,
+		type: "warning",
+	});
 }
 
 function normalizeBody(body: string): string {
