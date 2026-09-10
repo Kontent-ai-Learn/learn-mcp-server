@@ -12,6 +12,7 @@ import { type SearchRecord, searchRecordSchema } from "../content/models/search-
 import { initializeSearchRecords } from "../content/search-records.js";
 import { openDb } from "../database/db.js";
 import { type IndexDocumentsResult, indexSearchRecords } from "../indexing/indexer.js";
+import type { DocumentToIndex } from "../indexing/indexer.models.js";
 import { findDuplicateKeys } from "../utils/duplicates.utils.js";
 import { readFile, rm } from "../utils/file.utils.js";
 import { logger } from "../utils/logger.js";
@@ -100,30 +101,31 @@ async function finishSync({
 	readonly apiReferenceObjects: readonly ApiReferenceObject[];
 }): Promise<SyncResult> {
 	const documents = [...searchRecords, ...apiReferenceObjects.map((object) => toSearchRecord(object))];
-	const apiReferenceByCodename = buildApiReferenceByCodename({ apiReferenceEndpoints, apiReferenceObjects });
+	const apiReferenceByCodename = buildApiReferenceByCodename({ apiReferenceEndpoints });
 	const index = await indexWithDb({ apiReferenceByCodename, documents, isTest });
 
 	return toSyncResult({ apiReferenceEndpoints, apiReferenceObjects, index, isTest, searchRecords });
 }
 
-/** Keyed by codename: joins searchRecords (endpoint/object docs) to their owning API reference. */
+/**
+ * Keyed by codename: joins endpoint searchRecords to their owning API reference. Objects are not
+ * in here — they carry `apiReference` on the document itself, because one schema object reused by
+ * several APIs shares a codename across those records and could not be resolved by it.
+ */
 function buildApiReferenceByCodename({
 	apiReferenceEndpoints,
-	apiReferenceObjects,
 }: {
 	readonly apiReferenceEndpoints: readonly ApiReferenceEndpoint[];
-	readonly apiReferenceObjects: readonly ApiReferenceObject[];
 }): ReadonlyMap<string, string> {
-	const entries: readonly (readonly [string, string])[] = [
-		...apiReferenceEndpoints.map((endpoint) => [endpoint.codename, endpoint.apiReference] as const),
-		...apiReferenceObjects.map((object) => [object.codename, object.apiReference] as const),
-	];
+	const entries: readonly (readonly [string, string])[] = apiReferenceEndpoints.map(
+		(endpoint) => [endpoint.codename, endpoint.apiReference] as const,
+	);
 	warnAboutDuplicateCodenames(findDuplicateKeys(entries, ([codename]) => codename));
 
 	return new Map(entries);
 }
 
-/** `getTopMatches` resolves a search hit back to its record by codename, so a repeated one is ambiguous. */
+/** Endpoint search hits still resolve back to their record by codename, so a repeated one is ambiguous. */
 function warnAboutDuplicateCodenames(duplicateCodenames: readonly string[]): void {
 	if (duplicateCodenames.length === 0) {
 		return;
@@ -145,7 +147,7 @@ async function indexWithDb({
 	apiReferenceByCodename,
 	isTest,
 }: {
-	readonly documents: readonly SearchRecord[];
+	readonly documents: readonly DocumentToIndex[];
 	readonly apiReferenceByCodename: ReadonlyMap<string, string>;
 	readonly isTest: boolean;
 }): Promise<IndexDocumentsResult> {
@@ -161,8 +163,9 @@ async function indexWithDb({
  * Objects are not part of the search endpoint, so they are indexed as their own
  * search records; the endpoint's description already includes the title.
  */
-function toSearchRecord(object: ApiReferenceObject): SearchRecord {
+function toSearchRecord(object: ApiReferenceObject): DocumentToIndex {
 	return {
+		apiReference: object.apiReference,
 		codename: object.codename,
 		id: object.id,
 		description: object.description,

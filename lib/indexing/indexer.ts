@@ -2,14 +2,13 @@ import { createHash } from "node:crypto";
 import { colorize } from "@kontent-ai/core-sdk/devkit";
 import type { Database } from "@tursodatabase/database";
 import { EMBED_BATCH_SIZE, EMBEDDING_MODEL } from "../config.js";
-import type { SearchRecord } from "../content/models/search-records.models.js";
 import { deleteDocuments, getDocHashes, replaceDocument, selectChunksToEmbed, updateEmbeddings } from "../database/db.js";
 import { findDuplicateKeys } from "../utils/duplicates.utils.js";
 import { logger, type SpinnerLog } from "../utils/logger.js";
 import { yieldToEventLoop } from "../utils/timeout.utils.js";
 import { chunkDoc } from "./chunking.js";
 import { embedTexts } from "./embeddings.js";
-import type { NormalizedDoc } from "./indexer.models.js";
+import type { DocumentToIndex, NormalizedDoc } from "./indexer.models.js";
 
 export interface IndexDocumentsResult {
 	readonly addedCount: number;
@@ -29,13 +28,11 @@ export interface IndexDocumentsResult {
  */
 export async function indexSearchRecords(
 	db: Database,
-	searchRecords: readonly SearchRecord[],
+	searchRecords: readonly DocumentToIndex[],
 	apiReferenceByCodename: ReadonlyMap<string, string>,
 ): Promise<IndexDocumentsResult> {
 	const normalized = searchRecords.map((doc) => normalize(doc, apiReferenceByCodename));
-	const duplicateIds = findDuplicateKeys(normalized, (doc) => doc.id);
-	warnAboutDuplicateIds(duplicateIds);
-	const deduplicated = keepLastById(normalized);
+	const { documents: deduplicated, duplicateIdCount } = collapseDuplicateIds(normalized);
 
 	const result = await logger.logWithSpinnerAsync<IndexDocumentsResult>(async (spinner) => {
 		logger.log({ message: `Indexing ${colorize("yellow", deduplicated.length.toString())} source documents` });
@@ -49,7 +46,7 @@ export async function indexSearchRecords(
 		return {
 			addedCount: added,
 			changedCount: changed,
-			duplicateIdCount: duplicateIds.length,
+			duplicateIdCount,
 			indexedCount: deduplicated.length,
 			removedCount: removed,
 			unchangedCount: unchanged,
@@ -58,16 +55,49 @@ export async function indexSearchRecords(
 	return result;
 }
 
+export function normalize(doc: DocumentToIndex, apiReferenceByCodename: ReadonlyMap<string, string>): NormalizedDoc {
+	const title = doc.title.trim();
+	const url = doc.url.trim();
+	const body = normalizeBody(doc.description);
+	// A document that already knows its API wins: objects share a codename across APIs, so the
+	// codename map cannot tell their records apart.
+	const apiReference = doc.apiReference ?? apiReferenceByCodename.get(doc.codename) ?? null;
+	return {
+		apiReference,
+		body,
+		codename: doc.codename,
+		// Every persisted field that affects retrieval, so any change to one re-indexes the document.
+		// `codename` and `type` matter as much as the text: the first is what resolves a search hit
+		// back to its API-reference record, the second drives the type filter — and a change to
+		// either alone would otherwise hash identically and be skipped as unchanged.
+		contentHash: hashContent([title, url, body, apiReference ?? "", doc.codename, doc.type]),
+		id: doc.id,
+		title,
+		type: doc.type,
+		url,
+	};
+}
+
 /**
- * Collapse colliding ids up front, keeping the last. `replaceDocument` writes by id, so this is
- * what the database does anyway — doing it here makes the reported counts match the rows written
+ * Collapse colliding ids up front, reporting them. `replaceDocument` writes by id, so the database
+ * would do this anyway — doing it here makes the reported counts match the rows actually written,
  * and avoids writing (and re-chunking) the same document twice.
  */
+function collapseDuplicateIds(docs: readonly NormalizedDoc[]): {
+	readonly documents: readonly NormalizedDoc[];
+	readonly duplicateIdCount: number;
+} {
+	const duplicateIds = findDuplicateKeys(docs, (doc) => doc.id);
+	warnAboutDuplicateIds(duplicateIds);
+
+	return { documents: keepLastById(docs), duplicateIdCount: duplicateIds.length };
+}
+
+/** Last wins, mirroring `replaceDocument`'s delete-then-insert by id. */
 function keepLastById(docs: readonly NormalizedDoc[]): readonly NormalizedDoc[] {
 	return [...new Map(docs.map((doc) => [doc.id, doc])).values()];
 }
 
-/** `replaceDocument` writes by id, so only the last record of a colliding group survives. */
 function warnAboutDuplicateIds(duplicateIds: readonly string[]): void {
 	if (duplicateIds.length === 0) {
 		return;
@@ -82,26 +112,9 @@ function normalizeBody(body: string): string {
 	return body.replaceAll("\r\n", "\n").trim();
 }
 
+/** NUL-delimited so text shifting across a field boundary cannot hash to the same value as before. */
 function hashContent(parts: readonly string[]): string {
-	return createHash("sha256").update(parts.join(" ")).digest("hex");
-}
-
-function normalize(doc: SearchRecord, apiReferenceByCodename: ReadonlyMap<string, string>): NormalizedDoc {
-	const title = doc.title.trim();
-	const url = doc.url.trim();
-	const body = normalizeBody(doc.description);
-	const apiReference = apiReferenceByCodename.get(doc.codename) ?? null;
-	return {
-		apiReference,
-		body,
-		codename: doc.codename,
-		// Fold apiReference into the hash so a recategorised endpoint gets re-indexed.
-		contentHash: hashContent([title, url, body, apiReference ?? ""]),
-		id: doc.id,
-		title,
-		type: doc.type,
-		url,
-	};
+	return createHash("sha256").update(parts.join("\u0000")).digest("hex");
 }
 
 function toBatches<T>(items: readonly T[], size: number): readonly (readonly T[])[] {

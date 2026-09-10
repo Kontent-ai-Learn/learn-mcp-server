@@ -76,7 +76,7 @@ it("returns 200 when the sync finishes within the timeout", async () => {
 				apiReferenceEndpointsCount: 0,
 				apiReferenceObjectsCount: 0,
 				dbName: "test.db",
-				index: { added: 0, changed: 0, removed: 0, total: 0, unchanged: 0 },
+				index: { added: 0, changed: 0, duplicateIdCount: 0, removed: 0, total: 0, unchanged: 0 },
 				searchRecordsCount: 0,
 			},
 			success: true,

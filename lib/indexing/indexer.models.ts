@@ -1,5 +1,13 @@
 import { z } from "zod";
-import { type SearchRecordType, searchRecordTypeSchema } from "../content/models/search-records.models.js";
+import { type SearchRecord, type SearchRecordType, searchRecordTypeSchema } from "../content/models/search-records.models.js";
+
+/**
+ * A source record on its way into the index. `apiReference` is carried directly by documents that
+ * already know their API (objects), rather than being resolved from the ambiguous codename map.
+ */
+export type DocumentToIndex = SearchRecord & {
+	readonly apiReference?: string;
+};
 
 export type NormalizedDoc = {
 	readonly id: string;

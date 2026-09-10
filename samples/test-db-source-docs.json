@@ -2797,13 +2797,22 @@
 						}
 					],
 					"samples": [
-						{ "language": "json", "code": "{\"type\": \"asset\",\"name\": \"Teaser image\",\"codename\": \"teaser_image\"}" },
+						{
+							"language": "json",
+							"code": "{\"type\": \"asset\",\"name\": \"Teaser image\",\"codename\": \"teaser_image\"}"
+						},
 						{
 							"language": "json",
 							"code": "{\"type\": \"custom\",\"name\": \"Markdown editor\",\"codename\": \"markdown_editor\"}"
 						},
-						{ "language": "json", "code": "{\"type\": \"date_time\",\"name\": \"Post date\",\"codename\": \"post_date\"}" },
-						{ "language": "json", "code": "{\"type\": \"modular_content\",\"name\": \"Author\",\"codename\": \"author\"}" },
+						{
+							"language": "json",
+							"code": "{\"type\": \"date_time\",\"name\": \"Post date\",\"codename\": \"post_date\"}"
+						},
+						{
+							"language": "json",
+							"code": "{\"type\": \"modular_content\",\"name\": \"Author\",\"codename\": \"author\"}"
+						},
 						{
 							"language": "json",
 							"code": "{\"type\": \"multiple_choice\",\"name\": \"Show image border\",\"options\": [\n   {\n      \"name\": \"True\",\n      \"codename\": \"true\"\n  },\n  {\n      \"name\": \"False\",\n      \"codename\": \"false\"\n  }\n],\"codename\": \"show_image_border\"}"
@@ -2812,14 +2821,26 @@
 							"language": "json",
 							"code": "{\"type\": \"number\",\"name\": \"Days since last accident\",\"codename\": \"days_since_last_accident\"}"
 						},
-						{ "language": "json", "code": "{\"type\": \"modular_content\",\"name\": \"Subpages\",\"codename\": \"subpages\"}" },
+						{
+							"language": "json",
+							"code": "{\"type\": \"modular_content\",\"name\": \"Subpages\",\"codename\": \"subpages\"}"
+						},
 						{
 							"language": "json",
 							"code": "{\"type\": \"taxonomy\",\"name\": \"Category\",\"taxonomy_group\": \"category\",\"codename\": \"category\"}"
 						},
-						{ "language": "json", "code": "{\"type\": \"text\",\"name\": \"Meta keywords\",\"codename\": \"meta_keywords\"}" },
-						{ "language": "json", "code": "{\"type\": \"rich_text\",\"name\": \"Description\",\"codename\": \"description\"}" },
-						{ "language": "json", "code": "{\"type\": \"url_slug\",\"name\": \"URL\",\"codename\": \"url\"}" },
+						{
+							"language": "json",
+							"code": "{\"type\": \"text\",\"name\": \"Meta keywords\",\"codename\": \"meta_keywords\"}"
+						},
+						{
+							"language": "json",
+							"code": "{\"type\": \"rich_text\",\"name\": \"Description\",\"codename\": \"description\"}"
+						},
+						{
+							"language": "json",
+							"code": "{\"type\": \"url_slug\",\"name\": \"URL\",\"codename\": \"url\"}"
+						},
 						{
 							"language": "json",
 							"code": "{\n  \"message\": \"The requested content element 'authors' was not found in content type 'article'.\",\n  \"request_id\": \"|b8ec7d395e95c04e9511dbabd65bf4d1.a44b7400_\",\n  \"error_code\": 102,\n  \"specific_code\": 0\n}"
@@ -2860,13 +2881,22 @@
 						}
 					],
 					"samples": [
-						{ "language": "json", "code": "{\"type\": \"asset\",\"name\": \"Teaser image\",\"codename\": \"teaser_image\"}" },
+						{
+							"language": "json",
+							"code": "{\"type\": \"asset\",\"name\": \"Teaser image\",\"codename\": \"teaser_image\"}"
+						},
 						{
 							"language": "json",
 							"code": "{\"type\": \"custom\",\"name\": \"Markdown editor\",\"codename\": \"markdown_editor\"}"
 						},
-						{ "language": "json", "code": "{\"type\": \"date_time\",\"name\": \"Post date\",\"codename\": \"post_date\"}" },
-						{ "language": "json", "code": "{\"type\": \"modular_content\",\"name\": \"Author\",\"codename\": \"author\"}" },
+						{
+							"language": "json",
+							"code": "{\"type\": \"date_time\",\"name\": \"Post date\",\"codename\": \"post_date\"}"
+						},
+						{
+							"language": "json",
+							"code": "{\"type\": \"modular_content\",\"name\": \"Author\",\"codename\": \"author\"}"
+						},
 						{
 							"language": "json",
 							"code": "{\"type\": \"multiple_choice\",\"name\": \"Show image border\",\"options\": [\n   {\n      \"name\": \"True\",\n      \"codename\": \"true\"\n  },\n  {\n      \"name\": \"False\",\n      \"codename\": \"false\"\n  }\n],\"codename\": \"show_image_border\"}"
@@ -2875,14 +2905,26 @@
 							"language": "json",
 							"code": "{\"type\": \"number\",\"name\": \"Days since last accident\",\"codename\": \"days_since_last_accident\"}"
 						},
-						{ "language": "json", "code": "{\"type\": \"modular_content\",\"name\": \"Subpages\",\"codename\": \"subpages\"}" },
+						{
+							"language": "json",
+							"code": "{\"type\": \"modular_content\",\"name\": \"Subpages\",\"codename\": \"subpages\"}"
+						},
 						{
 							"language": "json",
 							"code": "{\"type\": \"taxonomy\",\"name\": \"Category\",\"taxonomy_group\": \"category\",\"codename\": \"category\"}"
 						},
-						{ "language": "json", "code": "{\"type\": \"text\",\"name\": \"Meta keywords\",\"codename\": \"meta_keywords\"}" },
-						{ "language": "json", "code": "{\"type\": \"rich_text\",\"name\": \"Description\",\"codename\": \"description\"}" },
-						{ "language": "json", "code": "{\"type\": \"url_slug\",\"name\": \"URL\",\"codename\": \"url\"}" },
+						{
+							"language": "json",
+							"code": "{\"type\": \"text\",\"name\": \"Meta keywords\",\"codename\": \"meta_keywords\"}"
+						},
+						{
+							"language": "json",
+							"code": "{\"type\": \"rich_text\",\"name\": \"Description\",\"codename\": \"description\"}"
+						},
+						{
+							"language": "json",
+							"code": "{\"type\": \"url_slug\",\"name\": \"URL\",\"codename\": \"url\"}"
+						},
 						{
 							"language": "json",
 							"code": "{\n  \"message\": \"The requested content element 'authors' was not found in content type 'article'.\",\n  \"request_id\": \"|b8ec7d395e95c04e9511dbabd65bf4d1.a44b7400_\",\n  \"error_code\": 102,\n  \"specific_code\": 0\n}"
@@ -3282,7 +3324,7 @@
 			"title": "Error object",
 			"codename": "error_object",
 			"url": "http://localhost:3000/learn/docs/apis/sync-api-v2/errors#error-object",
-			"id": "api_reference_object_error_object",
+			"id": "api_reference_object_sync_api_v2_error_object",
 			"description": "Error object \n\nError object in Delivery API.",
 			"properties": [
 				{
@@ -3314,13 +3356,51 @@
 					"nestedProperties": []
 				}
 			],
-			"apiReference": "Sync API v2"
+			"apiReference": "sync_api_v2"
+		},
+		{
+			"title": "Error object",
+			"codename": "error_object",
+			"url": "http://localhost:3000/learn/docs/apis/delivery-api/errors#error-object",
+			"id": "api_reference_object_delivery_api_error_object",
+			"description": "Error object \n\nError object in Delivery API.",
+			"properties": [
+				{
+					"name": "message",
+					"type": "string",
+					"description": "<p>The error message explaining what caused the error.</p>",
+					"modifiers": ["non-nullable", "required"],
+					"nestedProperties": []
+				},
+				{
+					"name": "request_id",
+					"type": "string",
+					"description": "<p>The performed request's unique ID.</p>",
+					"modifiers": ["nullable", "optional"],
+					"nestedProperties": []
+				},
+				{
+					"name": "error_code",
+					"type": "number",
+					"description": "<p>The internal error code for the type of error. Used for finding patterns among error requests.</p>",
+					"modifiers": ["non-nullable", "optional"],
+					"nestedProperties": []
+				},
+				{
+					"name": "specific_code",
+					"type": "number",
+					"description": "<p>Only useful for finding reasons behind failed requests in specific cases.</p>",
+					"modifiers": ["non-nullable", "optional"],
+					"nestedProperties": []
+				}
+			],
+			"apiReference": "delivery_api"
 		},
 		{
 			"title": "Content item object",
 			"codename": "content_item",
 			"url": "http://localhost:3000/learn/docs/apis/delivery-api/content-items#content-item-object",
-			"id": "api_reference_object_content_item",
+			"id": "api_reference_object_delivery_api_content_item",
 			"description": "Content item object \n\nThe content item with metadata and individual elements.",
 			"properties": [
 				{
@@ -3417,13 +3497,13 @@
 					]
 				}
 			],
-			"apiReference": "Delivery REST API"
+			"apiReference": "delivery_api"
 		},
 		{
 			"title": "Content type object",
 			"codename": "content_type",
 			"url": "http://localhost:3000/learn/docs/apis/delivery-api/content-types#content-type-object",
-			"id": "api_reference_object_content_type",
+			"id": "api_reference_object_delivery_api_content_type",
 			"description": "Content type object",
 			"properties": [
 				{
@@ -3478,13 +3558,13 @@
 					]
 				}
 			],
-			"apiReference": "Delivery REST API"
+			"apiReference": "delivery_api"
 		},
 		{
 			"title": "Language object",
 			"codename": "dapi_language",
 			"url": "http://localhost:3000/learn/docs/apis/delivery-api/languages#language-object",
-			"id": "api_reference_object_dapi_language",
+			"id": "api_reference_object_delivery_api_dapi_language",
 			"description": "Language object \n\nProvides metadata of a language in your environment.",
 			"properties": [
 				{
@@ -3517,13 +3597,13 @@
 					]
 				}
 			],
-			"apiReference": "Delivery REST API"
+			"apiReference": "delivery_api"
 		},
 		{
 			"title": "Asset element",
 			"codename": "asset_element_in_item",
 			"url": "http://localhost:3000/learn/docs/apis/delivery-api/content-elements#asset-element",
-			"id": "api_reference_object_asset_element_in_item",
+			"id": "api_reference_object_delivery_api_asset_element_in_item",
 			"description": "Asset element",
 			"properties": [
 				{
@@ -3657,13 +3737,13 @@
 					]
 				}
 			],
-			"apiReference": "Delivery REST API"
+			"apiReference": "delivery_api"
 		},
 		{
 			"title": "Custom element",
 			"codename": "custom_element_in_item",
 			"url": "http://localhost:3000/learn/docs/apis/delivery-api/content-elements#custom-element",
-			"id": "api_reference_object_custom_element_in_item",
+			"id": "api_reference_object_delivery_api_custom_element_in_item",
 			"description": "Custom element \n\nCreate your own custom elements or discover existing [custom elements built by the community](https://github.com/topics/kontent-ai-integration).",
 			"properties": [
 				{
@@ -3688,13 +3768,13 @@
 					"nestedProperties": []
 				}
 			],
-			"apiReference": "Delivery REST API"
+			"apiReference": "delivery_api"
 		},
 		{
 			"title": "Subpages element",
 			"codename": "subpages_element_in_item",
 			"url": "http://localhost:3000/learn/docs/apis/delivery-api/content-elements#subpages-element",
-			"id": "api_reference_object_subpages_element_in_item",
+			"id": "api_reference_object_delivery_api_subpages_element_in_item",
 			"description": "Subpages element \n\nThe _Subpages_ element that works with live preview. This element defines parent-child relationships between content items to build a navigation hierarchy. When a space has a root item with a _Subpages_ element, it enables the navigation tree.",
 			"properties": [
 				{
@@ -3719,13 +3799,13 @@
 					"nestedProperties": []
 				}
 			],
-			"apiReference": "Delivery REST API"
+			"apiReference": "delivery_api"
 		},
 		{
 			"title": "Taxonomy group object",
 			"codename": "taxonomy_group",
 			"url": "http://localhost:3000/learn/docs/apis/delivery-api/taxonomy-groups#taxonomy-group-object",
-			"id": "api_reference_object_taxonomy_group",
+			"id": "api_reference_object_delivery_api_taxonomy_group",
 			"description": "Taxonomy group object",
 			"properties": [
 				{
@@ -3802,13 +3882,13 @@
 					]
 				}
 			],
-			"apiReference": "Delivery REST API"
+			"apiReference": "delivery_api"
 		},
 		{
 			"title": "Taxonomy element",
 			"codename": "taxonomy_element_in_item",
 			"url": "http://localhost:3000/learn/docs/apis/delivery-api/content-elements#taxonomy-element",
-			"id": "api_reference_object_taxonomy_element_in_item",
+			"id": "api_reference_object_delivery_api_taxonomy_element_in_item",
 			"description": "Taxonomy element",
 			"properties": [
 				{
@@ -3863,13 +3943,13 @@
 					]
 				}
 			],
-			"apiReference": "Delivery REST API"
+			"apiReference": "delivery_api"
 		},
 		{
 			"title": "Date and time element",
 			"codename": "date___time_element_in_item",
 			"url": "http://localhost:3000/learn/docs/apis/delivery-api/content-elements#date-and-time-element",
-			"id": "api_reference_object_date___time_element_in_item",
+			"id": "api_reference_object_delivery_api_date___time_element_in_item",
 			"description": "Date and time element",
 			"properties": [
 				{
@@ -3901,7 +3981,7 @@
 					"nestedProperties": []
 				}
 			],
-			"apiReference": "Delivery REST API"
+			"apiReference": "delivery_api"
 		}
 	]
 }

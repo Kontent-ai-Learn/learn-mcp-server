@@ -16,6 +16,8 @@ interface SeedChunk {
 
 interface SeedDoc {
 	readonly id: string;
+	/** Defaults to `id`; set it explicitly to model two API variants that share one source item. */
+	readonly codename?: string;
 	readonly chunks: readonly SeedChunk[];
 	readonly type?: SearchRecordType;
 	readonly apiReference?: ApiReferenceCodenames;
@@ -68,7 +70,7 @@ const insertDoc = async (db: Database, doc: SeedDoc): Promise<void> => {
 	await db.run(
 		`INSERT INTO ${DOCUMENTS_TABLE.tableName} (${columns.join(", ")}) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
 		doc.id,
-		doc.id,
+		doc.codename ?? doc.id,
 		`Title ${doc.id}`,
 		`https://example.com/${doc.id}`,
 		`Body ${doc.id}`,
@@ -100,6 +102,10 @@ const search = async (
 	await getDocumentsFromDb({ db: await seededDb(docs), limit: 10, queryVector: QUERY_VECTOR, ...options });
 
 const codenamesOf = (results: readonly SearchResult[]): readonly string[] => results.map((result) => result.codename);
+const url = (id: string): string => `https://example.com/${id}`;
+
+/** Documents that share a codename are told apart by their url, which is per-API in the real data too. */
+const urlsOf = (results: readonly SearchResult[]): readonly string[] => results.map((result) => result.docsUrl);
 
 describe("getDocumentsFromDb scoring", () => {
 	it("blends the title with the best body chunk using the configured weights", async () => {
@@ -179,5 +185,36 @@ describe("getDocumentsFromDb edge cases", () => {
 
 		expect(codenamesOf(await search(docs, { type: "endpoint" }))).toEqual(["endpoint-sync", "endpoint-delivery"]);
 		expect(codenamesOf(await search(docs, { apiReference: "delivery_api", type: "endpoint" }))).toEqual(["endpoint-delivery"]);
+	});
+});
+
+describe("getDocumentsFromDb identity", () => {
+	/**
+	 * A schema object reused by two APIs is indexed once per API: same codename, different url and
+	 * apiReference. Each variant must stay independently filterable, since the codename alone
+	 * cannot tell them apart.
+	 */
+	it("keeps documents that share a codename separable by url and apiReference", async () => {
+		const docs: readonly SeedDoc[] = [
+			{
+				apiReference: "delivery_api",
+				chunks: [{ sourceField: "title", similarity: 0.9 }],
+				codename: "error_object",
+				id: "object-delivery",
+				type: "object",
+			},
+			{
+				apiReference: "sync_api_v2",
+				chunks: [{ sourceField: "title", similarity: 1 }],
+				codename: "error_object",
+				id: "object-sync",
+				type: "object",
+			},
+		];
+
+		expect(urlsOf(await search(docs, { type: "object" }))).toEqual([url("object-sync"), url("object-delivery")]);
+		expect(codenamesOf(await search(docs, { type: "object" }))).toEqual(["error_object", "error_object"]);
+		expect(urlsOf(await search(docs, { apiReference: "delivery_api", type: "object" }))).toEqual([url("object-delivery")]);
+		expect(urlsOf(await search(docs, { apiReference: "sync_api_v2", type: "object" }))).toEqual([url("object-sync")]);
 	});
 });

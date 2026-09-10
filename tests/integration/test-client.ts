@@ -45,13 +45,15 @@ export async function callToolAndParse<T>({
 	toolName,
 	schema,
 	text,
+	apiReference,
 }: {
 	readonly toolName: ToolName;
 	readonly schema: { readonly safeParse: (data: unknown) => { readonly data?: T; readonly error?: unknown } };
 	readonly text: string;
+	readonly apiReference?: string;
 }): Promise<ToolCallResult<T>> {
 	return await withTestClient(async (client) => {
-		const res = await client.callTool({ arguments: { text }, name: toolName });
+		const res = await client.callTool({ arguments: apiReference ? { apiReference, text } : { text }, name: toolName });
 		expect(res.isError).toBeFalsy();
 
 		const { data: parsedItem, error: parseError } = parseFirstJsonContent(res);

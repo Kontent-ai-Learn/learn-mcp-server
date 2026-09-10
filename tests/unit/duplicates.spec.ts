@@ -44,7 +44,7 @@ describe("findDuplicateKeys", () => {
 
 describe("test fixture data", () => {
 	/** The guard must stay silent on the test corpus, or every test run drowns in warnings. */
-	it("has no colliding ids or api-reference codenames", async () => {
+	it("has no colliding document ids, and no colliding endpoint codenames", async () => {
 		const path = fileURLToPath(new URL("../../samples/test-db-source-docs.json", import.meta.url));
 		const { searchRecords, apiReferenceEndpoints, apiReferenceObjects } = JSON.parse(await readFile(path, "utf8")) as {
 			readonly searchRecords: readonly { readonly id: string }[];
@@ -53,6 +53,9 @@ describe("test fixture data", () => {
 		};
 
 		expect(findDuplicateKeys([...searchRecords, ...apiReferenceObjects], (record) => record.id)).toEqual([]);
-		expect(findDuplicateKeys([...apiReferenceEndpoints, ...apiReferenceObjects], (record) => record.codename)).toEqual([]);
+		// Only endpoints are still resolved by codename. Objects deliberately repeat one — a schema
+		// object reused by several APIs — and are resolved by their root-qualified id instead.
+		expect(findDuplicateKeys(apiReferenceEndpoints, (record) => record.codename)).toEqual([]);
+		expect(findDuplicateKeys(apiReferenceObjects, (record) => record.codename)).toEqual(["error_object"]);
 	});
 });
