@@ -1,15 +1,14 @@
 import { tryCatchAsync } from "@kontent-ai/core-sdk";
 import type { Request, Response } from "express";
 import { Duration } from "luxon";
-import { match } from "ts-pattern";
-import { LearnMcpExceptionError } from "../../exceptions/learn-mcp-exception.js";
 import { runAndRecordSync, type SyncRunResult } from "../../sync/sync-runner.js";
 import { withTimeout } from "../../utils/timeout.utils.js";
 import { validateSyncToken } from "../../utils/token.utils.js";
 import { packageJsonVersion } from "../../utils/version.js";
-import { logAndRespondError, setAcceptedResponse, setConflictResponse, setOkResponse, setUnauthorizedResponse } from "./route.utils.js";
+import { respondWithError, respondWithOperationStillRunning, setOkResponse } from "../utils/route.utils.js";
 
 const SYNC_WAIT_TIMEOUT = Duration.fromObject({ seconds: 5 });
+const REQUEST_LABEL = "sync";
 
 export async function handleSync(req: Request, res: Response): Promise<void> {
 	const syncOutcome = tryCatchAsync(async () => {
@@ -19,49 +18,23 @@ export async function handleSync(req: Request, res: Response): Promise<void> {
 	const raceResult = await withTimeout(syncOutcome, SYNC_WAIT_TIMEOUT);
 
 	if (raceResult.kind === "timedOut") {
-		respondWithSyncStillRunning(res);
+		respondWithOperationStillRunning({ operationLabel: "Sync", res });
 		return;
 	}
 
 	const { success, data, error } = raceResult.value;
 
 	if (!success) {
-		respondWithSyncError(res, error);
+		respondWithError({ error, requestLabel: REQUEST_LABEL, res });
 		return;
 	}
 
 	respondWithSyncOutcome(res, data.outcome);
 }
 
-function respondWithSyncStillRunning(res: Response): void {
-	setAcceptedResponse(res, {
-		currentVersion: packageJsonVersion,
-		message: "Sync is still running in the background. Check results later.",
-		timestamp: new Date().toISOString(),
-	});
-}
-
-function respondWithSyncError(res: Response, error: unknown): void {
-	if (error instanceof LearnMcpExceptionError) {
-		match(error.type)
-			.with("syncAlreadyRunning", () => {
-				setConflictResponse(res, { message: error.message, type: error.type });
-			})
-			.with("unauthorized", () => {
-				setUnauthorizedResponse(res, { message: error.message, type: error.type });
-			})
-			.with("cacheNotInitialized", () => {
-				logAndRespondError({ error, requestLabel: "sync", res });
-			})
-			.exhaustive();
-		return;
-	}
-	logAndRespondError({ error, requestLabel: "sync", res });
-}
-
 function respondWithSyncOutcome(res: Response, outcome: SyncRunResult["outcome"]): void {
 	if (!outcome.success) {
-		logAndRespondError({ error: outcome.error, requestLabel: "sync", res });
+		respondWithError({ error: outcome.error, requestLabel: REQUEST_LABEL, res });
 		return;
 	}
 

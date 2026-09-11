@@ -2,13 +2,14 @@ import { tryCatchAsync } from "@kontent-ai/core-sdk";
 import type { Request, Response } from "express";
 import { getEndpointDetails } from "../../content/api-reference-details.js";
 import { mapRecordToPublicApiReferenceEndpoint } from "../../content/utils/public-api-reference-endpoint-mapper.js";
-import { logAndRespondError, setOkResponse } from "./route.utils.js";
-import { parseTextAndFilterQuery } from "./text-query.utils.js";
+import { respondWithError, setOkResponse } from "../utils/route.utils.js";
+import { parseTextAndFilterQuery } from "../utils/text-query.utils.js";
+
+const REQUEST_LABEL = "endpoint-details";
 
 export async function handleEndpointDetails(req: Request, res: Response): Promise<void> {
-	const { success: parseSuccess, data: parseData, error: parseError } = parseTextAndFilterQuery(req, res);
+	const { success: parseSuccess, data: parseData } = parseTextAndFilterQuery(req, res);
 	if (!parseSuccess) {
-		logAndRespondError({ error: parseError, requestLabel: "endpoint-details", res });
 		return;
 	}
 
@@ -22,7 +23,7 @@ export async function handleEndpointDetails(req: Request, res: Response): Promis
 	);
 
 	if (!success) {
-		logAndRespondError({ error, requestLabel: "endpoint-details", res });
+		respondWithError({ error, requestLabel: REQUEST_LABEL, res });
 		return;
 	}
 

@@ -12,9 +12,9 @@ import { handleEndpointDetails } from "./routes/endpoint-details.route.js";
 import { handleHealth } from "./routes/health.route.js";
 import { handleMcpRequest } from "./routes/mcp.route.js";
 import { handleObjectDetails } from "./routes/object-details.route.js";
-import { registerRoutes, type SupportedRoute } from "./routes/route.utils.js";
 import { handleSearch } from "./routes/search.route.js";
 import { handleSync } from "./routes/sync.route.js";
+import { registerRoutes, type SupportedRoute } from "./utils/route.utils.js";
 
 const supportedRoutes: readonly SupportedRoute[] = [
 	{ description: "MCP endpoint (Streamable HTTP).", handler: handleMcpRequest, method: "post", path: "/mcp" },

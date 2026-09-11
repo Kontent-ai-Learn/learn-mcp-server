@@ -1,6 +1,7 @@
 import type { JsonValue } from "@kontent-ai/core-sdk";
 import type { Application, RequestHandler, Response } from "express";
 import { match } from "ts-pattern";
+import { LearnMcpExceptionError } from "../../exceptions/learn-mcp-exception.js";
 import { getErrorMessage } from "../../utils/error.utils.js";
 import { logger } from "../../utils/logger.js";
 import { packageJsonName, packageJsonVersion } from "../../utils/version.js";
@@ -60,8 +61,12 @@ export function setRequestTimeoutResponse(res: Response, message = "Request time
 	setResponse({ json: { error: { code: -32_603, message } }, res, statusCode: 504 });
 }
 
-/** Logs the error and, unless the response has already started streaming, sends a 500. */
-export function logAndRespondError({
+/**
+ * Single exit for every route failure: always logs, then maps known exception types onto their
+ * status code. A response that already started streaming (MCP) is committed, so logging is all
+ * that's left to do for it.
+ */
+export function respondWithError({
 	res,
 	requestLabel,
 	error,
@@ -71,13 +76,50 @@ export function logAndRespondError({
 	readonly error: unknown;
 }): void {
 	const errorMessage = getErrorMessage(error);
+	logRouteError({ errorMessage, requestLabel });
+
+	if (res.headersSent) {
+		return;
+	}
+
+	if (!(error instanceof LearnMcpExceptionError)) {
+		setInternalServerErrorResponse(res, errorMessage);
+		return;
+	}
+
+	match(error.type)
+		.with("syncAlreadyRunning", () => {
+			setConflictResponse(res, { message: errorMessage, type: error.type });
+		})
+		.with("unauthorized", () => {
+			setUnauthorizedResponse(res, { message: errorMessage, type: error.type });
+		})
+		.with("cacheNotInitialized", () => {
+			setInternalServerErrorResponse(res, errorMessage);
+		})
+		.exhaustive();
+}
+
+/** Answers 202 for a long-running operation that outlived the route's wait window. */
+export function respondWithOperationStillRunning({
+	res,
+	operationLabel,
+}: {
+	readonly res: Response;
+	readonly operationLabel: string;
+}): void {
+	setAcceptedResponse(res, {
+		currentVersion: packageJsonVersion,
+		message: `${operationLabel} is still running in the background. Check results later.`,
+		timestamp: new Date().toISOString(),
+	});
+}
+
+function logRouteError({ requestLabel, errorMessage }: { readonly requestLabel: string; readonly errorMessage: string }): void {
 	logger.log({
 		message: `${packageJsonName}@${packageJsonVersion} - Error handling ${requestLabel} request: ${errorMessage}`,
 		type: "error",
 	});
-	if (!res.headersSent) {
-		setInternalServerErrorResponse(res, errorMessage);
-	}
 }
 
 function setMethodNotAllowedResponse({

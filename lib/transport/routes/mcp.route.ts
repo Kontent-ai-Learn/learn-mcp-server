@@ -6,10 +6,11 @@ import { createServer } from "../../server.js";
 import { getErrorMessage } from "../../utils/error.utils.js";
 import { logger } from "../../utils/logger.js";
 import { withTimeout } from "../../utils/timeout.utils.js";
-import { logAndRespondError, setRequestTimeoutResponse } from "./route.utils.js";
+import { respondWithError, setRequestTimeoutResponse } from "../utils/route.utils.js";
 
 /** Generous enough to cover a cold-start embedding-model load; guards against a genuinely stuck request. */
 const MCP_REQUEST_TIMEOUT = Duration.fromObject({ seconds: 30 });
+const REQUEST_LABEL = "MCP";
 
 export async function handleMcpRequest(req: Request, res: Response): Promise<void> {
 	const { success, error } = await tryCatchAsync(async () => {
@@ -40,6 +41,6 @@ export async function handleMcpRequest(req: Request, res: Response): Promise<voi
 	});
 
 	if (!success) {
-		logAndRespondError({ error, requestLabel: "MCP", res });
+		respondWithError({ error, requestLabel: REQUEST_LABEL, res });
 	}
 }

@@ -4,7 +4,7 @@ import { computeNextSyncAt, toIsoString, toRelativeDateTimeString } from "../../
 import { readSyncState } from "../../sync/sync-state.js";
 import { getEnvConfig } from "../../utils/environment.utils.js";
 import { packageJsonVersion } from "../../utils/version.js";
-import { setOkResponse } from "./route.utils.js";
+import { setOkResponse } from "../utils/route.utils.js";
 
 export function handleHealth(_req: Request, res: Response): void {
 	const { autoSyncEnabled, syncIntervalValue, syncIntervalUnit } = getEnvConfig();

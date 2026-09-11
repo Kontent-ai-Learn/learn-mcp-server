@@ -151,6 +151,7 @@ The HTTP server exposes:
 - `GET /endpoint-details?text=<query>` — API endpoint reference lookup by natural-language text
 - `GET /object-details?text=<query>` — API reference object lookup by natural-language text
 - `POST /sync?token=<ApiToken>` — (re)build the search index; requires a `token` query parameter matching the configured `ApiToken`. Returns `200` with index counts (added/changed/removed/unchanged) on completion, `202` if still running after 5s, `409` if a sync is already in progress, or `401` if the token is missing/invalid.
+- `POST /clean?token=<ApiToken>` — delete the search index and the cached JSON; requires the same `token` query parameter as `/sync`. Returns `200` on completion, `202` if still running after 20s, `409` if a sync is already in progress, or `401` if the token is missing/invalid. The routes backed by the index answer `500` until the next `POST /sync` rebuilds it.
 
 ## Environment Variables
 
@@ -164,7 +165,7 @@ All variables are optional; copy `.env.template` to `.env` to override defaults.
 | `AutoSyncEnabled`    | `true`                  | Automatically re-sync the search index from `LearnHost` on a schedule (Streamable HTTP transport only). |
 | `SyncIntervalValue`  | `1`                     | How often automatic sync runs, paired with `SyncIntervalUnit`.           |
 | `SyncIntervalUnit`   | `days`                  | Unit for `SyncIntervalValue`: `minutes`, `hours`, or `days`.             |
-| `ApiToken`           | *(none)*                 | Secret token required as a `?token=` query parameter to call `POST /sync`. Unset by default — set it to protect the sync endpoint. |
+| `ApiToken`           | *(none)*                 | Secret token required as a `?token=` query parameter to call `POST /sync` and `POST /clean`. Unset by default — set it to protect those endpoints. |
 
 Endpoint URLs are composed as `LearnHost` + the corresponding path.
 
@@ -172,7 +173,7 @@ The embedding model cache is the committed root-level `transformers/` folder. It
 
 ## Security
 
-The server is read-only and exposes only public Kontent.ai Learn documentation. The MCP endpoint and the read-only GET routes (`/search`, `/endpoint-details`, `/object-details`) require no API keys or credentials. `POST /sync` is the only write operation and is protected by the `ApiToken` token when one is configured. As with any MCP server, be mindful that document content is passed to the connected AI client.
+The server is read-only and exposes only public Kontent.ai Learn documentation. The MCP endpoint and the read-only GET routes (`/search`, `/endpoint-details`, `/object-details`) require no API keys or credentials. `POST /sync` and `POST /clean` are the only write operations and are both protected by the `ApiToken` token when one is configured. As with any MCP server, be mindful that document content is passed to the connected AI client.
 
 ## Deployment
 
