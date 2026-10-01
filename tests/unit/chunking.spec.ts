@@ -3,6 +3,7 @@ import { chunkDoc, chunkPlainText } from "../../lib/indexing/chunking.js";
 import type { NormalizedDoc } from "../../lib/indexing/indexer.models.js";
 
 const repeat = (word: string, times: number): string => Array.from({ length: times }, () => word).join(" ");
+const para = (index: number): string => `Paragraph ${index} ${repeat("word", 30)}`;
 
 describe("chunkPlainText", () => {
 	it("returns a single chunk for short text", () => {
@@ -23,7 +24,6 @@ describe("chunkPlainText", () => {
 	});
 
 	it("splits into multiple chunks when paragraphs exceed the target size", () => {
-		const para = (index: number): string => `Paragraph ${index} ${repeat("word", 30)}`;
 		const text = [para(1), para(2), para(3)].join("\n\n");
 		const chunks = chunkPlainText(text, { overlapChars: 0, targetChars: 200 });
 		expect(chunks.length).toBeGreaterThan(1);
