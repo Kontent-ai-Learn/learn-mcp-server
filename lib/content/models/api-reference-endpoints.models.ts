@@ -4,6 +4,7 @@ export type ApiReferenceProperty = {
 	readonly name: string;
 	readonly description: string;
 	readonly type: string;
+	readonly acceptedValues?: readonly string[];
 	readonly modifiers: readonly string[];
 	readonly nestedProperties: readonly ApiReferenceProperty[];
 };
@@ -12,6 +13,7 @@ export type ApiReferenceProperty = {
 export const apiReferencePropertySchema: z.ZodType<ApiReferenceProperty> = z.compile(
 	z
 		.object({
+			acceptedValues: z.array(z.string()).readonly().optional(),
 			description: z.string(),
 			modifiers: z.array(z.string()).readonly(),
 			name: z.string(),
